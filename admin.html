@@ -752,14 +752,17 @@ function saveEvents(){
 // 저장 시 이 결과를 public.json으로 커밋하고, 고객 페이지가 그걸 읽는다.
 function buildPublicSchedule(){
   const busyMap={};
+  const mark=ds=>{if(!busyMap[ds])busyMap[ds]={allDay:false,slots:[]};return busyMap[ds];};
   maydlyEvents.forEach(e=>{
     if(!stActive(e.status)||isExt(e))return;
-    if(!busyMap[e.date])busyMap[e.date]={allDay:false,slots:[]};
-    if(e.allDay||(['rest','outdoor_c','pa_shoot'].includes(e.label)&&(e.dur||0)>=8)){
-      busyMap[e.date].allDay=true;
+    const fullDay=e.allDay||(['rest','outdoor_c','pa_shoot'].includes(e.label)&&(e.dur||0)>=8);
+    if(fullDay){
+      // 여러 날에 걸친 종일/휴무 일정은 시작일부터 끝나는 날까지 전부 마감 (첫날만 막던 버그 수정)
+      const days=Math.max(1,Math.round((e.dur||24)/24));
+      for(let k=0;k<days;k++)mark(addDays(e.date,k)).allDay=true;
     }else if(e.time){
       const[hh,mm]=e.time.split(':').map(Number);
-      busyMap[e.date].slots.push({s:hh+mm/60,e:hh+mm/60+(e.dur||2)});
+      mark(e.date).slots.push({s:hh+mm/60,e:hh+mm/60+(e.dur||2)});
     }
   });
   const schedule={};
