@@ -468,6 +468,7 @@ function isExt(e){return e&&(e.ext||EXT_LABELS.includes(e.label));}
 // ── status 정의 (260630 v4.0 개편): 예약→촬영→구매 흐름 6단계 ──
 // active=true → 실제 예약(고객 공개 '예약불가'·집계에 포함), false → 노쇼/취소
 const STATUS={
+  none:      {name:'개인·휴무',    emoji:'',    active:true},   // (0) 예약이 아닌 일정(개인·휴무) — 상태 없음
   booked:    {name:'예약완료',     emoji:'🙋🏻', active:true},   // (1) 의상 공유 전 — 🙋🏻 표시
   outfit:    {name:'의상확인',     emoji:'',    active:true},   // (2) 의상확인 완료 — 🙋🏻 떼냄(표시 없음)
   nosh:      {name:'노쇼',         emoji:'🚫',  active:false},  // (3) 개인사정/규정 미준수
@@ -479,7 +480,7 @@ const STATUS={
   pending:  {name:'예약대기',emoji:'⏳',active:true},
   cancel:   {name:'취소',   emoji:'',  active:false},
 };
-const STATUS_ORDER=['booked','outfit','nosh','buy_select','buy_raw','buy_color'];
+const STATUS_ORDER=['none','booked','outfit','nosh','buy_select','buy_raw','buy_color'];
 function stInfo(s){return STATUS[s]||STATUS.booked;}
 function stName(s){return stInfo(s).name;}
 function stEmoji(s){return stInfo(s).emoji||'';}
@@ -762,8 +763,11 @@ function buildPublicSchedule(){
     }
   });
   const schedule={};
+  const LEAD_DAYS=3;   // 오늘부터 3일 이내(오늘·내일·모레)는 촬영 준비시간 확보 위해 예약 마감
   for(let i=-7;i<90;i++){
     const d=new Date(TODAY);d.setDate(TODAY.getDate()+i);const ds=fd(d);const dow=dowOf(ds);
+    // 지난 날 + 3일 이내는 자리가 남아도 예약불가
+    if(i<LEAD_DAYS){schedule[ds]={unavailable:true};continue;}
     if([1,2,5,6].includes(dow)){schedule[ds]={unavailable:true};continue;}
     const busy=busyMap[ds];
     if(busy&&busy.allDay){schedule[ds]={unavailable:true};continue;}
