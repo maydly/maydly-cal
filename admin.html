@@ -1061,6 +1061,19 @@ function forgetToken(){
     }
     x0=null;y0=null;
   },{passive:true});
+  // 맥 트랙패드·마우스 가로 스크롤로도 월(주/일) 넘기기 (데스크탑)
+  let wAcc=0,wLock=0;
+  el.addEventListener('wheel',e=>{
+    if(Math.abs(e.deltaX)<=Math.abs(e.deltaY)*1.2)return;   // 세로 스크롤은 그대로 둠
+    e.preventDefault();                                      // 브라우저 뒤로가기 제스처 방지
+    const now=Date.now();
+    if(now-wLock<500){return;}                               // 한 번 넘긴 직후 연속 발동 방지
+    wAcc+=e.deltaX;
+    if(Math.abs(wAcc)>=60){
+      chM(wAcc>0?1:-1);                                      // 왼쪽으로 밀기→다음, 오른쪽→이전
+      wAcc=0;wLock=now;
+    }
+  },{passive:false});
 })();
 // 세션 자동 로그인
 if(localStorage.getItem('maydly_session')==='1'){enter();}
