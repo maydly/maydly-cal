@@ -814,7 +814,12 @@ function buildPublicSchedule(){
     const timeSlots=dow===0?[[11,13],[14,16],[17,19],[20,22]]:[[14,16],[17,19],[20,22]];
     // 다음날이 국가공휴일이면 19시까지만 촬영 (20~22 타임 마감)
     const preHol=isPreHoliday(ds);
-    schedule[ds]={slots:timeSlots.map(([s,e])=>({s:`${pad(s)}:00`,e:`${pad(e)}:00`,avail:!overlap(s,e)&&!(preHol&&s>=19)}))};
+    schedule[ds]={
+      slots:timeSlots.map(([s,e])=>({s:`${pad(s)}:00`,e:`${pad(e)}:00`,avail:!overlap(s,e)&&!(preHol&&s>=19)})),
+      // 페이용 1시간 단위 캘린더 계산용 — 예약된 시간 범위(숫자만, 개인정보 없음)
+      busy:bSlots.map(r=>[r.s,r.e]),
+      ...(preHol?{preHol:true}:{})
+    };
   }
   return{generated:new Date().toISOString(),note:'고객 공개용 — 예약 가능 여부만 포함',schedule};
 }
@@ -2012,7 +2017,7 @@ function exportPublicData(){
     // 다음날이 국가공휴일이면 19시까지만 촬영 (20~22 타임 마감)
     const preHol=isPreHoliday(ds);
     const result=timeSlots.map(([s,e])=>({s:`${pad(s)}:00`,e:`${pad(e)}:00`,avail:!isOverlap(s,e)&&!(preHol&&s>=19)}));
-    publicSlots[ds]={slots:result};
+    publicSlots[ds]={slots:result,busy:bSlots.map(r=>[r.s,r.e]),...(preHol?{preHol:true}:{})};
   });
 
   const output={
