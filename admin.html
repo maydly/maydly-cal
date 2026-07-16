@@ -189,16 +189,7 @@ body{font-family:-apple-system,'Pretendard','Apple SD Gothic Neo',sans-serif;hei
 /* 일정 폼 저장 버튼 하단 고정 — 스크롤 없이 항상 보이게 */
 .form-foot{position:sticky;bottom:-26px;z-index:5;background:var(--sf);margin:8px -18px -26px;padding:10px 18px 16px;box-shadow:0 -10px 14px -10px rgba(0,0,0,.12)}
 .form-foot .sub-btn{margin-top:0}
-@media(max-width:520px){
-  .pn{max-height:92vh;padding:16px 14px}
-  .pn-h{margin-bottom:10px}
-  .fg{margin-bottom:7px}
-  .fg label{margin-bottom:3px}
-  .fg input,.fg select,.fg textarea{padding:7px 10px}
-  .label-grid{grid-template-columns:repeat(5,1fr);gap:4px}
-  .label-chip{padding:4px 3px;font-size:8.5px}
-  .form-foot{margin:6px -14px -16px;padding:8px 14px 12px;bottom:-16px}
-}
+@media(max-width:520px){.pn{max-height:92vh;padding:18px 14px}.fg{margin-bottom:9px}.form-foot{margin:8px -14px -18px;padding:10px 14px 14px;bottom:-18px}}
 .label-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:4px}
 .label-chip{border-radius:20px;padding:5px 6px;cursor:pointer;font-size:9px;font-weight:700;text-align:center;color:#fff;transition:opacity .15s;border:2px solid transparent;opacity:.6}
 .label-chip:hover{opacity:.85}
@@ -761,6 +752,29 @@ function saveEvents(){
   pushToGithub();
 }
 
+// ── 국가공휴일 목록 (다음날이 공휴일이면 그날은 19시까지만 촬영 = 20~22 타임 마감) ──
+// ※ 여기 날짜만 고치면 규칙이 바뀜. 매년 갱신 필요 (음력 명절·대체공휴일 포함)
+const KR_HOLIDAYS=[
+  // 2026년
+  '2026-01-01',                            // 신정
+  '2026-02-16','2026-02-17','2026-02-18',  // 설 연휴
+  '2026-03-01','2026-03-02',               // 삼일절(일) + 대체공휴일
+  '2026-05-05',                            // 어린이날
+  '2026-05-24','2026-05-25',               // 부처님오신날(일) + 대체공휴일
+  '2026-06-03',                            // 전국동시지방선거
+  '2026-06-06',                            // 현충일
+  '2026-07-17',                            // 제헌절 (2026년부터 공휴일 재지정 확인됨)
+  '2026-08-15','2026-08-17',               // 광복절(토) + 대체공휴일
+  '2026-09-24','2026-09-25','2026-09-26',  // 추석 연휴
+  '2026-10-03','2026-10-05',               // 개천절(토) + 대체공휴일
+  '2026-10-09',                            // 한글날
+  '2026-12-25',                            // 성탄절
+  // 2027년 초
+  '2027-01-01',                            // 신정
+];
+// 다음날이 공휴일인 날인가?
+function isPreHoliday(ds){return KR_HOLIDAYS.includes(addDays(ds,1));}
+
 // ── 공개용 가용시간 계산 (개인정보는 여기서 전부 버려짐 — 숫자만 남긴다) ──
 // 저장 시 이 결과를 public.json으로 커밋하고, 고객 페이지가 그걸 읽는다.
 function buildPublicSchedule(){
@@ -784,13 +798,23 @@ function buildPublicSchedule(){
     const d=new Date(TODAY);d.setDate(TODAY.getDate()+i);const ds=fd(d);const dow=dowOf(ds);
     // 지난 날 + 3일 이내는 자리가 남아도 예약불가
     if(i<LEAD_DAYS){schedule[ds]={unavailable:true};continue;}
-    if([1,2,5,6].includes(dow)){schedule[ds]={unavailable:true};continue;}
+    if([1,2,5,6].includes(dow)){
+      // 고정 차단 요일(월화금토): 실제 종일 일정이 있는 날만 예약 불가,
+      // 그 외에는 야외촬영 문의 가능으로 공개 (야외촬영은 일정·시간 협의 가능)
+      // 단, 야외촬영도 오늘 기준 1주일 이내는 예약 불가
+      const fb=busyMap[ds];
+      if(fb&&fb.allDay){schedule[ds]={unavailable:true};continue;}
+      if(i<7){schedule[ds]={unavailable:true};continue;}
+      schedule[ds]={unavailable:true,outdoorInquiry:true};continue;
+    }
     const busy=busyMap[ds];
     if(busy&&busy.allDay){schedule[ds]={unavailable:true};continue;}
     const bSlots=(busy&&busy.slots)||[];
     const overlap=(s,e)=>bSlots.some(r=>!(e<=r.s||s>=r.e));
     const timeSlots=dow===0?[[11,13],[14,16],[17,19],[20,22]]:[[14,16],[17,19],[20,22]];
-    schedule[ds]={slots:timeSlots.map(([s,e])=>({s:`${pad(s)}:00`,e:`${pad(e)}:00`,avail:!overlap(s,e)}))};
+    // 다음날이 국가공휴일이면 19시까지만 촬영 (20~22 타임 마감)
+    const preHol=isPreHoliday(ds);
+    schedule[ds]={slots:timeSlots.map(([s,e])=>({s:`${pad(s)}:00`,e:`${pad(e)}:00`,avail:!overlap(s,e)&&!(preHol&&s>=19)}))};
   }
   return{generated:new Date().toISOString(),note:'고객 공개용 — 예약 가능 여부만 포함',schedule};
 }
@@ -1511,18 +1535,16 @@ function timeFormBlock(sd,st,ed,et,durSel){
         <select id="f_st" class="time-only" style="width:100%;min-width:0" onchange="recalcEnd()">${timeOptions(st)}</select>
       </div>
     </div>
-    <div style="display:flex;gap:8px">
-      <div class="fg time-only" style="flex:1;min-width:0"><label>시간(길이) <span style="color:var(--mu);font-weight:400;font-size:10px">(종료 자동)</span></label>
-        <select id="f_h" onchange="pickDurSel()">${durLenOptions(durSel)}</select>
-      </div>
-      <div class="fg" style="flex:1;min-width:0"><label>반복</label><select id="f_rep">${repeatOptions(sd,'none')}</select></div>
+    <div class="fg time-only"><label>시간(길이) <span style="color:var(--mu);font-weight:400;font-size:10px">(고르면 종료 자동)</span></label>
+      <select id="f_h" onchange="pickDurSel()">${durLenOptions(durSel)}</select>
     </div>
     <div class="fg"><label>종료 <span style="color:var(--mu);font-weight:400;font-size:10px">(자동, 필요시 수정)</span></label>
       <div style="display:grid;grid-template-columns:1fr 96px;gap:6px">
         <input type="date" id="f_ed" value="${ed}" style="width:100%;min-width:0">
         <select id="f_et" class="time-only" style="width:100%;min-width:0">${timeOptions(et)}</select>
       </div>
-    </div>`;
+    </div>
+    <div class="fg"><label>반복</label><select id="f_rep">${repeatOptions(sd,'none')}</select></div>`;
 }
 
 let seLabel=null;
@@ -1536,11 +1558,11 @@ function openAdd(ds){
     <div class="fg"><label>고객명 <span style="color:#c4763a">*</span> <span style="color:var(--mu);font-weight:400;font-size:10px">(예약문구 붙여넣으면 날짜·시간 자동입력)</span></label><input type="text" id="f_c" placeholder="이름 (필수) — 예: 최혜주님7/15 14~16시" onpaste="pasteParse(event)"></div>
     ${timeFormBlock(ds,'10:00',ds,'12:00',2)}
     <div class="fg"><label>라벨</label><div class="label-grid">${chips}</div></div>
-    <div style="display:flex;gap:8px">
-      <div class="fg" style="flex:1;min-width:0"><label>인스타 아이디</label><input type="text" id="f_p" placeholder="@instagram_id"></div>
-      <div class="fg" style="flex:1;min-width:0"><label>상태</label><select id="f_s">${stOptions('booked')}</select></div>
+    <div class="fg"><label>인스타 아이디</label><input type="text" id="f_p" placeholder="@instagram_id"></div>
+    <div class="fg"><label>메모</label><textarea id="f_n" rows="2" placeholder="특이사항"></textarea></div>
+    <div class="fg"><label>상태</label>
+      <select id="f_s">${stOptions('booked')}</select>
     </div>
-    <div class="fg"><label>메모</label><textarea id="f_n" rows="1" placeholder="특이사항"></textarea></div>
     <div class="form-foot"><button class="sub-btn" onclick="saveEv()">저장</button></div>`;
   _editingId=null;
   openP();applyAllDay();bindAllDayNote();
@@ -1609,11 +1631,11 @@ function openEdit(id){
     <div class="fg"><label>고객명 <span style="color:#c4763a">*</span></label><input type="text" id="f_c" value="${e.client||''}"></div>
     ${timeFormBlock(e.date,st,endDate,endTime,durSel)}
     <div class="fg"><label>라벨</label><div class="label-grid">${chips}</div></div>
-    <div style="display:flex;gap:8px">
-      <div class="fg" style="flex:1;min-width:0"><label>인스타 아이디</label><input type="text" id="f_p" value="${e.insta||e.phone||''}" placeholder="@instagram_id"></div>
-      <div class="fg" style="flex:1;min-width:0"><label>상태</label><select id="f_s">${stOptions(e.status)}</select></div>
+    <div class="fg"><label>인스타 아이디</label><input type="text" id="f_p" value="${e.insta||e.phone||''}" placeholder="@instagram_id"></div>
+    <div class="fg"><label>메모</label><textarea id="f_n" rows="2">${e.note||''}</textarea></div>
+    <div class="fg"><label>상태</label>
+      <select id="f_s">${stOptions(e.status)}</select>
     </div>
-    <div class="fg"><label>메모</label><textarea id="f_n" rows="1">${e.note||''}</textarea></div>
     <button class="btn-del" onclick="delEv(${id})">삭제</button>
     <div class="form-foot"><button class="sub-btn" onclick="updateEv(${id})">저장</button></div>`;
   const rep=document.getElementById('f_rep');if(rep)rep.innerHTML=repeatOptions(e.date,e.repeat||'none');
@@ -1956,9 +1978,16 @@ function exportPublicData(){
   }
 
   const publicSlots={};
-  days.forEach(ds=>{
+  days.forEach((ds,di)=>{
     const dow=dowOf(ds);
-    if([1,2,5,6].includes(dow)){publicSlots[ds]={unavailable:true};return;}
+    if([1,2,5,6].includes(dow)){
+      // 고정 차단 요일(월화금토): 종일 일정이 있는 날만 예약 불가, 그 외 야외촬영 문의 가능
+      // 단, 야외촬영도 오늘 기준 1주일 이내는 예약 불가 (di-7 = 오늘부터 며칠 뒤)
+      const fb=busyMap[ds];
+      if(fb?.allDay){publicSlots[ds]={unavailable:true};return;}
+      if(di-7<7){publicSlots[ds]={unavailable:true};return;}
+      publicSlots[ds]={unavailable:true,outdoorInquiry:true};return;
+    }
 
     const busy=busyMap[ds];
     if(busy?.allDay){publicSlots[ds]={unavailable:true};return;}
@@ -1967,7 +1996,9 @@ function exportPublicData(){
     function isOverlap(s,e){return bSlots.some(r=>!(e<=r.s||s>=r.e));}
 
     const timeSlots=dow===0?[[11,13],[14,16],[17,19],[20,22]]:[[14,16],[17,19],[20,22]];
-    const result=timeSlots.map(([s,e])=>({s:`${pad(s)}:00`,e:`${pad(e)}:00`,avail:!isOverlap(s,e)}));
+    // 다음날이 국가공휴일이면 19시까지만 촬영 (20~22 타임 마감)
+    const preHol=isPreHoliday(ds);
+    const result=timeSlots.map(([s,e])=>({s:`${pad(s)}:00`,e:`${pad(e)}:00`,avail:!isOverlap(s,e)&&!(preHol&&s>=19)}));
     publicSlots[ds]={slots:result};
   });
 
