@@ -490,8 +490,8 @@ function stName(s){return stInfo(s).name;}
 function stEmoji(s){return stInfo(s).emoji||'';}
 function stActive(s){return stInfo(s).active!==false;}
 function stOptions(sel){return STATUS_ORDER.map(k=>`<option value="${k}"${k===sel?' selected':''}>${STATUS[k].emoji?STATUS[k].emoji+' ':''}${STATUS[k].name}</option>`).join('');}
-// 고객명 앞 상태 이모지 표시
-function nameTag(e,fallback){const c=e.client||fallback;const em=stEmoji(e.status);return (em?em:'')+c;}
+// 고객명 앞 상태 이모지 표시 (+워터마크 제거 표시 이모지)
+function nameTag(e,fallback){const c=e.client||fallback;const em=stEmoji(e.status);const wm=e.wm?(e.wmEmoji||'💧'):'';return wm+(em?em:'')+c;}
 // 시간(duration) 옵션 — 종일·다일 포함
 const DUR_OPTS=[1,2,3,4,5,6,7,8,10,12,24,48,72];
 function durLabel(v){return v>=24?(v/24)+'일'+(v===24?' (종일)':''):v+'시간';}
@@ -542,22 +542,28 @@ function buildAlerts(){
     // 지나간 촬영은 이제 와서 의상확인할 일이 없으므로 알리지 않는다(과거 데이터 보호).
     if(e.status==='booked'&&DELIV_LABELS.includes(e.label)){
       const left=dDiff(today,e.date);
-      if(left>=0&&left<=OUTFIT_LEAD)out.push({kind:'outfit',e,due:e.date,left});
+      if(left>=0&&left<=OUTFIT_LEAD)out.push({kind:'outfit',e,due:e.date,left,urgent:true});
+    }
+    // 🚨 긴급 보정본 — 직접 기록한 기한. 기록 즉시 목록에 뜨고, 임박하면 '지금 챙길 일'로.
+    if(e.dlvRush&&!e.dlvRushDone){
+      const left=dDiff(today,e.dlvRush);
+      out.push({kind:'rush',e,due:e.dlvRush,left,urgent:left<=ALERT_LEAD});
     }
     if(!isDelivTarget(e)||e.date>today)return;  // 촬영 전이면 전달 기한 없음
+    // 전달 대기 건은 촬영 직후부터 기한까지 계속 목록에 남긴다(누락 방지). urgent = 기한 임박·지남.
     if(!e.dlvBasic){
       const due=basicDue(e),left=dDiff(today,due);
-      if(left<=ALERT_LEAD)out.push({kind:'basic',e,due,left});
+      out.push({kind:'basic',e,due,left,urgent:left<=ALERT_LEAD});
     }
     const bd=buyDue(e);
     if(bd&&!e.dlvBuy){
       const left=dDiff(today,bd);
-      if(left<=ALERT_LEAD)out.push({kind:'buy',e,due:bd,left});
+      out.push({kind:'buy',e,due:bd,left,urgent:left<=ALERT_LEAD});
     }
   });
   return out.sort((a,b)=>a.left-b.left||a.due.localeCompare(b.due));
 }
-function alertCount(){return buildAlerts().length;}
+function alertCount(){return buildAlerts().filter(a=>a.urgent).length;}
 
 // 구매 종류가 바뀌면 전달 기한이 새로 잡히므로 이전 구매분 전달 체크를 해제한다.
 // (상세창 버튼 setStatus·편집창 updateEv 양쪽에서 같은 규칙을 쓰도록 여기 모아둔다)
@@ -573,7 +579,7 @@ function esc(s){
 
 function markDeliv(id,key,reopen){
   const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
-  if(key==='basic')e.dlvBasic=TSTR;else e.dlvBuy=TSTR;
+  if(key==='basic')e.dlvBasic=TSTR;else if(key==='rush')e.dlvRushDone=TSTR;else e.dlvBuy=TSTR;
   saveEvents();buildNav();
   if(curPage==='alert')renderAlerts();
   if(curPage==='cal')renderBody();
@@ -582,11 +588,34 @@ function markDeliv(id,key,reopen){
 }
 function undoDeliv(id,key,reopen){
   const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
-  if(key==='basic')e.dlvBasic=null;else e.dlvBuy=null;
+  if(key==='basic')e.dlvBasic=null;else if(key==='rush')e.dlvRushDone=null;else e.dlvBuy=null;
   saveEvents();buildNav();
   if(curPage==='alert')renderAlerts();
   if(reopen)openD(id);
   toast('전달 체크를 해제했습니다');
+}
+// 🚨 긴급 전달 기한 기록/해제
+function setRush(id){
+  const v=(document.getElementById('rushDate')||{}).value;
+  if(!v){toast('기한 날짜를 먼저 선택해주세요');return;}
+  const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
+  e.dlvRush=v;e.dlvRushDone=null;
+  saveEvents();buildNav();openD(id);toast('긴급 전달 기한 등록: '+v);
+}
+function clearRush(id){
+  const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
+  e.dlvRush=null;e.dlvRushDone=null;
+  saveEvents();buildNav();openD(id);toast('긴급 기한을 해제했습니다');
+}
+// 💧 워터마크 제거 표시 + 캘린더 이모지 선택
+function toggleWm(id){
+  const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
+  e.wm=!e.wm;if(e.wm&&!e.wmEmoji)e.wmEmoji='💧';
+  saveEvents();if(curPage==='cal')renderBody();openD(id);
+}
+function setWmEmoji(id,em){
+  const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
+  e.wmEmoji=em;saveEvents();if(curPage==='cal')renderBody();openD(id);
 }
 
 // ── 중복 시간 차단 (260714 v5.0) ──
@@ -1370,6 +1399,35 @@ function openD(id){
     if(bd)b+=dlvRow(e,'buy',DLV_TITLE[e.status]||'구매분',bd);
     b+=`</div>`;
   }
+  // 🚨 긴급 전달 기한 · 💧 워터마크 제거 — 촬영 라벨 일정이면 언제든 기록 가능
+  if(DELIV_LABELS.includes(e.label)&&stActive(e.status)){
+    b+=`<div style="border-top:1px solid var(--bd);margin-top:12px;padding-top:10px"><div style="font-size:10px;color:var(--mu);margin-bottom:2px">긴급 전달 · 워터마크</div>`;
+    if(e.dlvRushDone){
+      b+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
+        <span style="font-size:11px;color:var(--tx);flex:1">✅ 🚨 긴급 보정본 <span style="color:var(--mu)">— ${e.dlvRushDone} 보냄</span></span>
+        <button onclick="undoDeliv(${e.id},'rush',1)" style="padding:4px 9px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--mu);font-size:10px;cursor:pointer">되돌리기</button></div>`;
+    }else if(e.dlvRush){
+      const rl=dDiff(TSTR,e.dlvRush),rover=rl<0;
+      b+=`<div style="display:flex;align-items:center;gap:6px;padding:7px 0;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--tx);flex:1;min-width:150px">🚨 긴급 보정본 <span style="color:${rover?'#c0392b':'var(--mu)'}">— ${e.dlvRush}까지 (${dueText(rl)})</span></span>
+        <button onclick="markDeliv(${e.id},'rush',1)" style="padding:4px 10px;border:none;border-radius:7px;background:var(--R);color:#fff;font-size:10px;font-weight:700;cursor:pointer">보냈음 ✓</button>
+        <button onclick="clearRush(${e.id})" style="padding:4px 9px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--mu);font-size:10px;cursor:pointer">해제</button></div>`;
+    }else{
+      b+=`<div style="display:flex;align-items:center;gap:6px;padding:7px 0">
+        <span style="font-size:11px;color:var(--mu);white-space:nowrap">🚨 긴급 기한</span>
+        <input type="date" id="rushDate" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--tx);font-size:11px;font-family:inherit">
+        <button onclick="setRush(${e.id})" style="padding:5px 11px;border:none;border-radius:7px;background:var(--R);color:#fff;font-size:10px;font-weight:700;cursor:pointer">등록</button></div>`;
+    }
+    const wmOn=!!e.wm;
+    b+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
+      <span style="font-size:11px;color:var(--tx);flex:1">${wmOn?(e.wmEmoji||'💧')+' ':''}워터마크 제거</span>
+      <button onclick="toggleWm(${e.id})" style="padding:4px 12px;border:none;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;${wmOn?'background:var(--R);color:#fff':'background:var(--sf2);color:var(--mu);border:1px solid var(--bd)'}">${wmOn?'표시 중':'꺼짐'}</button></div>`;
+    if(wmOn){
+      b+=`<div style="display:flex;gap:6px;padding:0 0 4px">${['💧','🚫','✨','⭐','📌'].map(x=>`<button onclick="setWmEmoji(${e.id},'${x}')" style="flex:1;padding:5px 0;border-radius:7px;border:1.5px solid ${x===(e.wmEmoji||'💧')?'var(--R)':'var(--bd)'};background:var(--sf2);font-size:13px;cursor:pointer">${x}</button>`).join('')}</div>
+      <div style="font-size:9.5px;color:var(--mu);padding-bottom:4px">선택한 이모지가 캘린더 일정 이름 앞에 표시됩니다</div>`;
+    }
+    b+=`</div>`;
+  }
   if(stActive(e.status)&&e.status!=='nosh')b+=`<div class="act-row" style="margin-top:10px"><button class="btn-ng" style="flex:1" onclick="setStatus(${e.id},'nosh');closeP()">🚫 노쇼 처리</button></div>`;
   b+=`<button class="btn-del" style="background:var(--sf2);color:var(--tx);border:1px solid var(--bd);margin-bottom:4px" onclick="closeP();openEdit(${e.id})">✏️ 편집</button>`;
   b+=`<button class="btn-del" onclick="delEv(${e.id})">삭제</button>`;
@@ -1710,8 +1768,9 @@ function delEv(id){
 // ── 알림 페이지 (260714 v5.0) ──
 function renderAlerts(){
   const list=buildAlerts();
-  const late=list.filter(a=>a.left<0).length;
-  const cards=list.map(a=>{
+  const urgent=list.filter(a=>a.urgent),wait=list.filter(a=>!a.urgent);
+  const late=urgent.filter(a=>a.left<0).length;
+  const card=a=>{
     const e=a.e,L=LABELS[e.label]||{name:'기타',color:'#999'};
     const over=a.left<0;
     const tone=over?'#c0392b':(a.left<=1?'#c4763a':'var(--mu2)');
@@ -1720,6 +1779,10 @@ function renderAlerts(){
       head='👗 의상확인';
       body=`촬영 ${e.date}${e.time?' '+e.time.slice(0,5):''} — <b style="color:${tone}">${a.left===0?'오늘 촬영':`촬영 ${a.left}일 전`}</b> · 아직 의상확인 전`;
       act=`<button class="btn-ok" onclick="setStatus(${e.id},'outfit');renderAlerts()">👗 의상확인 완료</button>`;
+    }else if(a.kind==='rush'){
+      head='🚨 긴급 보정본 전달';
+      body=`촬영 ${e.date} · 약속 기한 ${a.due} — <b style="color:${tone}">${dueText(a.left)}</b>`;
+      act=`<button class="btn-ok" onclick="markDeliv(${e.id},'rush')">보냈음 ✓</button>`;
     }else{
       const key=a.kind==='basic'?'basic':'buy';
       const title=a.kind==='basic'?DLV_TITLE.basic:(DLV_TITLE[e.status]||'구매분');
@@ -1739,21 +1802,26 @@ function renderAlerts(){
         <button class="btn-ng" style="background:var(--bd);color:var(--mu);border:none" onclick="openD(${e.id})">일정 보기</button>
       </div>
     </div>`;
-  }).join('');
+  };
   document.getElementById('pg-alert').innerHTML=`
     <div class="rq-wrap">
-      <div class="stats" style="grid-template-columns:repeat(2,1fr)">
-        <div class="stat"><div class="sn">${list.length}</div><div class="sl">챙길 일</div></div>
+      <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat"><div class="sn">${urgent.length}</div><div class="sl">지금 챙길 일</div></div>
         <div class="stat"><div class="sn" style="${late?'color:#c0392b':''}">${late}</div><div class="sl">기한 지남</div></div>
+        <div class="stat"><div class="sn">${wait.length}</div><div class="sl">전달 대기</div></div>
       </div>
-      ${list.length
-        ?`<div class="sect-label">지금 챙겨야 할 일 (${list.length})</div>${cards}`
-        :'<div style="color:var(--mu);font-size:13px;text-align:center;padding:40px 0">지금 챙길 일이 없습니다. 👌</div>'
+      ${urgent.length
+        ?`<div class="sect-label">🔥 지금 챙겨야 할 일 (${urgent.length})</div>${urgent.map(card).join('')}`
+        :'<div style="color:var(--mu);font-size:13px;text-align:center;padding:24px 0">지금 급한 일은 없습니다. 👌</div>'
+      }
+      ${wait.length
+        ?`<div class="sect-label" style="margin-top:16px">📦 전달 대기 — 기한 전 (${wait.length})</div>${wait.map(card).join('')}`
+        :''
       }
       <div style="font-size:10px;color:var(--mu);text-align:center;margin-top:16px;line-height:1.6">
-        의상확인은 촬영 ${OUTFIT_LEAD}일 전부터, 전달 기한은 ${ALERT_LEAD}일 전부터 알립니다.<br>
-        기본 보정본 1달 · 2번 색보정 2주 · 전체 원본 2주 · 전체 색보정 1달 (촬영일 기준)<br>
-        ${DELIV_SINCE} 이전 촬영은 전달 완료로 봅니다.
+        전달할 건은 촬영 직후부터 '전달 대기'에 계속 떠 있고, 기한 ${ALERT_LEAD}일 전부터 '지금 챙겨야 할 일'로 올라옵니다.<br>
+        기본 보정본 1달 · 2번 색보정 2주 · 전체 원본 2주 · 전체 색보정 1달 · 🚨 긴급은 직접 기록한 날짜 기준<br>
+        '보냈음 ✓'을 눌러야 목록에서 사라집니다 · ${DELIV_SINCE} 이전 촬영은 전달 완료로 봅니다.
       </div>
     </div>`;
 }
@@ -1883,12 +1951,12 @@ async function loadFromGithub(btn){
     const d=await r.json();
     const evs=d.events||d;
     if(!Array.isArray(evs))throw new Error('유효하지 않은 데이터 형식');
-    // 전달 체크(dlvBasic/dlvBuy)는 원격 JSON에 없는 새 필드다.
-    // 통째로 덮어쓰면 그동안 체크한 '보냄' 기록이 사라지므로, 같은 id의 기록을 살려서 병합한다.
-    const keep=new Map(maydlyEvents.filter(e=>e.dlvBasic||e.dlvBuy).map(e=>[e.id,{dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null}]));
+    // 전달 체크(dlvBasic/dlvBuy)·긴급 기한(dlvRush)·워터마크(wm)는 원격 JSON에 없을 수 있는 새 필드다.
+    // 통째로 덮어쓰면 그동안 기록한 내용이 사라지므로, 같은 id의 기록을 살려서 병합한다.
+    const keep=new Map(maydlyEvents.filter(e=>e.dlvBasic||e.dlvBuy||e.dlvRush||e.dlvRushDone||e.wm).map(e=>[e.id,{dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null,dlvRush:e.dlvRush||null,dlvRushDone:e.dlvRushDone||null,wm:e.wm||false,wmEmoji:e.wmEmoji||null}]));
     const merged=evs.map(e=>{
       const k=keep.get(e.id);
-      return k?{...e,dlvBasic:e.dlvBasic||k.dlvBasic,dlvBuy:e.dlvBuy||k.dlvBuy}:e;
+      return k?{...e,dlvBasic:e.dlvBasic||k.dlvBasic,dlvBuy:e.dlvBuy||k.dlvBuy,dlvRush:e.dlvRush||k.dlvRush,dlvRushDone:e.dlvRushDone||k.dlvRushDone,wm:e.wm||k.wm,wmEmoji:e.wmEmoji||k.wmEmoji}:e;
     });
     maydlyEvents=merged;
     nextId=Math.max(0,...maydlyEvents.map(e=>e.id||0),0)+1;
