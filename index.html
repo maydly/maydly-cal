@@ -209,7 +209,6 @@ body{font-family:-apple-system,'Pretendard','Apple SD Gothic Neo',sans-serif;bac
     </div>
     <div id="legendBar" class="legend-bar">
       <span class="leg-dot" style="background:#6ab87a"></span><span>촬영 가능</span>
-      <span class="leg-dot" style="background:#c8a456"></span><span>야외촬영 문의 가능</span>
       <span class="leg-dot" style="background:#c86060"></span><span>예약 불가</span>
       <span style="margin-left:auto;font-size:10px;color:var(--mu)">날짜를 클릭하면 시간대별 확인 가능합니다</span>
     </div>
@@ -322,11 +321,8 @@ function getMaydlySlots(ds){
   if(!dataLoaded||!publicSchedule) return NO_DATA;
   const pd=publicSchedule[ds];
   if(pd===undefined) return NO_DATA;          // 서버가 안 내려준 날짜(범위 밖) — 문의로
-  if(pd.unavailable){
-    // 고정 차단 요일(월화금토) 중 실제 종일 일정이 없는 날 → 야외촬영 문의 가능
-    if(pd.outdoorInquiry) return[{avail:false,allDayBlock:true,outdoorInquiry:true,label:'야외촬영 문의 가능'}];
-    return UNAVAIL;
-  }
+  // 이 캘린더(협업 고객용)는 스튜디오 일정만 안내 — outdoorInquiry 플래그는 무시하고 예약 불가로 표시
+  if(pd.unavailable) return UNAVAIL;
   if(pd.slots) return pd.slots.map(s=>({avail:s.avail,allDayBlock:false,label:s.s+' ~ '+s.e}));
   return NO_DATA;
 }
@@ -378,8 +374,6 @@ function mCell(ds,dn,dim){
   if(slots[0]?.noData){
     // 데이터 없음 — 셀에 아무것도 표시 안 함 (클릭하면 카카오 안내)
     inner='';
-  }else if(slots[0]?.outdoorInquiry){
-    inner=`<div class="avail-pill" style="background:rgba(200,164,86,.18);color:#8a6a20">야외 문의 가능</div>`;
   }else if(slots.length===1&&slots[0].allDayBlock){
     inner=`<div class="ng-full">예약<br>불가</div>`;
   }else{
@@ -415,45 +409,13 @@ function openDaySlots(ds){
 <br>카카오로 직접 문의해주세요</div>
       <a href="${KAKAO_URL}" target="_blank" style="display:block;text-align:center;background:#FEE500;color:#3A1D1D;font-weight:700;font-size:13px;padding:13px;border-radius:10px;text-decoration:none">카카오로 문의하기</a>
     </div>`;
-  }else if(slots[0]?.outdoorInquiry){
-    b=`<div style="margin-bottom:10px;font-size:11px;color:var(--mu)">촬영 종류별 예약 가능 여부입니다</div>`;
-    b+=`<div style="display:flex;flex-direction:column;gap:6px">`;
-    b+=`<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(212,96,64,.06);border:1px solid #e0c0c0;border-radius:10px">
-      <span style="font-size:14px">—</span>
-      <div style="font-size:13px;font-weight:500;color:#b06060">스튜디오 촬영 · 예약 불가</div>
-    </div>`;
-    b+=`<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(200,164,86,.14);border:1px solid #c8a456;border-radius:10px">
-      <span style="font-size:14px">✅</span>
-      <div style="font-size:13px;font-weight:700;color:#8a6a20">야외 촬영 · 문의 가능 <span style="font-weight:500;font-size:11px;color:#a08040">(일정·시간 협의)</span></div>
-    </div>`;
-    b+=`</div>`;
-    b+=`<a href="${KAKAO_URL}" target="_blank" style="display:block;margin-top:14px;text-align:center;background:#FEE500;color:#3A1D1D;font-weight:700;font-size:13px;padding:13px;border-radius:10px;text-decoration:none">카카오로 야외촬영 문의하기</a>`;
   }else if(slots.length===1&&slots[0].allDayBlock){
     b=`<div style="text-align:center;padding:24px 16px">
       <div style="font-size:36px;margin-bottom:12px">📷</div>
       <div style="color:#c86060;font-weight:700;font-size:14px;line-height:1.7">종일 외부 촬영 일정으로 인한<br>예약 불가</div>
     </div>`;
   }else{
-    const stAvail=slots.some(s=>s.avail);
-    b=`<div style="margin-bottom:10px;font-size:11px;color:var(--mu)">촬영 종류별 예약 가능 여부입니다</div>`;
-    b+=`<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">`;
-    if(stAvail){
-      b+=`<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(106,184,122,.15);border:1px solid #6ab87a;border-radius:10px">
-        <span style="font-size:14px">✅</span>
-        <div style="font-size:13px;font-weight:700;color:#3a7a4a">스튜디오 촬영 · 문의 가능</div>
-      </div>`;
-    }else{
-      b+=`<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(212,96,64,.06);border:1px solid #e0c0c0;border-radius:10px">
-        <span style="font-size:14px">—</span>
-        <div style="font-size:13px;font-weight:500;color:#b06060">스튜디오 촬영 · 예약 불가 (마감)</div>
-      </div>`;
-    }
-    b+=`<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(212,96,64,.06);border:1px solid #e0c0c0;border-radius:10px">
-      <span style="font-size:14px">—</span>
-      <div style="font-size:13px;font-weight:500;color:#b06060">야외 촬영 · 예약 불가</div>
-    </div>`;
-    b+=`</div>`;
-    b+=`<div style="margin-bottom:8px;font-size:11px;color:var(--mu)">스튜디오 시간대별 예약 가능 여부</div>`;
+    b=`<div style="margin-bottom:10px;font-size:11px;color:var(--mu)">스튜디오 촬영 — 시간대별 예약 가능 여부입니다</div>`;
     b+=`<div style="display:flex;flex-direction:column;gap:6px">`;
     slots.forEach(s=>{
       const col=s.avail?'rgba(106,184,122,.15)':'rgba(212,96,64,.06)';
