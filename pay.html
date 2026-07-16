@@ -318,8 +318,10 @@ async function loadPublicData(){
 // (예전 버전은 로딩 실패 시 기본 요일표를 '전부 가능'으로 보여줘, 꽉 찬 날도 가능해 보일 수 있었다)
 const NO_DATA=[{noData:true}];
 const UNAVAIL=[{avail:false,allDayBlock:true,label:'종일 외부 촬영 일정으로 인한 예약 불가'}];
-// 페이 촬영 1시간 단위 시작 시각 (11시부터, 13~14·16~17·19~20 제외, 22시 종료)
-const PAY_HOURS=[11,12,14,15,17,18,20,21];
+// 페이 촬영 1시간 단위 시작 시각 (11시~22시 종료)
+const PAY_HOURS=[11,12,13,14,15,16,17,18,19,20,21];
+// 고정 예약 불가 시간 (13~14·16~17·19~20) — 목록에는 보이되 항상 '예약 불가'로 표시
+const PAY_FIXED_BLOCK=[13,16,19];
 function getMaydlySlots(ds){
   if(!dataLoaded||!publicSchedule) return NO_DATA;
   const pd=publicSchedule[ds];
@@ -334,7 +336,7 @@ function getMaydlySlots(ds){
     if(pd.busy===undefined) return NO_DATA;
     const overlap=(s,e)=>pd.busy.some(r=>!(e<=r[0]||s>=r[1]));
     return PAY_HOURS.map(h=>({
-      avail:!overlap(h,h+1)&&!(pd.preHol&&h>=19), // 다음날 공휴일이면 19시 이후 마감
+      avail:!PAY_FIXED_BLOCK.includes(h)&&!overlap(h,h+1)&&!(pd.preHol&&h>=19), // 고정불가 + 예약겹침 + 다음날 공휴일 19시 이후 마감
       allDayBlock:false,
       label:`${pad(h)}:00 ~ ${pad(h+1)}:00`
     }));
