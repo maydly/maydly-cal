@@ -807,20 +807,63 @@ function isPreHoliday(ds){return KR_HOLIDAYS.includes(addDays(ds,1));}
 
 // ── 공개용 가용시간 계산 (개인정보는 여기서 전부 버려짐 — 숫자만 남긴다) ──
 // 저장 시 이 결과를 public.json으로 커밋하고, 고객 페이지가 그걸 읽는다.
+
+// 반복 일정의 다음 발생일 계산 (260717)
+function nextOccurrence(cur, repeat, origin){
+  const d=new Date(cur);
+  if(repeat==='daily'){d.setDate(d.getDate()+1);}
+  else if(repeat==='weekly'){d.setDate(d.getDate()+7);}
+  else if(repeat==='weekday'){do{d.setDate(d.getDate()+1);}while(d.getDay()===0||d.getDay()===6);}
+  else if(repeat==='monthly_date'){d.setMonth(d.getMonth()+1);}
+  else if(repeat==='monthly_nth'){
+    const nth=Math.ceil(origin.getDate()/7),dow=origin.getDay();
+    d.setMonth(d.getMonth()+1);d.setDate(1);
+    while(d.getDay()!==dow)d.setDate(d.getDate()+1);
+    d.setDate(d.getDate()+(nth-1)*7);
+  }
+  else if(repeat==='yearly'){d.setFullYear(d.getFullYear()+1);}
+  else return null;
+  return d;
+}
+
 function buildPublicSchedule(){
+  const WIN_END=addDays(TSTR,90);
   const busyMap={};
   const mark=ds=>{if(!busyMap[ds])busyMap[ds]={allDay:false,slots:[]};return busyMap[ds];};
   maydlyEvents.forEach(e=>{
     if(!stActive(e.status)||isExt(e))return;
-    const fullDay=e.allDay||(['rest','outdoor_c','pa_shoot'].includes(e.label)&&(e.dur||0)>=8);
-    if(fullDay){
-      // 여러 날에 걸친 종일/휴무 일정은 시작일부터 끝나는 날까지 전부 마감 (첫날만 막던 버그 수정)
-      const days=Math.max(1,Math.round((e.dur||24)/24));
-      for(let k=0;k<days;k++)mark(addDays(e.date,k)).allDay=true;
-    }else if(e.time){
-      const[hh,mm]=e.time.split(':').map(Number);
-      mark(e.date).slots.push({s:hh+mm/60,e:hh+mm/60+(e.dur||2)});
+    // 반복 일정 전개: 원본 날짜 + 90일 창 내 모든 발생일 (260717)
+    const dates=[e.date];
+    if(e.repeat&&e.repeat!=='none'){
+      const origin=new Date(e.date+'T00:00:00');
+      let cur=new Date(origin);
+      for(let g=0;g<500;g++){
+        const next=nextOccurrence(cur,e.repeat,origin);
+        if(!next)break;
+        const ds=fd(next);
+        if(ds>WIN_END)break;
+        dates.push(ds);
+        cur=next;
+      }
     }
+    dates.forEach(ds=>{
+      const fullDay=e.allDay||(['rest','outdoor_c','pa_shoot'].includes(e.label)&&(e.dur||0)>=8);
+      if(fullDay){
+        // 여러 날에 걸친 종일/휴무 일정은 시작일부터 끝나는 날까지 전부 마감
+        const days=Math.max(1,Math.round((e.dur||24)/24));
+        for(let k=0;k<days;k++)mark(addDays(ds,k)).allDay=true;
+      }else if(e.time){
+        const[hh,mm]=e.time.split(':').map(Number);
+        const s=hh+mm/60,end=s+(e.dur||2);
+        // 자정 넘는 일정: 당일·익일 분할 기록 (260717)
+        if(end>24){
+          mark(ds).slots.push({s,e:24});
+          mark(addDays(ds,1)).slots.push({s:0,e:end-24});
+        }else{
+          mark(ds).slots.push({s,e:end});
+        }
+      }
+    });
   });
   const schedule={};
   const LEAD_DAYS=3;   // 오늘부터 3일 이내(오늘·내일·모레)는 촬영 준비시간 확보 위해 예약 마감
