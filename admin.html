@@ -420,13 +420,24 @@ async function ghGet(cfg){
 }
 async function ghPut(cfg,obj){
   const url=`https://api.github.com/repos/${GH_OWNER}/${cfg.repo}/contents/${cfg.path}`;
-  let sha=_ghSha[cfg.repo+'/'+cfg.path];
+  const key=cfg.repo+'/'+cfg.path;
+  const encoded=b64encode(JSON.stringify(obj,null,0));
+  async function tryPut(sha){
+    const body={message:'update '+cfg.path+' '+new Date().toISOString(),content:encoded};
+    if(sha)body.sha=sha;
+    const r=await fetch(url,{method:'PUT',headers:{...ghHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(r.status===409){
+      // SHA 충돌(다른 기기 저장 등) — 최신 SHA 가져와서 1회 자동 재시도
+      const latest=await fetch(url,{cache:'no-store',headers:ghHeaders()});
+      if(latest.ok){const newSha=(await latest.json()).sha;_ghSha[key]=newSha;return tryPut(newSha);}
+    }
+    return r;
+  }
+  let sha=_ghSha[key];
   if(!sha){try{const r=await fetch(url,{cache:'no-store',headers:ghHeaders()});if(r.ok)sha=(await r.json()).sha;}catch(_){}}
-  const body={message:'update '+cfg.path+' '+new Date().toISOString(),content:b64encode(JSON.stringify(obj,null,cfg===GH_PUBLIC?0:0))};
-  if(sha)body.sha=sha;
-  const r=await fetch(url,{method:'PUT',headers:{...ghHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const r=await tryPut(sha);
   if(!r.ok)throw new Error('PUT '+cfg.path+' '+r.status+' '+(await r.text()).slice(0,120));
-  _ghSha[cfg.repo+'/'+cfg.path]=(await r.json()).content.sha;
+  _ghSha[key]=(await r.json()).content.sha;
 }
 function hasToken(){return !!_ghToken;}
 function saveGhToken(t){_ghToken=(t||'').trim();localStorage.setItem(GH_TOKEN_KEY,_ghToken);}
