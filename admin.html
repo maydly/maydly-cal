@@ -466,8 +466,9 @@ const LABELS={
   suvin:{name:'수빈',color:'#e08a3c'},
   holiday:{name:'휴일',color:'#d64545'},
 };
-// maydly 예약이 아닌 외부 캘린더 라벨(수빈·휴일) — 가용시간·공개데이터 계산에서 제외
-const EXT_LABELS=['suvin','holiday'];
+// maydly 예약이 아닌 외부 캘린더 라벨(수빈) — 가용시간·공개데이터 계산에서 제외
+// 휴일은 휴무와 동일하게 차단 처리 (260717)
+const EXT_LABELS=['suvin'];
 function isExt(e){return e&&(e.ext||EXT_LABELS.includes(e.label));}
 // ── status 정의 (260630 v4.0 개편): 예약→촬영→구매 흐름 6단계 ──
 // active=true → 실제 예약(고객 공개 '예약불가'·집계에 포함), false → 노쇼/취소
