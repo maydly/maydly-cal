@@ -48,7 +48,8 @@ body{font-family:-apple-system,'Pretendard','Apple SD Gothic Neo',sans-serif;hei
 /* 폰 — 탭이 4개로 늘어 자리가 빠듯하므로, 상단 우측 표시를 줄여 탭 자리를 확보한다 */
 @media(max-width:560px){
   .tn-tab{padding:0 9px;letter-spacing:0}
-  .tn-mode,.autosave-ind{display:none!important}
+  .tn-mode{display:none!important}
+  .autosave-ind{font-size:10px!important;padding:3px 7px!important}
   .tn-logo{display:none}
 }
 .tn-tab:hover{color:var(--tx)}
@@ -910,18 +911,25 @@ function buildPublicSchedule(){
 
 // ── GitHub 저장 (원본 events.json + 공개 public.json) ──
 let _pushT=null, _serverOn=false, _pushing=false;
-function setSaveStatus(txt){const el=document.getElementById('gcalStatus');if(el)el.textContent=txt;}
+function setSaveStatus(txt, state){
+  const el=document.getElementById('gcalStatus');if(el)el.textContent=txt;
+  const ind=document.querySelector('.autosave-ind');if(!ind)return;
+  ind.textContent=txt;
+  const S={ok:{bg:'#e6f4ea',color:'#1a7f37',bd:'#a8d5b5'},fail:{bg:'#fdecea',color:'#c62828',bd:'#f5a0a0'},loading:{bg:'#e8f0fe',color:'#1a73e8',bd:'#a8c4f5'},off:{bg:'#f5f5f5',color:'#888',bd:'#ddd'}};
+  const s=S[state]||S.off;
+  ind.style.background=s.bg;ind.style.color=s.color;ind.style.borderColor=s.bd;
+}
 function pushToGithub(){
   if(!hasToken())return;   // 토큰 없으면 로컬 단독 (저장은 localStorage에 이미 됨)
   clearTimeout(_pushT);
   _pushT=setTimeout(async()=>{
-    if(_pushing)return; _pushing=true; setSaveStatus('☁ 저장 중…');
+    if(_pushing)return; _pushing=true; setSaveStatus('⟳ 저장 중…','loading');
     try{
       await ghPut(GH_DATA,{events:maydlyEvents,savedAt:new Date().toISOString()});
       await ghPut(GH_PUBLIC,buildPublicSchedule());   // 고객 공개 데이터도 함께 갱신
-      _serverOn=true; lastSaved=nowStr(); setSaveStatus('☁ 저장됨 '+lastSaved);
+      _serverOn=true; lastSaved=nowStr(); setSaveStatus('✓ 저장됨 '+lastSaved,'ok');
     }catch(e){
-      setSaveStatus('⚠ 저장 실패 — 토큰 확인');
+      setSaveStatus('✗ 저장 실패','fail');
       toast('GitHub 저장 실패: '+e.message);
     }finally{_pushing=false;}
   },500);
@@ -937,14 +945,14 @@ async function syncFromGithub(){
       try{localStorage.setItem(STORAGE_KEY,JSON.stringify(maydlyEvents));}catch(e){}
       if(typeof curPage!=='undefined'&&curPage==='cal')renderBody();
       if(typeof buildNav==='function')buildNav();
-      setSaveStatus('☁ 최신 불러옴 ('+maydlyEvents.length+')');
+      setSaveStatus('✓ 불러옴 ('+maydlyEvents.length+')','ok');
       toast('GitHub에서 최신 불러옴 ('+maydlyEvents.length+')');
     }else{
       // 저장소가 비었으면 현재(임베드) 데이터로 시드
       pushToGithub();
     }
   }catch(e){
-    setSaveStatus('⚠ 불러오기 실패 — 토큰 확인');
+    setSaveStatus('✗ 불러오기 실패','fail');
     toast('GitHub 불러오기 실패: '+e.message);
   }
 }
@@ -1044,7 +1052,7 @@ async function syncAndExport(btn){
   try{
     await ghPut(GH_DATA,{events:maydlyEvents,savedAt:new Date().toISOString()});
     await ghPut(GH_PUBLIC,buildPublicSchedule());
-    setSaveStatus('☁ 저장됨 '+nowStr());
+    setSaveStatus('✓ 저장됨 '+nowStr(),'ok');
     toast('✓ GitHub에 저장 완료 (고객 페이지도 갱신)');
   }catch(e){
     toast('저장 실패: '+e.message);
@@ -1122,7 +1130,7 @@ async function applyToken(){
   try{
     await ghGet(GH_DATA);   // 읽기 시도로 토큰 검증
     closeP();
-    setSaveStatus('☁ 연결됨');
+    setSaveStatus('✓ GitHub 연결됨','ok');
     syncFromGithub();
   }catch(e){
     saveGhToken('');
@@ -1131,7 +1139,7 @@ async function applyToken(){
 }
 function forgetToken(){
   if(!confirm('이 기기에서 GitHub 토큰을 지울까요? (동기화가 멈춥니다)'))return;
-  saveGhToken('');setSaveStatus('연결 안 됨');toast('토큰을 지웠습니다');
+  saveGhToken('');setSaveStatus('연결 안 됨','off');toast('토큰을 지웠습니다');
 }
 // ── 좌우 스와이프로 월(주/일) 넘기기 (폰) ──
 (function(){
@@ -1187,9 +1195,10 @@ function buildNav(){
   if(tnRight&&!tnRight.querySelector('.autosave-ind')){
     const ind=document.createElement('span');
     ind.className='autosave-ind';
-    ind.style.cssText='font-size:10px;color:var(--mu);white-space:nowrap';
-    ind.innerHTML='☁ 자동저장';
+    ind.style.cssText='font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;border:1.5px solid #ddd;background:#f5f5f5;color:#888;white-space:nowrap;transition:background .2s,color .2s';
+    ind.textContent=hasToken()?'✓ GitHub 연결됨':'⚠ 연결 안 됨';
     tnRight.insertBefore(ind,tnRight.firstChild);
+    setSaveStatus(hasToken()?'✓ GitHub 연결됨':'⚠ 연결 안 됨', hasToken()?'ok':'off');
   }
 }
 function switchPage(pg,el){
