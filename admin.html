@@ -397,7 +397,7 @@ const STORAGE_GCAL_KEY='maydly_gcal_admin_v1';
 //  · 원본(events.json, 고객명·연락처 포함) → 비공개 저장소
 //  · 공개용(public.json, 개인정보 뺀 가용시간만) → 공개 저장소(고객 페이지가 읽음)
 // 토큰은 소스에 넣지 않는다. 명진이 관리자 화면에 1회 입력 → 이 기기 localStorage에만 저장.
-const GH_OWNER='bucket0825';
+const GH_OWNER='maydly';
 const GH_DATA  ={repo:'maydly-cal-data', path:'events.json'};  // 비공개 원본
 const GH_PUBLIC={repo:'maydly-cal',      path:'public.json'};  // 공개 (고객이 읽음)
 const GH_TOKEN_KEY='maydly_gh_token';
@@ -2399,6 +2399,6 @@ function mergeIcal() {
 </script>
 
 
-<a href="https://bucket0825.github.io/note/hub/" id="maydlyHubBtn" aria-label="maydly 허브로" style="position:fixed;left:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:2147483647;display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.94);color:#2e2a26;text-decoration:none;font-family:-apple-system,'Pretendard','Apple SD Gothic Neo',sans-serif;font-size:13px;line-height:1;padding:9px 15px;border-radius:22px;box-shadow:0 3px 14px rgba(0,0,0,.22);border:1px solid rgba(0,0,0,.06);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)"><span style="font-weight:800">← 허브</span><span style="width:1px;height:12px;background:rgba(0,0,0,.16)"></span><span style="font-weight:600;color:#8a8178">예약 캘린더</span></a>
+<a href="https://bucket0825.github.io/maydly-hub/" id="maydlyHubBtn" aria-label="maydly 허브로" style="position:fixed;left:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:2147483647;display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.94);color:#2e2a26;text-decoration:none;font-family:-apple-system,'Pretendard','Apple SD Gothic Neo',sans-serif;font-size:13px;line-height:1;padding:9px 15px;border-radius:22px;box-shadow:0 3px 14px rgba(0,0,0,.22);border:1px solid rgba(0,0,0,.06);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)"><span style="font-weight:800">← 허브</span><span style="width:1px;height:12px;background:rgba(0,0,0,.16)"></span><span style="font-weight:600;color:#8a8178">예약 캘린더</span></a>
 </body>
 </html>
