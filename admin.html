@@ -457,10 +457,11 @@ const LABELS={
   brand:{name:'브랜드/상업',color:'#8a6040'},
   personal:{name:'개인',color:'#999'},
   suvin:{name:'수빈',color:'#e08a3c'},
-  holiday:{name:'휴일',color:'#d64545'},
 };
 // maydly 예약이 아닌 외부 캘린더 라벨(수빈) — 가용시간·공개데이터 계산에서 제외
-// 휴일은 휴무와 동일하게 차단 처리 (260717)
+// (260718) '휴일'(holiday) 라벨을 '휴무'(rest)로 통합. 로드 시 자동 변환 → 기존 휴일 예약도 휴무로 취급되고,
+//          저장하면 실제로 rest로 바뀜. 선택지·필터엔 '휴무'만 남음. (국가공휴일 KR_HOLIDAYS와는 무관)
+function mergeHoliday(evs){ if(Array.isArray(evs)) evs.forEach(function(e){ if(e&&e.label==='holiday') e.label='rest'; }); return evs; }
 const EXT_LABELS=['suvin'];
 function isExt(e){return e&&(e.ext||EXT_LABELS.includes(e.label));}
 // ── status 정의 (260630 v4.0 개편): 예약→촬영→구매 흐름 6단계 ──
@@ -921,7 +922,7 @@ async function syncFromGithub(){
     const {data}=await ghGet(GH_DATA);
     if(data&&Array.isArray(data.events)){
       _serverOn=true;
-      maydlyEvents=data.events;
+      maydlyEvents=mergeHoliday(data.events);
       nextId=Math.max(0,...maydlyEvents.map(e=>e.id||0),0)+1;
       try{localStorage.setItem(STORAGE_KEY,JSON.stringify(maydlyEvents));}catch(e){}
       if(typeof curPage!=='undefined'&&curPage==='cal')renderBody();
@@ -948,7 +949,7 @@ function saveRequests(){
   try{localStorage.setItem(STORAGE_REQ_KEY,JSON.stringify(clientRequests));}catch(e){}
 }
 
-let maydlyEvents=loadEvents();
+let maydlyEvents=mergeHoliday(loadEvents());
 let clientRequests=loadRequests();
 let nextId=Math.max(0,...maydlyEvents.map(e=>e.id||0),0)+1;
 let lastSaved=nowStr();
@@ -1992,7 +1993,7 @@ function parseDate(s){
 }
 function parseTime(s){if(/^\d{1,2}:\d{2}$/.test(s)){const[h,m]=s.split(':');return`${pad(parseInt(h))}:${m}`;}return null;}
 function parseLabel(s){
-  const map={'여스튜디오':'studio_f','여':'studio_f','남스튜디오':'studio_m','남':'studio_m','야외':'outdoor','야외상업':'outdoor_c','상업':'outdoor_c','프로필':'profile','페이':'profile','pa':'pa_shoot','pa촬영':'pa_shoot','휴무':'rest','쉬는날':'rest','개인':'personal','스튜디오대관':'nosh','대관':'nosh'};
+  const map={'여스튜디오':'studio_f','여':'studio_f','남스튜디오':'studio_m','남':'studio_m','야외':'outdoor','야외상업':'outdoor_c','상업':'outdoor_c','프로필':'profile','페이':'profile','pa':'pa_shoot','pa촬영':'pa_shoot','휴무':'rest','휴일':'rest','쉬는날':'rest','개인':'personal','스튜디오대관':'nosh','대관':'nosh'};
   return map[s.toLowerCase()]||null;
 }
 function parseDur(s){const m=s.match(/(\d+)(h|시간)?/i);return m?parseInt(m[1]):null;}
