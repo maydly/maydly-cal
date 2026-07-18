@@ -1613,7 +1613,11 @@ function parseBooking(txt){
       if(new Date(y,mo-1,da)<new Date(now.getFullYear(),now.getMonth(),now.getDate()-14))y+=1;
       date=y+'-'+pad(mo)+'-'+pad(da);res.name=res.name.replace(dm[0].trim(),' ');}}
   res.stime=stime;res.etime=etime;res.date=date;
-  res.name=res.name.replace(/\s+/g,' ').trim();
+  // 이름 정리: 맨 앞·중간 이모티콘/기호 제거 → 이름만 남김 (채널 복사 시 붙는 🙋▶✅[예약] 등)
+  res.name=res.name
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}\u{20E3}]/gu,'')
+    .replace(/[\[\]()<>{}|·・※►▶➡✔✅🔹]/g,' ')
+    .replace(/\s+/g,' ').trim();
   return res;
 }
 function pasteParse(ev){
@@ -1635,6 +1639,27 @@ function pasteParse(ev){
   }else if(r.stime){recalcEnd();}
   refreshRepeat();
   toast('📋 붙여넣기 자동입력: '+(r.date?r.date.slice(5):'')+' '+(r.stime||'')+(r.etime?'~'+r.etime:''));
+}
+// 고객명 칸에 예약문구가 들어오면(붙여넣기·입력) 자동으로 날짜·시간 채우고 이름만 남김.
+// paste 이벤트는 iOS에서 불안정 → input 이벤트로 감지(모든 기기 안정). 이모티콘도 자동 제거.
+function tryAutofill(el){
+  const v=(el&&el.value)||'';
+  const r=parseBooking(v);
+  if(!r.date&&!r.stime)return;              // 예약문구 아님(일반 이름) → 그대로 둠
+  if(v.trim()===(r.name||'').trim())return; // 이미 정리됨 → 재실행 방지
+  const setOpt=(id,vv)=>{const s=document.getElementById(id);if(!s||!vv)return;if(![...s.options].some(o=>o.value===vv)){const o=document.createElement('option');o.value=vv;o.textContent=vv;s.appendChild(o);}s.value=vv;};
+  el.value=r.name||'';                       // 이름만 남김(이모티콘·날짜·시간 제거)
+  if(typeof seAllDay!=='undefined'&&seAllDay)toggleAllDay();
+  if(r.date){const sd=document.getElementById('f_sd');if(sd)sd.value=r.date;}
+  if(r.stime)setOpt('f_st',r.stime);
+  if(r.etime){
+    const ed=document.getElementById('f_ed');if(ed)ed.value=r.date||(document.getElementById('f_sd')||{}).value||'';
+    setOpt('f_et',r.etime);
+    const dh=document.getElementById('f_h');
+    if(dh){const a=r.stime.split(':'),b=r.etime.split(':'),diff=(b[0]*60+ +b[1])-(a[0]*60+ +a[1]);dh.value=(diff>0&&diff%60===0&&diff/60<=12)?String(diff/60):'';}
+  }else if(r.stime){if(typeof recalcEnd==='function')recalcEnd();}
+  if(typeof refreshRepeat==='function')refreshRepeat();
+  if(typeof toast==='function')toast('📋 자동입력: '+(r.date?r.date.slice(5):'')+' '+(r.stime||'')+(r.etime?'~'+r.etime:''));
 }
 function durLenOptions(sel){
   let h='<option value="">— 직접 설정 —</option>';
@@ -1679,7 +1704,7 @@ function openAdd(ds){
   document.getElementById('pnh').innerHTML=`일정 추가<button class="px" onclick="closeP()">×</button>`;
   const chips=Object.entries(LABELS).map(([k,v])=>`<div class="label-chip${k===lastLabel?' sel':''}" style="background:${v.color}${k===lastLabel?';border-color:rgba(0,0,0,.35)':''}" onclick="selLbl('${k}',this)">${v.name}</div>`).join('');
   document.getElementById('pb').innerHTML=`
-    <div class="fg"><label>고객명 <span style="color:#c4763a">*</span> <span style="color:var(--mu);font-weight:400;font-size:10px">(예약문구 붙여넣으면 날짜·시간 자동입력)</span></label><input type="text" id="f_c" placeholder="이름 (필수) — 예: 최혜주님7/15 14~16시" onpaste="pasteParse(event)"></div>
+    <div class="fg"><label>고객명 <span style="color:#c4763a">*</span> <span style="color:var(--mu);font-weight:400;font-size:10px">(예약문구 붙여넣으면 날짜·시간 자동입력)</span></label><input type="text" id="f_c" placeholder="이름 (필수) — 예: 최혜주님7/15 14~16시" oninput="tryAutofill(this)" onpaste="setTimeout(()=>tryAutofill(this),0)"></div>
     ${timeFormBlock(ds,'10:00',ds,'12:00',2)}
     <div class="fg"><label>라벨</label><div class="label-grid">${chips}</div></div>
     <div class="fg"><label>인스타 아이디</label><input type="text" id="f_p" placeholder="@instagram_id"></div>
@@ -1752,7 +1777,7 @@ function openEdit(id){
   const durSel=(!e.allDay&&Number.isInteger(e.dur)&&e.dur>=1&&e.dur<=12)?e.dur:'';
   document.getElementById('pnh').innerHTML=`일정 편집<button class="px" onclick="closeP()">×</button>`;
   document.getElementById('pb').innerHTML=`
-    <div class="fg"><label>고객명 <span style="color:#c4763a">*</span></label><input type="text" id="f_c" value="${e.client||''}"></div>
+    <div class="fg"><label>고객명 <span style="color:#c4763a">*</span></label><input type="text" id="f_c" value="${e.client||''}" oninput="tryAutofill(this)"></div>
     ${timeFormBlock(e.date,st,endDate,endTime,durSel)}
     <div class="fg"><label>라벨</label><div class="label-grid">${chips}</div></div>
     <div class="fg"><label>인스타 아이디</label><input type="text" id="f_p" value="${e.insta||e.phone||''}" placeholder="@instagram_id"></div>
