@@ -410,38 +410,19 @@ function ghHeaders(){return{Authorization:'Bearer '+_ghToken,Accept:'application
 function b64encode(str){return btoa(unescape(encodeURIComponent(str)));}
 function b64decode(b64){return decodeURIComponent(escape(atob(b64.replace(/\n/g,''))));}
 
+// ── 저장 계층: GitHub 토큰 → Firestore(구글 로그인)로 교체 ──
+// GH_DATA(비공개 예약 전체) → Firestore 문서 mj_cal/events
+// GH_PUBLIC(고객 공개 가용여부)   → Firestore 문서 cal_public/schedule
+function fsPathFor(cfg){ return cfg===GH_PUBLIC ? 'cal_public/schedule' : 'mj_cal/events'; }
 async function ghGet(cfg){
-  const url=`https://api.github.com/repos/${GH_OWNER}/${cfg.repo}/contents/${cfg.path}`;
-  const r=await fetch(url,{cache:'no-store',headers:ghHeaders()});
-  if(r.status===404)return{data:null,sha:null};
-  if(!r.ok)throw new Error('GET '+cfg.path+' '+r.status);
-  const j=await r.json();
-  _ghSha[cfg.repo+'/'+cfg.path]=j.sha;
-  return{data:JSON.parse(b64decode(j.content)),sha:j.sha};
+  const data=await window.MJCAL.get(fsPathFor(cfg));   // {events,savedAt} 또는 공개객체, 없으면 null
+  return {data, sha:null};
 }
 async function ghPut(cfg,obj){
-  const url=`https://api.github.com/repos/${GH_OWNER}/${cfg.repo}/contents/${cfg.path}`;
-  const key=cfg.repo+'/'+cfg.path;
-  const encoded=b64encode(JSON.stringify(obj,null,0));
-  async function tryPut(sha){
-    const body={message:'update '+cfg.path+' '+new Date().toISOString(),content:encoded};
-    if(sha)body.sha=sha;
-    const r=await fetch(url,{method:'PUT',headers:{...ghHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(r.status===409){
-      // SHA 충돌(다른 기기 저장 등) — 최신 SHA 가져와서 1회 자동 재시도
-      const latest=await fetch(url,{cache:'no-store',headers:ghHeaders()});
-      if(latest.ok){const newSha=(await latest.json()).sha;_ghSha[key]=newSha;return tryPut(newSha);}
-    }
-    return r;
-  }
-  let sha=_ghSha[key];
-  if(!sha){try{const r=await fetch(url,{cache:'no-store',headers:ghHeaders()});if(r.ok)sha=(await r.json()).sha;}catch(_){}}
-  const r=await tryPut(sha);
-  if(!r.ok)throw new Error('PUT '+cfg.path+' '+r.status+' '+(await r.text()).slice(0,120));
-  _ghSha[key]=(await r.json()).content.sha;
+  await window.MJCAL.put(fsPathFor(cfg), obj);
 }
-function hasToken(){return !!_ghToken;}
-function saveGhToken(t){_ghToken=(t||'').trim();localStorage.setItem(GH_TOKEN_KEY,_ghToken);}
+function hasToken(){ return !!(window.MJCAL && window.MJCAL.user); }   // 로그인=연결
+function saveGhToken(t){ /* 토큰 방식 폐지 — 구글 로그인 사용 */ }
 
 // ── 구글 캘린더 설정 ──
 const GCAL_MINJIN_KEYWORDS=['명진'];
@@ -930,7 +911,7 @@ function pushToGithub(){
       _serverOn=true; lastSaved=nowStr(); setSaveStatus('✓ 저장됨 '+lastSaved,'ok');
     }catch(e){
       setSaveStatus('✗ 저장 실패','fail');
-      toast('GitHub 저장 실패: '+e.message);
+      toast('저장 실패: '+e.message);
     }finally{_pushing=false;}
   },500);
 }
@@ -946,14 +927,14 @@ async function syncFromGithub(){
       if(typeof curPage!=='undefined'&&curPage==='cal')renderBody();
       if(typeof buildNav==='function')buildNav();
       setSaveStatus('✓ 불러옴 ('+maydlyEvents.length+')','ok');
-      toast('GitHub에서 최신 불러옴 ('+maydlyEvents.length+')');
+      toast('최신 불러옴 ('+maydlyEvents.length+')');
     }else{
       // 저장소가 비었으면 현재(임베드) 데이터로 시드
       pushToGithub();
     }
   }catch(e){
     setSaveStatus('✗ 불러오기 실패','fail');
-    toast('GitHub 불러오기 실패: '+e.message);
+    toast('불러오기 실패: '+e.message);
   }
 }
 // 하위 호환 (기존 호출부가 있으면 GitHub 버전으로 연결)
@@ -1053,7 +1034,7 @@ async function syncAndExport(btn){
     await ghPut(GH_DATA,{events:maydlyEvents,savedAt:new Date().toISOString()});
     await ghPut(GH_PUBLIC,buildPublicSchedule());
     setSaveStatus('✓ 저장됨 '+nowStr(),'ok');
-    toast('✓ GitHub에 저장 완료 (고객 페이지도 갱신)');
+    toast('✓ 저장 완료 (고객 페이지도 갱신)');
   }catch(e){
     toast('저장 실패: '+e.message);
   }finally{
@@ -1094,52 +1075,54 @@ async function syncGcal(){
   }catch(e){console.log('gcal sync skip',e);}
 }
 
+var _mjEntered=false;
+// 로그인 상태가 바뀌면(브리지에서 호출) 화면 반영
+window.onMjAuth=function(u){
+  if(!_mjEntered) return;              // 랜딩(PIN) 단계에선 대기
+  setSaveStatus(u?'✓ 구글 로그인됨':'로그인 필요', u?'ok':'off');
+  if(u) syncFromGithub(); else promptToken();
+};
 function enter(){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').style.display='flex';
   buildNav();showPage('cal');
-  if(hasToken())syncFromGithub();   // 토큰 있으면 GitHub 최신 불러오기
-  else promptToken();               // 없으면 토큰 입력 안내(입력하면 이어서 동기화)
+  _mjEntered=true;
+  if(window.MJCAL&&window.MJCAL.ready) onMjAuth(window.MJCAL.user);   // 로그인 상태 반영
+  else setSaveStatus('로그인 확인 중…','loading');                   // 브리지 준비되면 onMjAuth가 이어받음
   syncGcal();
 }
 
 // ── GitHub 토큰 입력 (한 번만) ──
 function promptToken(){
-  document.getElementById('pnh').innerHTML=`GitHub 연결<button class="px" onclick="closeP()">×</button>`;
+  document.getElementById('pnh').innerHTML=`구글 로그인<button class="px" onclick="closeP()">×</button>`;
   document.getElementById('pb').innerHTML=`
     <div style="font-size:12px;color:var(--mu2);line-height:1.7;margin-bottom:14px">
-      일정을 폰·PC에서 함께 쓰려면 <b>GitHub 토큰</b>을 한 번 넣어주세요.<br>
-      이 기기에만 저장되고, 화면·소스에는 남지 않습니다.
+      예약을 폰·PC에서 함께 쓰려면 <b>구글 계정</b>으로 로그인하세요.<br>
+      토큰 붙여넣기 없이 버튼 한 번이면 됩니다. (명진 계정만 접근 가능)
     </div>
-    <div class="fg"><label>GitHub 토큰 (ghp_… 또는 github_pat_…)</label>
-      <input type="password" id="ghTokenInput" placeholder="토큰 붙여넣기" autocomplete="off"></div>
-    <button class="sub-btn" onclick="applyToken()">연결</button>
-    <div id="tok-err" style="font-size:11px;color:var(--ng);margin-top:8px;display:none"></div>
-    <div style="font-size:10px;color:var(--mu);margin-top:12px;line-height:1.6">
-      토큰이 없으면 지금은 이 기기에만 저장돼요(동기화 안 됨). 나중에 사이드바 <b>☁</b>에서 넣어도 됩니다.
-    </div>`;
+    <button class="sub-btn" onclick="doGoogleLogin()">Google로 로그인</button>
+    <div id="tok-err" style="font-size:11px;color:var(--ng);margin-top:8px;display:none"></div>`;
   document.getElementById('ov').style.display='flex';
-  setTimeout(()=>document.getElementById('ghTokenInput')?.focus(),100);
 }
-async function applyToken(){
-  const t=(document.getElementById('ghTokenInput').value||'').trim();
+async function doGoogleLogin(){
   const err=document.getElementById('tok-err');
-  if(!t){err.style.display='block';err.textContent='토큰을 넣어주세요.';return;}
-  saveGhToken(t);
-  err.style.display='block';err.style.color='var(--mu)';err.textContent='연결 확인 중…';
+  if(err){err.style.display='block';err.style.color='var(--mu)';err.textContent='로그인 창을 여는 중…';}
   try{
-    await ghGet(GH_DATA);   // 읽기 시도로 토큰 검증
+    await window.MJCAL.login();
     closeP();
-    setSaveStatus('✓ GitHub 연결됨','ok');
-    syncFromGithub();
+    setSaveStatus('✓ 구글 로그인됨','ok');
+    // onAuthStateChanged → onMjAuth 가 이어서 syncFromGithub 호출
   }catch(e){
-    saveGhToken('');
-    err.style.color='var(--ng)';err.textContent='연결 실패 — 토큰/권한을 확인하세요. ('+e.message+')';
+    if(err){err.style.display='block';err.style.color='var(--ng)';
+      err.textContent = e && e.code==='auth/unauthorized-domain'
+        ? '이 주소가 Firebase 허용목록에 없어요 — localhost 또는 등록된 주소에서 여세요'
+        : ('로그인 실패: '+((e&&(e.code||e.message))||e));}
   }
 }
+async function applyToken(){ return doGoogleLogin(); }   // 하위호환
 function forgetToken(){
-  if(!confirm('이 기기에서 GitHub 토큰을 지울까요? (동기화가 멈춥니다)'))return;
-  saveGhToken('');setSaveStatus('연결 안 됨','off');toast('토큰을 지웠습니다');
+  if(!confirm('로그아웃할까요? (다시 로그인 전까지 동기화 멈춤)'))return;
+  window.MJCAL.logout(); setSaveStatus('로그인 필요','off'); toast('로그아웃했습니다');
 }
 // ── 좌우 스와이프로 월(주/일) 넘기기 (폰) ──
 (function(){
@@ -1196,9 +1179,9 @@ function buildNav(){
     const ind=document.createElement('span');
     ind.className='autosave-ind';
     ind.style.cssText='font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;border:1.5px solid #ddd;background:#f5f5f5;color:#888;white-space:nowrap;transition:background .2s,color .2s';
-    ind.textContent=hasToken()?'✓ GitHub 연결됨':'⚠ 연결 안 됨';
+    ind.textContent=hasToken()?'✓ 구글 로그인됨':'⚠ 연결 안 됨';
     tnRight.insertBefore(ind,tnRight.firstChild);
-    setSaveStatus(hasToken()?'✓ GitHub 연결됨':'⚠ 연결 안 됨', hasToken()?'ok':'off');
+    setSaveStatus(hasToken()?'✓ 구글 로그인됨':'⚠ 연결 안 됨', hasToken()?'ok':'off');
   }
 }
 function switchPage(pg,el){
@@ -1236,13 +1219,13 @@ function buildSidebar(){
     <div style="padding:10px 12px;border-top:1px solid var(--bd)">
       <button onclick="syncAndExport(this)" style="width:100%;padding:7px;border:1px solid var(--bd);border-radius:8px;background:var(--sf2);cursor:pointer;font-size:10px;color:var(--mu2);display:flex;align-items:center;justify-content:center;gap:5px">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-        지금 GitHub에 저장
+        지금 저장
       </button>
-      <div style="font-size:9px;color:var(--mu);margin-top:5px;text-align:center" id="gcalStatus">${hasToken()?'☁ 연결됨':'연결 안 됨 — 눌러서 토큰 입력'}</div>
+      <div style="font-size:9px;color:var(--mu);margin-top:5px;text-align:center" id="gcalStatus">${hasToken()?'☁ 연결됨':'연결 안 됨 — 눌러서 구글 로그인'}</div>
       <div style="text-align:center;margin-top:6px">
         ${hasToken()
           ?`<a href="#" onclick="forgetToken();return false" style="font-size:9px;color:var(--mu)">토큰 지우기</a>`
-          :`<a href="#" onclick="promptToken();return false" style="font-size:9px;color:var(--Rd)">GitHub 토큰 연결</a>`}
+          :`<a href="#" onclick="promptToken();return false" style="font-size:9px;color:var(--Rd)">구글 로그인</a>`}
       </div>
     </div>
     ${saved}`;
@@ -2381,5 +2364,22 @@ function mergeIcal() {
 
 
 <a href="https://maydly.github.io/note/hub/" id="maydlyHubBtn" aria-label="maydly 허브로" style="position:fixed;left:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:2147483647;display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.94);color:#2e2a26;text-decoration:none;font-family:-apple-system,'Pretendard','Apple SD Gothic Neo',sans-serif;font-size:13px;line-height:1;padding:9px 15px;border-radius:22px;box-shadow:0 3px 14px rgba(0,0,0,.22);border:1px solid rgba(0,0,0,.06);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)"><span style="font-weight:800">← 허브</span><span style="width:1px;height:12px;background:rgba(0,0,0,.16)"></span><span style="font-weight:600;color:#8a8178">예약 캘린더</span></a>
+<!-- ── Firebase 로그인+저장 브리지 (토큰 대신 구글 로그인) ── -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const cfg={ apiKey:"AIzaSyBfyRE7CNENjgSfe25xHAdr87gOllpYtvM", authDomain:"subin-routine.firebaseapp.com", projectId:"subin-routine" };
+const app=initializeApp(cfg,"mjcal"); const auth=getAuth(app), db=getFirestore(app);
+setPersistence(auth, browserLocalPersistence).catch(()=>{});
+window.MJCAL={
+  user:null, ready:false,
+  login:()=>signInWithPopup(auth, new GoogleAuthProvider()),
+  logout:()=>signOut(auth),
+  async get(path){ const [c,i]=path.split('/'); const s=await getDoc(doc(db,c,i)); if(!s.exists())return null; const b=s.data().blob; return b?JSON.parse(b):null; },
+  async put(path,obj){ const [c,i]=path.split('/'); await setDoc(doc(db,c,i),{ blob:JSON.stringify(obj), savedAt:new Date().toISOString() }); }
+};
+onAuthStateChanged(auth,(u)=>{ window.MJCAL.user=u; window.MJCAL.ready=true; if(typeof window.onMjAuth==='function') window.onMjAuth(u); });
+</script>
 </body>
 </html>

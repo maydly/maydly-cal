@@ -273,7 +273,7 @@ const KAKAO_URL='https://pf.kakao.com/_pxnxgbn/chat';
 // 이 API는 '가능/불가'만 내보내며, 고객명·연락처·메모는 애초에 들어있지 않다.
 // 같은 사이트(GitHub Pages)에 올라간 공개 데이터. 관리자가 저장할 때마다 자동 갱신됨.
 // (개인정보 없는 '가능/불가'만 담긴 파일 — 관리자 서버 함수 대신 GitHub 정적 파일로 읽는다)
-const PUBLIC_API='./public.json';
+const PUBLIC_API='https://firestore.googleapis.com/v1/projects/subin-routine/databases/(default)/documents/cal_public/schedule'; // 고객 공개 가용여부: Firestore cal_public/schedule (로그인 없이 읽기)
 
 // 이 데이터가 없거나 로딩 실패하면 기본 가능표를 절대 보여주지 않음
 let publicSchedule = null;
@@ -281,9 +281,9 @@ let dataLoaded = false; // true여야만 가능/불가 표시
 
 async function loadPublicData(){
   try{
-    const res=await fetch(PUBLIC_API+'?t='+Date.now(),{cache:'no-store'});
+    const res=await fetch(PUBLIC_API,{cache:'no-store'});
     if(res.ok){
-      const d=await res.json();
+      const _fs=await res.json(); const d=JSON.parse(_fs.fields.blob.stringValue); // Firestore 문서에서 원본 꺼냄
       if(d.schedule&&Object.keys(d.schedule).length>0){
         publicSchedule=d.schedule;
         dataLoaded=true;
