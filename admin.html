@@ -1249,7 +1249,7 @@ function renderCal(){
       <button class="add-b" onclick="openAdd()">+ 일정</button>
     </div>
     <div class="cal-filterbar">${buildFilterBar()}</div>
-    <div id="calBody" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0"></div>`;
+    <div id="calBody" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;padding-bottom:calc(58px + env(safe-area-inset-bottom,0px))"></div>`;
   updLabel();renderBody();
 }
 // 상단 라벨 필터바 (사이드바 대체 — 웹·폰 공통 전체폭 구조)
