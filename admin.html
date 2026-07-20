@@ -873,18 +873,17 @@ function buildPublicSchedule(){
     });
   });
   const schedule={};
-  const LEAD_DAYS=3;   // 오늘부터 3일 이내(오늘·내일·모레)는 촬영 준비시간 확보 위해 예약 마감
+  const LEAD_DAYS=7;   // 오늘부터 7일 이내(오늘~6일 뒤)는 자리가 남아도 예약 마감 — 7일 뒤부터 예약 가능
   for(let i=-7;i<90;i++){
     const d=new Date(TODAY);d.setDate(TODAY.getDate()+i);const ds=fd(d);const dow=dowOf(ds);
-    // 지난 날 + 3일 이내는 자리가 남아도 예약불가
-    if(i<LEAD_DAYS){schedule[ds]={unavailable:true};continue;}
+    // 지난 날 + 일주일 이내는 공개 데이터에서 아예 제외 → 고객 달력에 표시되지 않음(빈 칸)
+    // (스튜디오·야외 공통. 노쇼 등으로 자리가 비어도 이 기간은 열지 않는다)
+    if(i<LEAD_DAYS){continue;}
     if([1,2,5,6].includes(dow)){
       // 고정 차단 요일(월화금토): 실제 종일 일정이 있는 날만 예약 불가,
       // 그 외에는 야외촬영 문의 가능으로 공개 (야외촬영은 일정·시간 협의 가능)
-      // 단, 야외촬영도 오늘 기준 1주일 이내는 예약 불가
       const fb=busyMap[ds];
       if(fb&&fb.allDay){schedule[ds]={unavailable:true};continue;}
-      if(i<7){schedule[ds]={unavailable:true};continue;}
       schedule[ds]={unavailable:true,outdoorInquiry:true};continue;
     }
     const busy=busyMap[ds];
@@ -2112,13 +2111,14 @@ function exportPublicData(){
 
   const publicSlots={};
   days.forEach((ds,di)=>{
+    // 지난 날 + 일주일 이내(오늘~6일 뒤)는 공개 데이터에서 제외 → 고객 달력에 안 보임
+    // (di-7 = 오늘부터 며칠 뒤. buildPublicSchedule()의 LEAD_DAYS=7과 동일 규칙)
+    if(di-7<7)return;
     const dow=dowOf(ds);
     if([1,2,5,6].includes(dow)){
       // 고정 차단 요일(월화금토): 종일 일정이 있는 날만 예약 불가, 그 외 야외촬영 문의 가능
-      // 단, 야외촬영도 오늘 기준 1주일 이내는 예약 불가 (di-7 = 오늘부터 며칠 뒤)
       const fb=busyMap[ds];
       if(fb?.allDay){publicSlots[ds]={unavailable:true};return;}
-      if(di-7<7){publicSlots[ds]={unavailable:true};return;}
       publicSlots[ds]={unavailable:true,outdoorInquiry:true};return;
     }
 

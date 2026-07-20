@@ -376,7 +376,16 @@ async function loadPublicData(){
 // (예전 버전은 로딩 실패 시 기본 요일표를 '전부 가능'으로 보여줘, 꽉 찬 날도 가능해 보일 수 있었다)
 const NO_DATA=[{noData:true}];
 const UNAVAIL=[{avail:false,allDayBlock:true,label:'종일 외부 촬영 일정으로 인한 예약 불가'}];
+// 오늘 기준 며칠 뒤인지 (0=오늘, 음수=지난 날)
+function daysAhead(ds){
+  const t=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
+  return Math.round((parseDS(ds)-t)/86400000);
+}
+const LEAD_DAYS=7;  // 오늘~6일 뒤는 자리가 남아도 예약 마감 (7일 뒤부터 가능)
 function getMaydlySlots(ds){
+  // 일주일 이내(및 지난 날)는 공개 데이터와 무관하게 항상 마감 — 달력에 표시하지 않음.
+  // 관리자 데이터가 오래돼 '가능'으로 남아 있어도 여기서 막는다(노쇼 빈자리 노출 방지).
+  if(daysAhead(ds)<LEAD_DAYS) return NO_DATA;
   if(!dataLoaded||!publicSchedule) return NO_DATA;
   const pd=publicSchedule[ds];
   if(pd===undefined) return NO_DATA;          // 서버가 안 내려준 날짜(범위 밖) — 문의로
