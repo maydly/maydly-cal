@@ -266,19 +266,20 @@ body,#landing,#calPage,#app{background:#f0f6ef url("data:image/svg+xml,%3Csvg%20
     </div>
     <div class="mg" id="calGrid"></div>
     <div id="gcalStatus" style="margin-top:10px;font-size:11px;font-weight:700;padding:5px 12px;border-radius:8px;border:1.5px solid #ddd;background:#f5f5f5;color:#888;display:inline-block;float:right"></div>
-    <a href="https://pf.kakao.com/_pxnxgbn/chat" target="_blank" style="clear:both;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;background:#FEE500;color:#3A1D1D;font-weight:700;font-size:13px;padding:15px;border-radius:12px;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.06)">
-      <svg width="18" height="16" viewBox="0 0 20 18"><path d="M10 0C4.477 0 0 3.358 0 7.5c0 2.67 1.756 5.013 4.398 6.395L3.25 18l5.134-3.37c.527.074 1.068.12 1.616.12 5.523 0 10-3.358 10-7.5S15.523 0 10 0z" fill="#3A1D1D"/></svg>
-      가능한 날짜를 확인했다면, 카카오채널로 문의하기
-    </a>
+    <div style="clear:both;display:flex;gap:8px;margin-top:16px;align-items:stretch">
+      <a href="https://pf.kakao.com/_pxnxgbn/chat" target="_blank" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:#FEE500;color:#3A1D1D;padding:13px 10px;border-radius:12px;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.1);text-align:center;line-height:1.4">
+        <span style="font-size:9.5px;font-weight:600;opacity:.7">가능한 날짜를 확인했다면</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800">
+          <svg width="16" height="14" viewBox="0 0 20 18" style="flex-shrink:0"><path d="M10 0C4.477 0 0 3.358 0 7.5c0 2.67 1.756 5.013 4.398 6.395L3.25 18l5.134-3.37c.527.074 1.068.12 1.616.12 5.523 0 10-3.358 10-7.5S15.523 0 10 0z" fill="#3A1D1D"/></svg>
+          카카오채널로 문의하기
+        </span>
+      </a>
+      <a href="https://maydly.github.io/" target="_blank" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#7ab87a;color:#fff;padding:13px 10px;border-radius:12px;text-decoration:none;box-shadow:0 2px 12px rgba(122,184,122,.35);text-align:center;line-height:1.5">
+        <span style="font-size:11px;font-weight:700">보내드린 시안 페이지 끝까지<br>확인을 못하셨다면 확인 부탁드립니다</span>
+        <span style="font-size:11px;font-weight:800;opacity:.95">📄 시안 페이지 열기 →</span>
+      </a>
+    </div>
   </div>
-</div>
-
-<!-- KAKAO STICKY -->
-<div class="kakao-sticky" id="kakaoSticky" style="display:none">
-  <a href="https://pf.kakao.com/_pxnxgbn/chat" target="_blank" class="kakao-btn">
-    <svg width="18" height="16" viewBox="0 0 20 18"><path d="M10 0C4.477 0 0 3.358 0 7.5c0 2.67 1.756 5.013 4.398 6.395L3.25 18l5.134-3.37c.527.074 1.068.12 1.616.12 5.523 0 10-3.358 10-7.5S15.523 0 10 0z" fill="#3A1D1D"/></svg>
-    카카오로 문의
-  </a>
 </div>
 
 <!-- POPUP -->
@@ -402,7 +403,6 @@ function goCalendar(){
   document.getElementById('landing').style.display='none';
   document.getElementById('calPage').style.display='flex';
   document.getElementById('calPage').style.flexDirection='column';
-  document.getElementById('kakaoSticky').style.display='block';
   updLabel();
   renderCal();
   loadPublicData(); // admin에서 내보낸 공개 데이터 로드 (최우선)
@@ -410,7 +410,6 @@ function goCalendar(){
 function goLanding(){
   document.getElementById('landing').style.display='flex';
   document.getElementById('calPage').style.display='none';
-  document.getElementById('kakaoSticky').style.display='none';
 }
 function chM(n){curDate.setMonth(curDate.getMonth()+n);updLabel();renderCal();}
 function goToday(){curDate=new Date(TODAY);updLabel();renderCal();}
