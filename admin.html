@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>maydly — 관리자 v3.0</title>
+<title>maydly — 명진 캘린더 v3.0</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -324,7 +324,7 @@ body,#landing,#calPage,#app{background:#f0f6ef url("data:image/svg+xml,%3Csvg%20
       </svg>
     </div>
     <div style="font-size:12px;color:#8aaa8a;letter-spacing:.5px;line-height:1.8;margin-bottom:8px">나를 이해하고 기록하는 촬영</div>
-    <div style="font-size:10px;color:#b04040;font-weight:600;margin-bottom:16px;padding:5px 14px;border:1px solid #e0c0c0;border-radius:20px;background:#fff8f8">관리자 전용</div>
+    <div style="font-size:10px;color:#b04040;font-weight:600;margin-bottom:16px;padding:5px 14px;border:1px solid #e0c0c0;border-radius:20px;background:#fff8f8">명진 캘린더 · 전용</div>
 
     <div style="
       background:#fff3cd;border:1px solid #ffc107;border-radius:10px;
@@ -345,7 +345,7 @@ body,#landing,#calPage,#app{background:#f0f6ef url("data:image/svg+xml,%3Csvg%20
       width:240px;transition:background .15s;
       box-shadow:0 2px 12px rgba(122,184,122,.3);
     " onmouseover="this.style.background='var(--Rd)'" onmouseout="this.style.background='var(--R)'">
-      관리자로 시작하기
+      명진 캘린더 시작하기
     </button>
   </div>
 </div>
@@ -970,7 +970,7 @@ let calView='month',curPage='cal';
 let curDate=new Date(TODAY);
 let sbOpen=true;
 const PX=52,HS=8,HE=22;
-const filters={studio_m:true,studio_f:true,outdoor:true,studio_pay:true,outdoor_pay:true,pa_shoot:true,rest:true,nopay:true,brand:true,personal:true};
+const filters={studio_m:true,studio_f:true,outdoor:true,studio_pay:true,outdoor_pay:true,pa_shoot:true,rest:true,nopay:true,brand:true,personal:true,suvin:true};
 
 // ── 관리자 로그인 ──
 let selAdminUser='mj';
