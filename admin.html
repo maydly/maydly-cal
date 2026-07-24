@@ -470,12 +470,13 @@ const LABELS={
   brand:{name:'브랜드/상업',color:'#8a6040'},
   personal:{name:'개인',color:'#999'},
   suvin:{name:'수빈',color:'#e08a3c'},
+  gov:{name:'거버넌스',color:'#5a6fa0'},
 };
-// maydly 예약이 아닌 외부 캘린더 라벨(수빈) — 가용시간·공개데이터 계산에서 제외
+// maydly 예약이 아닌 외부 캘린더 라벨(수빈·거버넌스) — 가용시간·공개데이터 계산에서 제외
 // (260718) '휴일'(holiday) 라벨을 '휴무'(rest)로 통합. 로드 시 자동 변환 → 기존 휴일 예약도 휴무로 취급되고,
 //          저장하면 실제로 rest로 바뀜. 선택지·필터엔 '휴무'만 남음. (국가공휴일 KR_HOLIDAYS와는 무관)
 function mergeHoliday(evs){ if(Array.isArray(evs)) evs.forEach(function(e){ if(e&&e.label==='holiday') e.label='rest'; }); return evs; }
-const EXT_LABELS=['suvin'];
+const EXT_LABELS=['suvin','gov'];
 function isExt(e){return e&&(e.ext||EXT_LABELS.includes(e.label));}
 // ── status 정의 (260630 v4.0 개편): 예약→촬영→구매 흐름 6단계 ──
 // active=true → 실제 예약(고객 공개 '예약불가'·집계에 포함), false → 노쇼/취소
