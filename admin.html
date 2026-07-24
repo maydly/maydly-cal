@@ -494,6 +494,13 @@ const STATUS={
   cancel:   {name:'취소',   emoji:'',  active:false},
 };
 const STATUS_ORDER=['none','booked','outfit','nosh','buy_select','buy_raw','buy_color'];
+// 노쇼 표시 색(회색 통일) + 노쇼를 목록 맨 아래로 보내는 정렬
+const NOSH_COLOR='#dcdcdc';   // 노쇼 배경(연한 회색)
+const NOSH_TEXT='#8a8a8a';    // 노쇼 글씨(연한 배경 위 진회색 — 가독성)
+function noshLast(a,b){
+  const na=a.status==='nosh'?1:0, nb=b.status==='nosh'?1:0;
+  return (na-nb) || (a.time||'').localeCompare(b.time||'');
+}
 function stInfo(s){return STATUS[s]||STATUS.booked;}
 function stName(s){return stInfo(s).name;}
 function stEmoji(s){return stInfo(s).emoji||'';}
@@ -1330,7 +1337,7 @@ function mCell(ds,dn,dim){
       }
     }
     return false;
-  }).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  }).sort(noshLast);   // 노쇼는 시간순 뒤, 맨 아래로
   const dow=new Date(ds+'T00:00').getDay();     // 0=일요일(주 시작)
   let spanHtml='';                               // 장기(연속)일정 = 칸 맨 위
   evs.forEach(e=>{
@@ -1340,17 +1347,17 @@ function mCell(ds,dn,dim){
     const isSpanCont=e.date!==ds;                // 이 칸이 연속 중간(시작일 아님)
     const multi=e.dur>=24;                        // 다일(장기) 일정
     let op='';
-    if(isNosh)op='opacity:.45;text-decoration:line-through;';
+    if(isNosh)op='text-decoration:line-through;';               // 노쇼 = 회색(아래) + 취소선
     else if(isCancel)op='opacity:.35;text-decoration:line-through;';
     else if(!stActive(e.status))op='opacity:.6;';
     if(multi){
       // 이름은 시작일 또는 주 시작(일요일)에만 → 나머지는 색 바만 이어짐
       const showName=!isSpanCont||dow===0;
-      spanHtml+=`<div class="m-bar m-span${isSpanCont?' m-cont':''}" style="background:${L.color};color:#fff;${op}" onclick="event.stopPropagation();openD(${e.id})">${showName?nameTag(e,L.name):'&nbsp;'}</div>`;
+      spanHtml+=`<div class="m-bar m-span${isSpanCont?' m-cont':''}" style="background:${isNosh?NOSH_COLOR:L.color};color:${isNosh?NOSH_TEXT:'#fff'};${op}" onclick="event.stopPropagation();openD(${e.id})">${showName?nameTag(e,L.name):'&nbsp;'}</div>`;
     }else{
       const mAlpha=e.allDay?'ff':'80';            // 종일=100%, 비종일=50%
       const mTxc=e.allDay?'#fff':'var(--tx)';
-      inner+=`<div class="m-bar" style="background:${L.color}${mAlpha};color:${mTxc};${op}" onclick="event.stopPropagation();openD(${e.id})">${nameTag(e,L.name)}</div>`;
+      inner+=`<div class="m-bar" style="background:${isNosh?NOSH_COLOR:L.color+mAlpha};color:${isNosh?NOSH_TEXT:mTxc};${op}" onclick="event.stopPropagation();openD(${e.id})">${nameTag(e,L.name)}</div>`;
     }
   });
   return`<div class="mc${dim?' dim':''}${isT?' tdc':''}" onclick="openDay('${ds}')"><div class="dn sticky">${dn}</div>${spanHtml}${inner}</div>`;
@@ -1397,7 +1404,7 @@ function placeBlocks(ws,cols){
 
 function openDay(ds){
   const evs=getVis().filter(e=>e.date===ds)
-    .sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+    .sort(noshLast);   // 노쇼는 맨 아래로
   if(evs.length===0){openAdd(ds);return;}
   const [y,m,d]=ds.split('-');
   document.getElementById('pnh').innerHTML=`${y}년 ${parseInt(m)}월 ${parseInt(d)}일<button class="px" onclick="closeP()">×</button>`;
@@ -1405,9 +1412,11 @@ function openDay(ds){
   evs.forEach(e=>{
     const L=LABELS[e.label]||{name:'기타',color:'#999'};
     const isNosh=e.status==='nosh',isCancel=e.status==='cancel';
-    let op=(isNosh||isCancel)?'opacity:.5;text-decoration:line-through;':(!stActive(e.status)?'opacity:.7;':'');
-    b+=`<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;margin-bottom:4px;background:${L.color}12;cursor:pointer;${op}" onclick="closeP();openD(${e.id})">
-      <div style="width:8px;height:8px;border-radius:50%;background:${L.color};flex-shrink:0"></div>
+    let op=isNosh?'text-decoration:line-through;':(isCancel?'opacity:.5;text-decoration:line-through;':(!stActive(e.status)?'opacity:.7;':''));
+    const rowBg=isNosh?NOSH_COLOR+'22':L.color+'12';   // 노쇼 = 회색 배경
+    const dotC=isNosh?NOSH_COLOR:L.color;
+    b+=`<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;margin-bottom:4px;background:${rowBg};cursor:pointer;${op}" onclick="closeP();openD(${e.id})">
+      <div style="width:8px;height:8px;border-radius:50%;background:${dotC};flex-shrink:0"></div>
       <div style="flex:1;min-width:0">
         <div style="font-size:11px;font-weight:700;color:var(--tx)">${nameTag(e,L.name)}</div>
         <div style="font-size:9px;color:var(--mu);margin-top:1px">${e.time?e.time.slice(0,5)+' – '+addH(e.time,e.dur)+' ('+e.dur+'h)':L.name}</div>
@@ -1426,7 +1435,7 @@ function openD(id){
   const emj=stEmoji(e.status);
   const stb=stActive(e.status)
     ?`<span class="badge bOK">${emj?emj+' ':''}${stName(e.status)}</span>`
-    :`<span class="badge" style="background:#c86060;color:#fff">${emj?emj+' ':''}${stName(e.status)}</span>`;
+    :`<span class="badge" style="background:${e.status==='nosh'?NOSH_COLOR:'#c86060'};color:${e.status==='nosh'?NOSH_TEXT:'#fff'}">${emj?emj+' ':''}${stName(e.status)}</span>`;
   let b=`<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center">${stb}<span style="background:${L.color};color:#fff;font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px">${L.name}</span></div>`;
   const durDays=Math.ceil(e.dur/24);
   b+=`<div class="det-r"><span class="det-l">📅 날짜</span>${e.date}${durDays>1?` ~ ${addDays(e.date,durDays-1)} (${durDays}일)`:''}</div>`;
