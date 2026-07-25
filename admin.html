@@ -1447,7 +1447,7 @@ function openD(id){
     if(govE.note)b+=`<div class="det-r"><span class="det-l">📝 메모</span>${govE.note}</div>`;
     b+=`<div style="margin-top:14px;font-size:11px;color:var(--mu);border-top:1px solid var(--bd);padding-top:10px">자동 거버넌스 일정 · 읽기 전용</div>`;
     document.getElementById('pb').innerHTML=b;
-    document.getElementById('pnl').classList.add('open');
+    openP();
     return;
   }
   const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
