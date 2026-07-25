@@ -1436,6 +1436,20 @@ function openDay(ds){
 }
 
 function openD(id){
+  const govE=govEvents.find(x=>x.id===id);
+  if(govE){
+    const L=LABELS[govE.label]||{name:'거버넌스',color:'#5a6fa0'};
+    document.getElementById('pnh').innerHTML=`<span style="color:${L.color}">${L.name}</span><button class="px" onclick="closeP()">×</button>`;
+    let b=`<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center"><span style="background:${L.color};color:#fff;font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px">${L.name}</span></div>`;
+    b+=`<div class="det-r"><span class="det-l">📋 제목</span>${govE.title||''}</div>`;
+    b+=`<div class="det-r"><span class="det-l">📅 날짜</span>${govE.date||''}</div>`;
+    if(govE.allDay)b+=`<div class="det-r"><span class="det-l">🕐 시간</span>종일</div>`;
+    if(govE.note)b+=`<div class="det-r"><span class="det-l">📝 메모</span>${govE.note}</div>`;
+    b+=`<div style="margin-top:14px;font-size:11px;color:var(--mu);border-top:1px solid var(--bd);padding-top:10px">자동 거버넌스 일정 · 읽기 전용</div>`;
+    document.getElementById('pb').innerHTML=b;
+    document.getElementById('pnl').classList.add('open');
+    return;
+  }
   const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
   const L=LABELS[e.label]||{name:'기타',color:'#999'};
   document.getElementById('pnh').innerHTML=`${e.client||L.name}<button class="px" onclick="closeP()">×</button>`;
