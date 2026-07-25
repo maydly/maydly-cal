@@ -952,7 +952,7 @@ async function syncFromGithub(){
       if(govEventsCache.length){
         govEventsCache.forEach(e=>{maydlyEvents.push(e);});
       }
-      nextId=Math.max(0,...maydlyEvents.map(e=>e.id||0),0)+1;
+      nextId=Math.max(0,...maydlyEvents.filter(e=>e.id<90000).map(e=>e.id||0),0)+1;
       try{localStorage.setItem(STORAGE_KEY,JSON.stringify(maydlyEvents));}catch(e){}
       if(typeof curPage!=='undefined'&&curPage==='cal')renderBody();
       if(typeof buildNav==='function')buildNav();
@@ -992,7 +992,7 @@ fetch('./governance-events.json?t='+Date.now())
   })
   .catch(()=>{});
 let clientRequests=loadRequests();
-let nextId=Math.max(0,...maydlyEvents.map(e=>e.id||0),0)+1;
+let nextId=Math.max(0,...maydlyEvents.filter(e=>e.id<90000).map(e=>e.id||0),0)+1;
 let lastSaved=nowStr();
 let calView='month',curPage='cal';
 let curDate=new Date(TODAY);
