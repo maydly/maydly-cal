@@ -498,6 +498,8 @@ const STATUS_ORDER=['none','booked','outfit','nosh','buy_select','buy_raw','buy_
 const NOSH_COLOR='#dcdcdc';   // 노쇼 배경(연한 회색)
 const NOSH_TEXT='#8a8a8a';    // 노쇼 글씨(연한 배경 위 진회색 — 가독성)
 function noshLast(a,b){
+  const ga=a.label==='gov'?2:0, gb=b.label==='gov'?2:0;
+  if(ga!==gb)return ga-gb;
   const na=a.status==='nosh'?1:0, nb=b.status==='nosh'?1:0;
   return (na-nb) || (a.time||'').localeCompare(b.time||'');
 }
