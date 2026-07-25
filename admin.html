@@ -836,6 +836,8 @@ function nextOccurrence(cur, repeat, origin){
     while(d.getDay()!==dow)d.setDate(d.getDate()+1);
     d.setDate(d.getDate()+(nth-1)*7);
   }
+  else if(repeat==='biweekly'){d.setDate(d.getDate()+14);}
+  else if(repeat==='4weekly'){d.setDate(d.getDate()+28);}
   else if(repeat==='yearly'){d.setFullYear(d.getFullYear()+1);}
   else return null;
   return d;
@@ -1575,6 +1577,7 @@ function daySpan(sd,ed){return Math.max(1,Math.round((new Date(ed+'T00:00')-new 
 function repeatOptions(ds,sel){
   const d=new Date(ds+'T00:00'),wd=WD[d.getDay()],nth=Math.ceil(d.getDate()/7),dom=d.getDate();
   return [['none','반복 안함'],['daily','매일'],['weekly','매주 '+wd+'요일'],['weekday','매주 평일 (월~금)'],
+    ['biweekly','격주 '+wd+'요일'],['4weekly','4주마다 '+wd+'요일'],
     ['monthly_nth','매월 '+nth+'째주 '+wd+'요일'],['monthly_date','매월 '+dom+'일'],['yearly','매년']]
     .map(([v,t])=>`<option value="${v}"${v===sel?' selected':''}>${t}</option>`).join('');
 }
@@ -1583,6 +1586,8 @@ function repeatLabel(ds,rep){
   const fixed={daily:'매일',weekday:'매주 평일(월~금)',yearly:'매년'};if(fixed[rep])return fixed[rep];
   const d=new Date(ds+'T00:00'),wd=WD[d.getDay()];
   if(rep==='weekly')return '매주 '+wd+'요일';
+  if(rep==='biweekly')return '격주 '+wd+'요일';
+  if(rep==='4weekly')return '4주마다 '+wd+'요일';
   if(rep==='monthly_nth')return '매월 '+Math.ceil(d.getDate()/7)+'째주 '+wd+'요일';
   if(rep==='monthly_date')return '매월 '+d.getDate()+'일';
   return rep;
