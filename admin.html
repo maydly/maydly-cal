@@ -2115,7 +2115,7 @@ function doJsonImport(){
       if(!e.date||!e.label)return;
       const _id=nextId++;
       // 전달 체크(dlvBasic/dlvBuy)가 들어 있으면 살려서 가져온다
-      maydlyEvents.push({id:_id,label:e.label||'studio_f',date:e.date,time:e.time||'10:00',dur:parseInt(e.dur)||2,status:e.status||'booked',client:e.client||null,insta:e.insta||e.phone||null,note:e.note||'',priv:e.priv||['rest','personal'].includes(e.label),allDay:!!e.allDay,dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null});
+      maydlyEvents.push({id:_id,label:e.label||'studio_f',date:e.date,time:e.time||'10:00',dur:parseFloat(e.dur)||2,status:e.status||'booked',client:e.client||null,insta:e.insta||e.phone||null,note:e.note||'',priv:e.priv||['rest','personal'].includes(e.label),allDay:!!e.allDay,dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null});
       _addedIds.push(_id);
       added++;
     });
