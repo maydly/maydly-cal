@@ -794,7 +794,8 @@ function loadEvents(){
   return[];
 }
 function saveEvents(){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(maydlyEvents));lastSaved=nowStr();}
+  const toSave=maydlyEvents.filter(e=>!(e.id>=90000));
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(toSave));lastSaved=nowStr();}
   catch(e){toast('저장 실패');}
   pushToGithub();
 }
@@ -931,7 +932,7 @@ function pushToGithub(){
   _pushT=setTimeout(async()=>{
     if(_pushing)return; _pushing=true; setSaveStatus('⟳ 저장 중…','loading');
     try{
-      await ghPut(GH_DATA,{events:maydlyEvents,savedAt:new Date().toISOString()});
+      await ghPut(GH_DATA,{events:maydlyEvents.filter(e=>!(e.id>=90000)),savedAt:new Date().toISOString()});
       await ghPut(GH_PUBLIC,buildPublicSchedule());   // 고객 공개 데이터도 함께 갱신
       _serverOn=true; lastSaved=nowStr(); setSaveStatus('✓ 저장됨 '+lastSaved,'ok');
     }catch(e){
@@ -946,8 +947,8 @@ async function syncFromGithub(){
     const {data}=await ghGet(GH_DATA);
     if(data&&Array.isArray(data.events)){
       _serverOn=true;
-      maydlyEvents=mergeHoliday(data.events);
-      // syncFromGithub 후에도 거버넌스 이벤트 유지 (GitHub 데이터에 없으므로 재병합)
+      maydlyEvents=mergeHoliday(data.events.filter(e=>!(e.id>=90000)));
+      // syncFromGithub 후에도 거버넌스 이벤트 유지 (저장 대상에서 제외되므로 캐시에서 재병합)
       if(govEventsCache.length){
         govEventsCache.forEach(e=>{maydlyEvents.push(e);});
       }
