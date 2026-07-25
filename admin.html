@@ -956,7 +956,7 @@ async function syncFromGithub(){
       try{localStorage.setItem(STORAGE_KEY,JSON.stringify(maydlyEvents));}catch(e){}
       if(typeof curPage!=='undefined'&&curPage==='cal')renderBody();
       if(typeof buildNav==='function')buildNav();
-      setSaveStatus('✓ 불러옴 ('+maydlyEvents.length+')','ok');
+      const _synced=data.savedAt?new Date(data.savedAt).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):nowStr(); setSaveStatus('✓ 동기화 '+_synced,'ok');
       toast('최신 불러옴 ('+maydlyEvents.length+')');
     }else{
       // 저장소가 비었으면 현재(임베드) 데이터로 시드
