@@ -1,0 +1,26 @@
+[
+  {
+    "id": "gov-weekly-20260728",
+    "label": "gov",
+    "date": "2026-07-28",
+    "title": "주간 구조·파일명 감사",
+    "allDay": true,
+    "note": "cron 자동 실행 · 매주 월요일 00:10"
+  },
+  {
+    "id": "gov-biweekly-20260801",
+    "label": "gov",
+    "date": "2026-08-01",
+    "title": "격주 신설업무 분류결정판",
+    "allDay": true,
+    "note": "cron 자동 실행 · 격주 금요일 00:10"
+  },
+  {
+    "id": "gov-monthly-20260802",
+    "label": "gov",
+    "date": "2026-08-02",
+    "title": "4주 거버넌스 감사",
+    "allDay": true,
+    "note": "cron 자동 실행 · 4주마다 토요일 00:10"
+  }
+]

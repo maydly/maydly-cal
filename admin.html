@@ -972,6 +972,11 @@ function saveRequests(){
 }
 
 let maydlyEvents=mergeHoliday(loadEvents());
+let govEvents=[];
+fetch('./governance-events.json?t='+Date.now())
+  .then(r=>r.ok?r.json():null)
+  .then(d=>{if(Array.isArray(d)){govEvents=d;if(typeof renderBody==='function')renderBody();if(typeof buildNav==='function')buildNav();}})
+  .catch(()=>{});
 let clientRequests=loadRequests();
 let nextId=Math.max(0,...maydlyEvents.map(e=>e.id||0),0)+1;
 let lastSaved=nowStr();
@@ -1307,7 +1312,7 @@ function renderMini(){
   document.getElementById('miniG').innerHTML=h;
 }
 function getVis(){
-  return maydlyEvents.filter(e=>filters[e.label]!==false);
+  return [...maydlyEvents,...govEvents].filter(e=>filters[e.label]!==false);
 }
 function renderBody(){calView==='month'?renderMonth():renderTimeGrid();}
 
