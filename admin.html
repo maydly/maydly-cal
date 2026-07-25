@@ -945,6 +945,10 @@ async function syncFromGithub(){
     if(data&&Array.isArray(data.events)){
       _serverOn=true;
       maydlyEvents=mergeHoliday(data.events);
+      // syncFromGithub 후에도 거버넌스 이벤트 유지 (GitHub 데이터에 없으므로 재병합)
+      if(govEventsCache.length){
+        govEventsCache.forEach(e=>{maydlyEvents.push(e);});
+      }
       nextId=Math.max(0,...maydlyEvents.map(e=>e.id||0),0)+1;
       try{localStorage.setItem(STORAGE_KEY,JSON.stringify(maydlyEvents));}catch(e){}
       if(typeof curPage!=='undefined'&&curPage==='cal')renderBody();
@@ -971,12 +975,13 @@ function saveRequests(){
   try{localStorage.setItem(STORAGE_REQ_KEY,JSON.stringify(clientRequests));}catch(e){}
 }
 
+let govEventsCache=[];
 let maydlyEvents=mergeHoliday(loadEvents());
 fetch('./governance-events.json?t='+Date.now())
   .then(r=>r.ok?r.json():null)
   .then(d=>{
     if(!Array.isArray(d))return;
-    // 90000+ ID 범위 기존 항목 제거 후 최신 파일로 교체 (중복 방지)
+    govEventsCache=d;
     maydlyEvents=maydlyEvents.filter(e=>!(e.id>=90000));
     d.forEach(e=>{maydlyEvents.push(e);});
     if(typeof renderBody==='function')renderBody();
