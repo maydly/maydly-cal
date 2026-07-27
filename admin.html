@@ -466,7 +466,7 @@ const LABELS={
   outdoor_pay:{name:'야외페이',color:'#5abfa8'},
   pa_shoot:{name:'PA촬영',color:'#7050c0'},
   rest:{name:'휴무',color:'#c03030'},
-  nopay:{name:'무페이',color:'#60a860'},
+
   brand:{name:'브랜드/상업',color:'#8a6040'},
   personal:{name:'개인',color:'#999'},
   suvin:{name:'수빈',color:'#e08a3c'},
@@ -475,7 +475,7 @@ const LABELS={
 // maydly 예약이 아닌 외부 캘린더 라벨(수빈·거버넌스) — 가용시간·공개데이터 계산에서 제외
 // (260718) '휴일'(holiday) 라벨을 '휴무'(rest)로 통합. 로드 시 자동 변환 → 기존 휴일 예약도 휴무로 취급되고,
 //          저장하면 실제로 rest로 바뀜. 선택지·필터엔 '휴무'만 남음. (국가공휴일 KR_HOLIDAYS와는 무관)
-function mergeHoliday(evs){ if(Array.isArray(evs)) evs.forEach(function(e){ if(e&&e.label==='holiday') e.label='rest'; }); return evs; }
+function mergeHoliday(evs){ if(Array.isArray(evs)) evs.forEach(function(e){ if(e&&e.label==='holiday') e.label='rest'; if(e&&e.label==='nopay'){ e.label='studio_f'; var _t='[과거이력1: 원 무페이]'; if((e.note||'').indexOf(_t)<0) e.note=(e.note?e.note+' ':'')+_t; } }); return evs; }
 const EXT_LABELS=['suvin','gov'];
 function isExt(e){return e&&(e.ext||EXT_LABELS.includes(e.label));}
 // ── status 정의 (260630 v4.0 개편): 예약→촬영→구매 흐름 6단계 ──
@@ -522,7 +522,7 @@ function durOptions(sel){
 
 // ── 전달 기한·알림 (260714 v5.0) ──
 // 전달 기한을 관리하는 촬영 라벨. PA·휴무·개인·휴일·수빈은 제외.
-const DELIV_LABELS=['studio_m','studio_f','outdoor','studio_pay','outdoor_pay','nopay','brand'];
+const DELIV_LABELS=['studio_m','studio_f','outdoor','studio_pay','outdoor_pay','brand'];
 // 이 날짜 이전 촬영은 이미 전달한 것으로 보고 알림을 띄우지 않는다(과거 1,300여 건 보호).
 const DELIV_SINCE='2026-07-14';
 const ALERT_LEAD=3;   // 전달 기한 며칠 전부터 알릴지
@@ -998,7 +998,7 @@ let calView='month',curPage='cal';
 let curDate=new Date(TODAY);
 let sbOpen=true;
 const PX=52,HS=8,HE=22;
-const filters={studio_m:true,studio_f:true,outdoor:true,studio_pay:true,outdoor_pay:true,pa_shoot:true,rest:true,nopay:true,brand:true,personal:true,suvin:true};
+const filters={studio_m:true,studio_f:true,outdoor:true,studio_pay:true,outdoor_pay:true,pa_shoot:true,rest:true,brand:true,personal:true,suvin:true};
 
 // ── 관리자 로그인 ──
 let selAdminUser='mj';
@@ -1948,7 +1948,7 @@ function renderAlerts(){
 function renderReq(){
   const now=`${TODAY.getFullYear()}-${pad(TODAY.getMonth()+1)}`;
   const pending=maydlyEvents.filter(e=>e.status==='pending').sort((a,b)=>a.date.localeCompare(b.date));
-  const shooting=['studio_f','studio_m','outdoor','studio_pay','outdoor_pay','nopay'];
+  const shooting=['studio_f','studio_m','outdoor','studio_pay','outdoor_pay'];
   const monthShots=maydlyEvents.filter(e=>e.date.startsWith(now)&&shooting.includes(e.label)&&stActive(e.status)).length;
   const yearShots=maydlyEvents.filter(e=>e.date.startsWith(`${TODAY.getFullYear()}`)&&shooting.includes(e.label)&&stActive(e.status)).length;
   const totalShots=maydlyEvents.filter(e=>shooting.includes(e.label)&&stActive(e.status)).length;
