@@ -847,7 +847,7 @@ function nextOccurrence(cur, repeat, origin){
 }
 
 function buildPublicSchedule(){
-  const WIN_END=addDays(TSTR,90);
+  const WIN_END=addDays(TSTR,185);  // 반복 일정 전개 창 — 공개 데이터 6개월치에 맞춰 확장(260724)
   const busyMap={};
   const mark=ds=>{if(!busyMap[ds])busyMap[ds]={allDay:false,slots:[]};return busyMap[ds];};
   maydlyEvents.forEach(e=>{
@@ -887,7 +887,7 @@ function buildPublicSchedule(){
   });
   const schedule={};
   const LEAD_DAYS=7;   // 오늘부터 7일 이내(오늘~6일 뒤)는 자리가 남아도 예약 마감 — 7일 뒤부터 예약 가능
-  for(let i=-7;i<90;i++){
+  for(let i=-7;i<185;i++){
     const d=new Date(TODAY);d.setDate(TODAY.getDate()+i);const ds=fd(d);const dow=dowOf(ds);
     // 지난 날 + 일주일 이내는 공개 데이터에서 아예 제외 → 고객 달력에 표시되지 않음(빈 칸)
     // (스튜디오·야외 공통. 노쇼 등으로 자리가 비어도 이 기간은 열지 않는다)
@@ -2138,7 +2138,7 @@ function exportPublicData(){
   });
 
   const days=[];
-  for(let i=-7;i<90;i++){
+  for(let i=-7;i<185;i++){
     const d=new Date(TODAY);d.setDate(TODAY.getDate()+i);
     days.push(fd(d));
   }

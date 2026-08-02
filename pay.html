@@ -255,6 +255,7 @@ body,#landing,#calPage,#app{background:#f0f6ef url("data:image/svg+xml,%3Csvg%20
     <div id="legendBar" class="legend-bar">
       <span class="leg-dot" style="background:#6ab87a"></span><span>스튜디오 촬영 가능</span>
       <span class="leg-dot" style="background:#c8a456"></span><span>야외촬영 문의 가능</span>
+      <span class="leg-dot" style="background:#5f7fa8"></span><span>협의 필요</span>
       <span class="leg-dot" style="background:#c86060"></span><span>예약 불가</span>
       <span style="margin-left:auto;font-size:10px;color:var(--mu)">날짜를 클릭하면 시간대별 확인 가능합니다</span>
     </div>
@@ -388,13 +389,20 @@ function daysAhead(ds){
   return Math.round((parseDS(ds)-t)/86400000);
 }
 const LEAD_DAYS=7;  // 오늘~6일 뒤는 자리가 남아도 예약 마감 (7일 뒤부터 가능)
+const CONSULT=[{consult:true}];  // 3~6개월 앞 — 협의 필요
+// 오늘+3개월(협의 시작) / 오늘+6개월(협의 끝). 페이는 3개월까지만 실제 가능/불가, 3~6개월은 협의 필요.
+const _cToday=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
+const CONSULT_START=(function(){const d=new Date(_cToday);d.setMonth(d.getMonth()+3);return d;})();
+const CONSULT_END=(function(){const d=new Date(_cToday);d.setMonth(d.getMonth()+6);return d;})();
 function getMaydlySlots(ds){
   // 일주일 이내(및 지난 날)는 공개 데이터와 무관하게 항상 마감 — 달력에 표시하지 않음.
   // 관리자 데이터가 오래돼 '가능'으로 남아 있어도 여기서 막는다(노쇼 빈자리 노출 방지).
   if(daysAhead(ds)<LEAD_DAYS) return NO_DATA;
+  // 3개월 초과 ~ 6개월은 실제 데이터와 무관하게 '협의 필요'(스튜디오 대관은 먼 앞은 확정 어려움), 6개월 초과는 표시 안 함
+  if(parseDS(ds)>CONSULT_START) return parseDS(ds)<=CONSULT_END ? CONSULT : NO_DATA;
   if(!dataLoaded||!publicSchedule) return NO_DATA;
   const pd=publicSchedule[ds];
-  if(pd===undefined) return NO_DATA;          // 서버가 안 내려준 날짜(범위 밖) — 문의로
+  if(pd===undefined) return NO_DATA;   // 3개월 이내인데 데이터 없음 → 문의
   if(pd.unavailable){
     // 고정 차단 요일(월화금토) 중 실제 종일 일정이 없는 날 → 야외촬영 문의 가능
     if(pd.outdoorInquiry) return[{avail:false,allDayBlock:true,outdoorInquiry:true,label:'야외촬영 문의 가능'}];
@@ -458,6 +466,8 @@ function mCell(ds,dn,dim){
   if(slots[0]?.noData){
     // 데이터 없음 — 셀에 아무것도 표시 안 함 (클릭하면 카카오 안내)
     inner='';
+  }else if(slots[0]?.consult){
+    inner=`<div class="avail-pill" style="background:rgba(95,127,168,.16);color:#3f5f8a">협의 필요</div>`;
   }else if(slots[0]?.outdoorInquiry){
     inner=`<div class="avail-pill" style="background:rgba(200,164,86,.18);color:#8a6a20">야외 문의 가능</div>`;
   }else if(slots.length===1&&slots[0].allDayBlock){
@@ -497,6 +507,14 @@ function openDaySlots(ds){
       <div style="font-size:12px;color:var(--mu);line-height:1.7;margin-bottom:16px">최신 예약 가능 정보는
 <br>카카오로 직접 문의해주세요</div>
       <a href="${KAKAO_URL}" target="_blank" style="display:block;text-align:center;background:#FEE500;color:#3A1D1D;font-weight:700;font-size:13px;padding:13px;border-radius:10px;text-decoration:none">카카오로 문의하기</a>
+    </div>`;
+  }else if(slots[0]?.consult){
+    // 3~6개월 앞 — 협의 필요
+    b=`<div style="text-align:center;padding:20px 16px">
+      <div style="font-size:32px;margin-bottom:12px">🗓️</div>
+      <div style="font-size:14px;font-weight:600;color:var(--tx);margin-bottom:6px">협의가 필요한 일정입니다</div>
+      <div style="font-size:12px;color:var(--mu);line-height:1.7;margin-bottom:16px">약 3~6개월 앞 일정은 아직 확정 전이라,<br>카카오로 문의해 일정을 협의해 주세요</div>
+      <a href="${KAKAO_URL}" target="_blank" style="display:block;text-align:center;background:#FEE500;color:#3A1D1D;font-weight:700;font-size:13px;padding:13px;border-radius:10px;text-decoration:none">카카오로 협의 문의하기</a>
     </div>`;
   }else if(slots[0]?.outdoorInquiry){
     b=`<div style="margin-bottom:10px;font-size:11px;color:var(--mu)">촬영 종류별 예약 가능 여부입니다</div>`;
