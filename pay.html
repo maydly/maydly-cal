@@ -412,11 +412,17 @@ function getMaydlySlots(ds){
     // 1시간 단위 계산에는 예약된 시간(busy) 정보가 필요 — 구버전 데이터면 문의 안내로
     if(pd.busy===undefined) return NO_DATA;
     const overlap=(s,e)=>pd.busy.some(r=>!(e<=r[0]||s>=r[1]));
-    return PAY_HOURS.map(h=>({
-      avail:!PAY_FIXED_BLOCK.includes(h)&&!overlap(h,h+1)&&!(pd.preHol&&h>=19), // 고정불가 + 예약겹침 + 다음날 공휴일 19시 이후 마감
-      allDayBlock:false,
-      label:`${pad(h)}:00 ~ ${pad(h+1)}:00`
-    }));
+    const _dow=dowOf(ds);
+    return PAY_HOURS.map(h=>{
+      // 수·목 오전 11~13시는 (야외처럼) 협의가 필요한 시간 — '가능'이 아니라 '협의 필요'로
+      if((_dow===3||_dow===4)&&(h===11||h===12))
+        return {avail:false,slotConsult:true,allDayBlock:false,label:`${pad(h)}:00 ~ ${pad(h+1)}:00`};
+      return {
+        avail:!PAY_FIXED_BLOCK.includes(h)&&!overlap(h,h+1)&&!(pd.preHol&&h>=19), // 고정불가 + 예약겹침 + 다음날 공휴일 19시 이후 마감
+        allDayBlock:false,
+        label:`${pad(h)}:00 ~ ${pad(h+1)}:00`
+      };
+    });
   }
   return NO_DATA;
 }
@@ -481,6 +487,9 @@ function mCell(ds,dn,dim){
       // 스튜디오 자리 남은 수·목엔 야외촬영도 협의 가능
       const _dow=dowOf(ds);
       if(_dow===3||_dow===4)inner+=`<div class="avail-pill" style="background:rgba(200,164,86,.18);color:#8a6a20;margin-top:2px">🌿 야외 협의</div>`;
+    }else if(slots.some(s=>s.slotConsult)){
+      // 가능한 타임은 없지만 협의 필요 시간(수·목 오전)이 있는 날 → '협의 필요'로
+      inner=`<div class="avail-pill" style="background:rgba(95,127,168,.16);color:#3f5f8a">협의 필요</div>`;
     }else{
       inner=`<div class="avail-pill" style="background:rgba(212,96,64,.12);color:#c04040">예약 불가</div>`;
     }
@@ -565,6 +574,14 @@ function openDaySlots(ds){
     b+=`<div style="margin-bottom:8px;font-size:11px;color:var(--mu)">스튜디오 시간대별 예약 가능 여부 (1시간 단위)</div>`;
     b+=`<div style="display:flex;flex-direction:column;gap:6px">`;
     slots.forEach(s=>{
+      if(s.slotConsult){
+        // 수·목 오전 11~13시 — 협의 필요(슬레이트)
+        b+=`<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(95,127,168,.12);border:1px solid #a9bcd6;border-radius:10px">
+          <span style="font-size:14px">🗓️</span>
+          <div style="font-size:13px;font-weight:600;color:#3f5f8a">${s.label} · 협의 필요</div>
+        </div>`;
+        return;
+      }
       const col=s.avail?'rgba(106,184,122,.15)':'rgba(212,96,64,.06)';
       const border=s.avail?'#6ab87a':'#e0c0c0';
       const textCol=s.avail?'#3a7a4a':'#b06060';
@@ -576,8 +593,12 @@ function openDaySlots(ds){
     });
     b+=`</div>`;
     const hasAvail=slots.some(s=>s.avail);
+    const hasConsult=slots.some(s=>s.slotConsult);
     if(hasAvail){
       b+=`<a href="${KAKAO_URL}" target="_blank" style="display:block;margin-top:14px;text-align:center;background:#FEE500;color:#3A1D1D;font-weight:700;font-size:13px;padding:13px;border-radius:10px;text-decoration:none">카카오로 예약 문의하기</a>`;
+    }else if(hasConsult){
+      b+=`<div style="margin-top:12px;text-align:center;font-size:12px;color:var(--mu)">예약 가능 시간은 없지만, 협의가 필요한 시간이 있어요</div>`;
+      b+=`<a href="${KAKAO_URL}" target="_blank" style="display:block;margin-top:8px;text-align:center;background:#FEE500;color:#3A1D1D;font-weight:700;font-size:13px;padding:13px;border-radius:10px;text-decoration:none">카카오로 협의 문의하기</a>`;
     }else{
       b+=`<div style="margin-top:12px;text-align:center;font-size:12px;color:var(--mu)">이 날은 예약 가능 시간이 없습니다</div>`;
       b+=`<a href="${KAKAO_URL}" target="_blank" style="display:block;margin-top:8px;text-align:center;border:1px solid var(--bd);color:var(--mu2);font-size:12px;padding:10px;border-radius:10px;text-decoration:none">다른 날짜로 문의하기</a>`;
