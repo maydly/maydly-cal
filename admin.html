@@ -498,10 +498,11 @@ const STATUS_ORDER=['none','booked','outfit','nosh','buy_select','buy_raw','buy_
 const NOSH_COLOR='#dcdcdc';   // 노쇼 배경(연한 회색)
 const NOSH_TEXT='#8a8a8a';    // 노쇼 글씨(연한 배경 위 진회색 — 가독성)
 function noshLast(a,b){
-  const ga=a.label==='gov'?2:0, gb=b.label==='gov'?2:0;
-  if(ga!==gb)return ga-gb;
-  const na=a.status==='nosh'?1:0, nb=b.status==='nosh'?1:0;
-  return (na-nb) || (a.time||'').localeCompare(b.time||'');
+  // 정렬 하단 규칙: 내 일정(0) < PA촬영(1) < 노쇼(2) < 거버넌스(3)
+  const _rk=e=>e.label==='gov'?3:(e.status==='nosh'?2:(e.label==='pa_shoot'?1:0));
+  const ra=_rk(a), rb=_rk(b);
+  if(ra!==rb)return ra-rb;
+  return (a.time||'').localeCompare(b.time||'');
 }
 function stInfo(s){return STATUS[s]||STATUS.booked;}
 function stName(s){return stInfo(s).name;}
