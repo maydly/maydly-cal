@@ -2036,6 +2036,14 @@ function renderImport(){
         </div>
       </div>
       <div class="import-box">
+        <h3>🔧 PA 스튜디오 목록 뽑기 (임시 진단 · 읽기전용)</h3>
+        <p>지금 등록된 <strong>PA(스튜디오) 일정 전체</strong>를 아래 칸에 뽑아줘요. (데이터는 안 바뀌어요)<br>
+        버튼 누른 뒤 → 칸 한 번 클릭 → <strong>⌘A(전체선택) → ⌘C(복사)</strong> → 클로드에 붙여넣기.</p>
+        <button class="sub-btn" style="margin-top:8px;background:var(--R)" onclick="dumpPAStudio()">📋 PA 스튜디오 목록 만들기</button>
+        <textarea id="pa-dump" readonly placeholder="여기에 목록이 나와요" style="margin-top:8px;min-height:160px;font-size:11px"></textarea>
+        <div id="pa-dump-result" class="import-result"></div>
+      </div>
+      <div class="import-box">
         <h3>일정 텍스트로 가져오기</h3>
         <p>일정을 복사해서 붙여넣으면 자동으로 분석해서 추가해드립니다.<br><br>
         <strong>형식 예시 (한 줄에 한 일정):</strong><br>
@@ -2234,6 +2242,27 @@ function openP(){document.getElementById('ov').style.display='flex';}
 function closeP(){document.getElementById('ov').style.display='none';seLabel=null;}
 function ovClick(e){if(e.target===document.getElementById('ov'))closeP();}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+// 임시 진단(읽기전용): PA 스튜디오 일정 목록 뽑기
+function dumpPAStudio(){
+  const p2=n=>String(n).padStart(2,'0');
+  const items=maydlyEvents
+    .filter(e=>e.label==='pa_shoot' && String(e.client||'').indexOf('스튜디오')===0)
+    .map(e=>{
+      let endStr='';
+      try{
+        const sd=new Date(e.date+'T'+(e.time||'00:00')+':00');
+        const ed=new Date(sd.getTime()+(Number(e.dur)||0)*3600000);
+        endStr=`${ed.getFullYear()}-${p2(ed.getMonth()+1)}-${p2(ed.getDate())} ${p2(ed.getHours())}:${p2(ed.getMinutes())}`;
+      }catch(_){}
+      return {k:(e.date||'')+' '+(e.time||''), line:`${e.date} ${e.time||'-'} (${e.dur}h) -> ${endStr} | id=${e.id} | ${e.client} | ${e.status||''}`};
+    })
+    .sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0);
+  const txt='PA스튜디오 '+items.length+'건\n'+items.map(x=>x.line).join('\n');
+  const ta=document.getElementById('pa-dump'); if(ta) ta.value=txt;
+  try{navigator.clipboard.writeText(txt);}catch(_){}
+  const r=document.getElementById('pa-dump-result'); if(r){r.className='import-result ok'; r.textContent='✓ '+items.length+'건 만들었어요. 아래 칸 클릭 → ⌘A → ⌘C 복사해서 클로드에 붙여넣기.';}
+  try{toast('PA스튜디오 '+items.length+'건 복사됨');}catch(_){}
+}
 
 // ── TimeTree iCal 파싱 및 가져오기 함수 (v3.0 추가) ──
 
