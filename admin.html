@@ -1997,6 +1997,13 @@ function renderReq(){
 function renderImport(){
   document.getElementById('pg-import').innerHTML=`
     <div class="import-wrap">
+      <div class="import-box" style="border-color:#c8a456;background:#fffdf5">
+        <h3>↩️ 가져오기 되돌리기</h3>
+        <p>가장 최근 <strong>가져오기 실행 직전 상태</strong>로 한 번 되돌려요. (잘못 가져왔을 때)<br>
+        되돌리기 전 현재 상태도 백업 파일로 자동 저장돼요.</p>
+        <button class="sub-btn" style="margin-top:8px;background:#c8a456;color:#fff" onclick="undoImport()">↩️ 최근 가져오기 되돌리기</button>
+        <div id="import-undo-result" class="import-result"></div>
+      </div>
       <div class="import-box">
         <h3>TimeTree iCal 가져오기</h3>
         <p>TimeTree 앱 → 캘린더 설정 → iCal 연동 URL을 복사하거나, .ics 파일 내용을 아래에 붙여넣으세요.</p>
@@ -2084,6 +2091,7 @@ function doImport(){
   const txt=document.getElementById('import-text').value.trim();
   const res=document.getElementById('import-result');
   if(!txt){res.className='import-result err';res.textContent='텍스트를 입력해주세요.';return;}
+  pushUndoSnapshot();   // 가져오기 직전 상태 저장(되돌리기용)
   const lines=txt.split('\n').filter(l=>l.trim());
   let added=0,failed=[];
   const _addedIds=[];
@@ -2119,6 +2127,7 @@ function doJsonImport(){
   const res=document.getElementById('import-json-result');
   try{
     const arr=JSON.parse(txt);
+    pushUndoSnapshot();   // 가져오기 직전 상태 저장(되돌리기용)
     if(!Array.isArray(arr))throw new Error('배열 형식이 아닙니다');
     let added=0;
     const _addedIds=[];
@@ -2222,6 +2231,28 @@ function openP(){document.getElementById('ov').style.display='flex';}
 function closeP(){document.getElementById('ov').style.display='none';seLabel=null;}
 function ovClick(e){if(e.target===document.getElementById('ov'))closeP();}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+// ── 가져오기 되돌리기(1단계): 가져오기 실행 직전 상태를 저장해두고 복원 ──
+function pushUndoSnapshot(){
+  try{
+    const snap={events:maydlyEvents.filter(e=>!(e.id>=90000)),at:new Date().toISOString()};
+    localStorage.setItem('mjcal_import_undo',JSON.stringify(snap));
+  }catch(_){}
+}
+function undoImport(){
+  let snap=null; try{snap=JSON.parse(localStorage.getItem('mjcal_import_undo')||'null');}catch(_){}
+  if(!snap||!Array.isArray(snap.events)){alert('되돌릴 가져오기 기록이 없어요. (가져오기를 한 번 실행한 뒤에만 되돌릴 수 있어요)');return;}
+  const when=snap.at?new Date(snap.at).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+  if(!confirm('가장 최근 가져오기 직전 상태로 되돌릴까요?\n\n기준 시점: '+when+'\n(그 이후 추가·변경분이 사라질 수 있어요. 되돌리기 전 현재 상태는 백업 파일로 저장돼요.)'))return;
+  try{
+    const bk=new Blob([JSON.stringify({events:maydlyEvents,savedAt:new Date().toISOString(),note:'되돌리기 직전 백업'},null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(bk);a.download='events_되돌리기전_백업.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  }catch(_){}
+  maydlyEvents.length=0; snap.events.forEach(e=>maydlyEvents.push(e));
+  nextId=Math.max(0,...maydlyEvents.filter(e=>e.id<90000).map(e=>e.id||0),0)+1;
+  localStorage.removeItem('mjcal_import_undo');
+  saveEvents(); try{renderBody();buildNav();if(typeof renderImport==='function')renderImport();}catch(_){}
+  alert('✓ 되돌렸어요. 가져오기 직전 상태로 복원하고 저장(동기화)했어요.');
+}
 
 // ── TimeTree iCal 파싱 및 가져오기 함수 (v3.0 추가) ──
 
@@ -2408,6 +2439,7 @@ function previewIcal() {
 function mergeIcal() {
   const parsed = window._icalParsed;
   if (!parsed || !parsed.length) { toast('미리보기를 먼저 실행해주세요.'); return; }
+  pushUndoSnapshot();   // 가져오기 직전 상태 저장(되돌리기용)
 
   const existingUids = new Set(maydlyEvents.map(e => e.uid).filter(Boolean));
   const existingKeys = new Set(maydlyEvents.map(e => `${e.date}_${e.time}_${e.label}`));
