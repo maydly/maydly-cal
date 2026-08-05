@@ -510,7 +510,7 @@ function stEmoji(s){return stInfo(s).emoji||'';}
 function stActive(s){return stInfo(s).active!==false;}
 function stOptions(sel){return STATUS_ORDER.map(k=>`<option value="${k}"${k===sel?' selected':''}>${STATUS[k].emoji?STATUS[k].emoji+' ':''}${STATUS[k].name}</option>`).join('');}
 // 고객명 앞 상태 이모지 표시 (+워터마크 제거 표시 이모지)
-function nameTag(e,fallback){const c=e.client||fallback;const em=stEmoji(e.status);const wm=e.wm?(e.wmEmoji||'💧'):'';return wm+(em?em:'')+c;}
+function nameTag(e,fallback){const c=e.client||fallback;const em=e.label==='pa_shoot'?'':stEmoji(e.status);const wm=e.wm?(e.wmEmoji||'💧'):'';return wm+(em?em:'')+c;}
 // 시간(duration) 옵션 — 종일·다일 포함
 const DUR_OPTS=[1,2,3,4,5,6,7,8,10,12,24,48,72];
 function durLabel(v){return v>=24?(v/24)+'일'+(v===24?' (종일)':''):v+'시간';}
@@ -1462,7 +1462,7 @@ function openD(id){
   const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
   const L=LABELS[e.label]||{name:'기타',color:'#999'};
   document.getElementById('pnh').innerHTML=`${e.client||L.name}<button class="px" onclick="closeP()">×</button>`;
-  const emj=stEmoji(e.status);
+  const emj=e.label==='pa_shoot'?'':stEmoji(e.status);
   const stb=stActive(e.status)
     ?`<span class="badge bOK">${emj?emj+' ':''}${stName(e.status)}</span>`
     :`<span class="badge" style="background:${e.status==='nosh'?NOSH_COLOR:'#c86060'};color:${e.status==='nosh'?NOSH_TEXT:'#fff'}">${emj?emj+' ':''}${stName(e.status)}</span>`;
@@ -2065,6 +2065,11 @@ function renderImport(){
         <button class="sub-btn" style="background:var(--R)" onclick="exportPublicData()">📥 공개예약데이터_운영중.json 다운로드</button>
         <div id="export-result" class="import-result"></div>
       </div>
+      <div class="import-box" style="border-color:#c8760a">
+        <h3 style="color:#c8760a">moon gang님 작성분 정리</h3>
+        <p>이번에 함께 잘못 등록된 <strong>moon gang님(문강님) 작성 일정</strong>을 삭제합니다. (명진님 일정은 그대로 유지)</p>
+        <button class="sub-btn" style="background:#c8760a" onclick="delMoon()">moon gang 작성분 삭제</button>
+      </div>
       <div class="import-box" style="border-color:var(--ng)">
         <h3 style="color:var(--ng)">⚠️ 전체 초기화</h3>
         <p>모든 일정을 삭제하고 새로 시작합니다. 되돌릴 수 없습니다.</p>
@@ -2206,6 +2211,18 @@ function exportPublicData(){
   toast('공개예약데이터_운영중.json 내보내기 완료');
 }
 
+function delMoon(){
+  const DEL=[['2026-06-30','12:00',9.5],['2026-07-02','13:00',8],['2026-07-03','13:00',7],['2026-07-06','12:00',9.5],['2026-07-17','12:30',9],['2026-07-21','12:00',9],['2026-07-22','13:00',9],['2026-07-25','12:00',9],['2026-07-28','12:00',7.5],['2026-07-30','14:00',8],['2026-08-01','12:30',4.5]];
+  const hits=maydlyEvents.filter(e=>e.label==='pa_shoot'&&e.client==='스튜디오'&&DEL.some(d=>d[0]===e.date&&d[1]===e.time&&d[2]===e.dur));
+  if(!hits.length){toast('삭제할 moon gang 일정이 없습니다');return;}
+  if(!confirm('moon gang님 작성 '+hits.length+'건을 삭제합니다. 명진님 일정은 그대로 유지됩니다. 계속할까요?'))return;
+  const ids=new Set(hits.map(e=>e.id));
+  maydlyEvents=maydlyEvents.filter(e=>!ids.has(e.id));
+  saveEvents();
+  toast(hits.length+'건 삭제 완료');
+  if(typeof renderMonth==='function')renderMonth();
+  renderImport();
+}
 function clearAll(){
   if(!confirm('정말 모든 일정을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'))return;
   if(!confirm('한 번 더 확인합니다. 전체 삭제하시겠습니까?'))return;
