@@ -2044,6 +2044,13 @@ function renderImport(){
         <div id="pa-dump-result" class="import-result"></div>
       </div>
       <div class="import-box">
+        <h3 style="color:#c62828">⚠️ PA 스튜디오 교정 실행 (1회용)</h3>
+        <p>클로드가 대조·검증한 대로 <strong>삭제 10건 · 수정 1건 · 추가 2건</strong>을 한 번에 정리해요.<br>
+        누르면 <strong>먼저 백업 파일(events_백업_PA교정전.json)이 자동 다운로드</strong>된 뒤 확인창이 떠요. 문제 생기면 그 백업으로 되돌릴 수 있어요.</p>
+        <button class="sub-btn" style="margin-top:8px;background:#c62828;color:#fff" onclick="fixPAStudio()">⚠️ 교정 실행 (백업 후 정리)</button>
+        <div id="pa-fix-result" class="import-result"></div>
+      </div>
+      <div class="import-box">
         <h3>일정 텍스트로 가져오기</h3>
         <p>일정을 복사해서 붙여넣으면 자동으로 분석해서 추가해드립니다.<br><br>
         <strong>형식 예시 (한 줄에 한 일정):</strong><br>
@@ -2262,6 +2269,31 @@ function dumpPAStudio(){
   try{navigator.clipboard.writeText(txt);}catch(_){}
   const r=document.getElementById('pa-dump-result'); if(r){r.className='import-result ok'; r.textContent='✓ '+items.length+'건 만들었어요. 아래 칸 클릭 → ⌘A → ⌘C 복사해서 클로드에 붙여넣기.';}
   try{toast('PA스튜디오 '+items.length+'건 복사됨');}catch(_){}
+}
+// 1회용 교정: PA 스튜디오 6/21~8/5을 정답과 일치시키기 (삭제10·수정1·추가2). 백업 먼저.
+function fixPAStudio(){
+  const DEL=[1536,1538,1540,1559,1567,1570,1575,1576,1578,1581];
+  try{
+    const bk=new Blob([JSON.stringify({events:maydlyEvents,savedAt:new Date().toISOString(),note:'PA스튜디오 교정 전 백업'},null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(bk); a.download='events_백업_PA교정전.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  }catch(e){ alert('백업 실패로 중단합니다: '+e.message); return; }
+  const delFound=maydlyEvents.filter(e=>DEL.includes(e.id)).length;
+  const fixE=maydlyEvents.find(e=>e.id===1584);
+  if(!confirm('백업 파일이 다운로드됐어요.\n\n삭제 '+delFound+'건 / 수정 '+(fixE?1:0)+'건(8/4 길이 29→5h) / 추가 2건(8/4 23:00, 8/5 11:00)\n\n진행할까요?')) return;
+  // 삭제(제자리)
+  const keep=maydlyEvents.filter(e=>!DEL.includes(e.id));
+  maydlyEvents.length=0; keep.forEach(e=>maydlyEvents.push(e));
+  // 수정
+  if(fixE) fixE.dur=5;
+  // 추가 (기존 pa_shoot 스튜디오 구조 복제 + 필드 덮어쓰기)
+  const tmpl=maydlyEvents.find(e=>e.label==='pa_shoot'&&String(e.client||'').indexOf('스튜디오')===0)||{};
+  function mk(date,time,dur){return Object.assign({},tmpl,{id:nextId++,label:'pa_shoot',client:'스튜디오',date:date,time:time,dur:dur,allDay:false,repeat:'none',status:'booked',note:''});}
+  maydlyEvents.push(mk('2026-08-04','23:00',5));
+  maydlyEvents.push(mk('2026-08-05','11:00',3));
+  // 저장(→ Firestore + 공개데이터 자동 갱신)
+  saveEvents(); try{renderBody();buildNav();}catch(_){}
+  const r=document.getElementById('pa-fix-result'); if(r){r.className='import-result ok'; r.textContent='✓ 교정 완료: 삭제 '+delFound+' / 수정 '+(fixE?1:0)+' / 추가 2. 저장(동기화)했어요.';}
+  alert('교정 완료!\n삭제 '+delFound+' · 수정 '+(fixE?1:0)+' · 추가 2\n저장(동기화)까지 됐어요. 7·8월 PA 스튜디오를 확인해보세요.');
 }
 
 // ── TimeTree iCal 파싱 및 가져오기 함수 (v3.0 추가) ──
