@@ -1357,6 +1357,12 @@ function mCell(ds,dn,dim){
         const nd=new Date(start);nd.setDate(start.getDate()+i);
         if(fd(nd)===ds)return true;
       }
+    } else if(e.time){
+      const _t=e.time.split(':').map(Number);
+      if(_t[0]+(_t[1]||0)/60+(e.dur||0)>24){
+        const nd=new Date(e.date);nd.setDate(nd.getDate()+1);
+        if(fd(nd)===ds)return true;
+      }
     }
     return false;
   }).sort(noshLast);   // 노쇼는 시간순 뒤, 맨 아래로
@@ -1367,7 +1373,9 @@ function mCell(ds,dn,dim){
     const isNosh=e.status==='nosh';
     const isCancel=e.status==='cancel';
     const isSpanCont=e.date!==ds;                // 이 칸이 연속 중간(시작일 아님)
-    const multi=e.dur>=24;                        // 다일(장기) 일정
+    const _st=e.time?e.time.split(':').map(Number):[0,0];
+    const _crossMid=e.time&&(_st[0]+(_st[1]||0)/60+(e.dur||0)>24)&&e.dur<24;
+    const multi=e.dur>=24||_crossMid;                        // 다일(장기) 일정
     let op='';
     if(isNosh)op='text-decoration:line-through;';               // 노쇼 = 회색(아래) + 취소선
     else if(isCancel)op='opacity:.35;text-decoration:line-through;';
@@ -1460,9 +1468,18 @@ function openD(id){
     :`<span class="badge" style="background:${e.status==='nosh'?NOSH_COLOR:'#c86060'};color:${e.status==='nosh'?NOSH_TEXT:'#fff'}">${emj?emj+' ':''}${stName(e.status)}</span>`;
   let b=`<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center">${stb}<span style="background:${L.color};color:#fff;font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px">${L.name}</span></div>`;
   const durDays=Math.ceil(e.dur/24);
-  b+=`<div class="det-r"><span class="det-l">📅 날짜</span>${e.date}${durDays>1?` ~ ${addDays(e.date,durDays-1)} (${durDays}일)`:''}</div>`;
-  if(e.allDay)b+=`<div class="det-r"><span class="det-l">🕐 시간</span>종일</div>`;
-  else if(e.time)b+=`<div class="det-r"><span class="det-l">🕐 시간</span>${e.time} – ${addH(e.time,Math.min(e.dur,12))} (${e.dur}시간)</div>`;
+  if(e.allDay){
+    b+=`<div class="det-r"><span class="det-l">📅 날짜</span>${e.date}${durDays>1?` ~ ${addDays(e.date,durDays-1)} (${durDays}일)`:''}</div>`;
+    b+=`<div class="det-r"><span class="det-l">🕐 시간</span>종일</div>`;
+  } else {
+    const _sp=e.date.split('-').map(Number), _tp=(e.time||'0:0').split(':').map(Number);
+    const _eMs=Date.UTC(_sp[0],_sp[1]-1,_sp[2],_tp[0],_tp[1])+(e.dur||0)*3600000;
+    const _ee=new Date(_eMs), _pp=n=>String(n).padStart(2,'0');
+    const _eD=`${_ee.getUTCFullYear()}-${_pp(_ee.getUTCMonth()+1)}-${_pp(_ee.getUTCDate())}`;
+    const _eT=`${_pp(_ee.getUTCHours())}:${_pp(_ee.getUTCMinutes())}`;
+    b+=`<div class="det-r"><span class="det-l">📅 시작</span>${e.date} ${e.time||''}</div>`;
+    b+=`<div class="det-r"><span class="det-l">📅 종료</span>${_eD} ${_eT} <span style="color:#999">(${e.dur}시간)</span></div>`;
+  }
   if(e.repeat&&e.repeat!=='none')b+=`<div class="det-r"><span class="det-l">🔁 반복</span>${repeatLabel(e.date,e.repeat)}</div>`;
   if(e.client)b+=`<div class="det-r"><span class="det-l">👤 고객</span>${e.client}</div>`;
   if(e.insta||e.phone)b+=`<div class="det-r"><span class="det-l">📷 인스타</span>${e.insta||e.phone}</div>`;
