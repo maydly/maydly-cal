@@ -1367,9 +1367,14 @@ function mCell(ds,dn,dim){
     return false;
   }).sort(noshLast);   // 노쇼는 시간순 뒤, 맨 아래로
   const dow=new Date(ds+'T00:00').getDay();     // 0=일요일(주 시작)
-  let spanHtml='';                               // 장기(연속)일정 = 칸 맨 위
+  let spanHtml='', paHtml='';                    // 장기=맨 위 / PA(기록용)=맨 아래
   evs.forEach(e=>{
     const L=LABELS[e.label]||{name:'기타',color:'#999'};
+    // PA(스튜디오)는 기록용 — 항상 칸 맨 아래에 흐리고 작게 (자정 넘는 것도 위로 안 올림)
+    if(e.label==='pa_shoot'){
+      paHtml+=`<div class="m-bar" style="background:#f0eff4;color:#9a92ad;font-size:8.5px;font-weight:500;line-height:1.35" onclick="event.stopPropagation();openD(${e.id})">${nameTag(e,L.name)}</div>`;
+      return;
+    }
     const isNosh=e.status==='nosh';
     const isCancel=e.status==='cancel';
     const isSpanCont=e.date!==ds;                // 이 칸이 연속 중간(시작일 아님)
@@ -1390,7 +1395,7 @@ function mCell(ds,dn,dim){
       inner+=`<div class="m-bar" style="background:${isNosh?NOSH_COLOR:L.color+mAlpha};color:${isNosh?NOSH_TEXT:mTxc};${op}" onclick="event.stopPropagation();openD(${e.id})">${nameTag(e,L.name)}</div>`;
     }
   });
-  return`<div class="mc${dim?' dim':''}${isT?' tdc':''}" onclick="openDay('${ds}')"><div class="dn sticky">${dn}</div>${spanHtml}${inner}</div>`;
+  return`<div class="mc${dim?' dim':''}${isT?' tdc':''}" onclick="openDay('${ds}')"><div class="dn sticky">${dn}</div>${spanHtml}${inner}${paHtml}</div>`;
 }
 
 function renderTimeGrid(){
