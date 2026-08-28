@@ -471,7 +471,10 @@ const LABELS={
   personal:{name:'개인',color:'#999'},
   suvin:{name:'수빈',color:'#e08a3c'},
 };
-// maydly 예약이 아닌 외부 캘린더 라벨(수빈) — 가용시간·공개데이터 계산에서 제외
+// maydly 예약이 아닌 외부 캘린더 라벨(수빈).
+// (260828) 공개데이터 계산에서는 더 이상 제외하지 않는다 — 수빈 일정이 있으면 고객 캘린더에서도 막힌다.
+//          종일이면 그날 전체, 시간이 지정돼 있으면 그 시간만 (일반 일정과 동일 규칙).
+//          단 전달기한·촬영 집계 등 maydly 촬영 전용 기능에서는 계속 제외한다(isExt 나머지 사용처).
 // (260718) '휴일'(holiday) 라벨을 '휴무'(rest)로 통합. 로드 시 자동 변환 → 기존 휴일 예약도 휴무로 취급되고,
 //          저장하면 실제로 rest로 바뀜. 선택지·필터엔 '휴무'만 남음. (국가공휴일 KR_HOLIDAYS와는 무관)
 function mergeHoliday(evs){ if(Array.isArray(evs)) evs.forEach(function(e){ if(e&&e.label==='holiday') e.label='rest'; if(e&&e.label==='nopay'){ e.label='studio_f'; var _t='[과거이력1: 원 무페이]'; if((e.note||'').indexOf(_t)<0) e.note=(e.note?e.note+' ':'')+_t; } }); return evs; }
@@ -851,7 +854,8 @@ function buildPublicSchedule(){
   const busyMap={};
   const mark=ds=>{if(!busyMap[ds])busyMap[ds]={allDay:false,slots:[]};return busyMap[ds];};
   maydlyEvents.forEach(e=>{
-    if(!stActive(e.status)||isExt(e))return;
+    // (260828) 수빈 라벨 포함. 예전에는 isExt(e)로 건너뛰어 수빈 일정이 고객 캘린더에 전혀 반영되지 않았다.
+    if(!stActive(e.status))return;
     // 반복 일정 전개: 원본 날짜 + 90일 창 내 모든 발생일 (260717)
     const dates=[e.date];
     if(e.repeat&&e.repeat!=='none'){
@@ -2144,7 +2148,7 @@ function doJsonImport(){
 }
 
 function exportPublicData(){
-  const confirmed=maydlyEvents.filter(e=>stActive(e.status)&&!isExt(e));
+  const confirmed=maydlyEvents.filter(e=>stActive(e.status));   // (260828) 수빈 포함 — buildPublicSchedule()과 동일 기준
 
   const busyMap={};
   confirmed.forEach(e=>{
