@@ -85,7 +85,7 @@ body{font-family:-apple-system,'Pretendard','Apple SD Gothic Neo',sans-serif;hei
 .sb-toggle:hover{background:var(--sf2);color:var(--Rd)}
 .cal-body{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .cal-top{
-  padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:10px 16px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
   border-bottom:1px solid var(--bd);background:var(--sf);flex-shrink:0;
 }
 /* 상단 라벨 필터바 (사이드바 대체, 웹·폰 공통) */
@@ -102,6 +102,15 @@ body{font-family:-apple-system,'Pretendard','Apple SD Gothic Neo',sans-serif;hei
   padding:4px 9px;border-radius:20px;cursor:pointer;font-size:11px;transition:border-color .15s;
 }
 .nb:hover{border-color:var(--R)}
+.nb.ar{padding:4px 6px;font-size:12px;line-height:1}   /* 화살표 전용 — 연·월 이동 5개가 폰 한 줄에 들어가게 */
+/* 좁은 폰(390px 등): 연 이동 버튼 2개가 늘어도 상단 줄이 한 줄로 유지되도록 여백만 줄인다 */
+@media(max-width:440px){
+  .cal-top{gap:5px;padding:10px 12px}
+  .nb{padding:4px 7px}
+  .nb.ar{padding:4px 5px}
+  .vb{padding:4px 8px}
+  .add-b{padding:6px 11px;margin-left:2px}
+}
 .ml{font-size:13px;font-weight:600;min-width:auto;color:var(--tx)}
 .vt{display:flex;gap:2px;background:var(--sf2);border-radius:20px;padding:2px;margin-left:auto}
 .vb{
@@ -1269,9 +1278,11 @@ function toggleF(k,el){filters[k]=!filters[k];if(el&&el.classList)el.classList.t
 function renderCal(){
   document.getElementById('pg-cal').innerHTML=`
     <div class="cal-top">
-      <button class="nb" onclick="chM(-1)">‹</button>
+      <button class="nb ar" onclick="chY(-1)" title="1년 전">«</button>
+      <button class="nb ar" onclick="chM(-1)" title="이전">‹</button>
       <button class="nb" onclick="goT()">오늘</button>
-      <button class="nb" onclick="chM(1)">›</button>
+      <button class="nb ar" onclick="chM(1)" title="다음">›</button>
+      <button class="nb ar" onclick="chY(1)" title="1년 후">»</button>
       <div class="ml" id="calLabel"></div>
       <div class="vt">
         <button class="vb on" onclick="setV('month',this)">월</button>
@@ -1295,6 +1306,16 @@ function chM(n){
   if(calView==='day'){curDate.setDate(curDate.getDate()+n);}
   else if(calView==='week'){curDate.setDate(curDate.getDate()+n*7);}
   else{curDate.setMonth(curDate.getMonth()+n);}
+  updLabel();renderMini();renderBody();
+}
+// 연 단위 이동 (260828) — 과거 일정을 볼 때 한 달씩 넘기지 않도록.
+// 월 말일에서 연을 옮기면 날짜가 다음 달로 밀릴 수 있어(2/29 등), 1일로 내렸다가 되돌린다.
+function chY(n){
+  const d=curDate.getDate();
+  curDate.setDate(1);
+  curDate.setFullYear(curDate.getFullYear()+n);
+  const last=new Date(curDate.getFullYear(),curDate.getMonth()+1,0).getDate();
+  curDate.setDate(Math.min(d,last));
   updLabel();renderMini();renderBody();
 }
 function goT(){curDate=new Date(TODAY);updLabel();renderMini();renderBody();}
