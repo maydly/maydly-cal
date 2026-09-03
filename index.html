@@ -383,16 +383,27 @@ function daysAhead(ds){
   return Math.round((parseDS(ds)-t)/86400000);
 }
 const LEAD_DAYS=7;  // 오늘~6일 뒤는 자리가 남아도 예약 마감 (7일 뒤부터 가능)
+// (260903) 리드타임 예외 — 여기 적은 날짜만 일주일 이내여도 달력에 띄운다.
+// 자리가 남아 급히 채우려는 날에 쓴다. 단 '남은 자리가 있을 때만' 보여주고,
+// 다 차거나 종일 막히면 다시 감춘다(꽉 찬 날을 굳이 광고하지 않는다).
+// 날짜가 지나면 자동으로 무시되므로 지우지 않아도 된다.
+const LEAD_EXCEPT=['2026-09-09'];
 function getMaydlySlots(ds){
   // 일주일 이내(및 지난 날)는 공개 데이터와 무관하게 항상 마감 — 달력에 표시하지 않음.
   // 관리자 데이터가 오래돼 '가능'으로 남아 있어도 여기서 막는다(노쇼 빈자리 노출 방지).
-  if(daysAhead(ds)<LEAD_DAYS) return NO_DATA;
+  const ahead=daysAhead(ds);
+  const isExcept=ahead>=0&&LEAD_EXCEPT.includes(ds);   // 지난 날은 예외로 되살리지 않는다
+  if(ahead<LEAD_DAYS&&!isExcept) return NO_DATA;
   if(!dataLoaded||!publicSchedule) return NO_DATA;
   const pd=publicSchedule[ds];
   if(pd===undefined) return NO_DATA;          // 서버가 안 내려준 날짜(범위 밖) — 문의로
   // 이 캘린더(협업 고객용)는 스튜디오 일정만 안내 — outdoorInquiry 플래그는 무시하고 예약 불가로 표시
-  if(pd.unavailable) return UNAVAIL;
-  if(pd.slots) return pd.slots.map(s=>({avail:s.avail,allDayBlock:false,label:s.s+' ~ '+s.e}));
+  if(pd.unavailable) return isExcept?NO_DATA:UNAVAIL;
+  if(pd.slots){
+    const slots=pd.slots.map(s=>({avail:s.avail,allDayBlock:false,label:s.s+' ~ '+s.e}));
+    if(isExcept&&!slots.some(s=>s.avail)) return NO_DATA;   // 예외 날인데 다 찼으면 감춘다
+    return slots;
+  }
   return NO_DATA;
 }
 
