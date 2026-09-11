@@ -532,7 +532,7 @@ function stEmoji(s){return stInfo(s).emoji||'';}
 function stActive(s){return stInfo(s).active!==false;}
 function stOptions(sel){return STATUS_ORDER.map(k=>`<option value="${k}"${k===sel?' selected':''}>${STATUS[k].emoji?STATUS[k].emoji+' ':''}${STATUS[k].name}</option>`).join('');}
 // 고객명 앞 상태 이모지 표시 (+워터마크 제거 표시 이모지)
-function nameTag(e,fallback){const c=e.client||fallback;const em=e.label==='pa_shoot'?'':stEmoji(e.status);const wm=e.wm?(e.wmEmoji||'💧'):'';const hf=e.half?'½':'';return hf+wm+(em?em:'')+c;}
+function nameTag(e,fallback){const c=e.client||fallback;const em=e.label==='pa_shoot'?'':stEmoji(e.status);const wm=e.wm?(e.wmEmoji||'💧'):'';const hf=e.half?' ½':'';return wm+(em?em:'')+c+hf;}   // ½는 이름 뒤 — 앞에 두면 좁은 칸에서 이름이 밀린다
 // 시간(duration) 옵션 — 종일·다일 포함
 const DUR_OPTS=[1,2,3,4,5,6,7,8,10,12,24,48,72];
 function durLabel(v){return v>=24?(v/24)+'일'+(v===24?' (종일)':''):v+'시간';}
