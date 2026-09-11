@@ -549,7 +549,7 @@ const DELIV_LABELS=['studio_m','studio_f','outdoor','studio_pay','outdoor_pay','
 // 이 날짜 이전 촬영은 이미 전달한 것으로 보고 알림을 띄우지 않는다(과거 1,300여 건 보호).
 const DELIV_SINCE='2026-07-14';
 const ALERT_LEAD=3;   // 전달 기한 며칠 전부터 알릴지
-const OUTFIT_LEAD=2;  // 의상확인 — 촬영 며칠 전부터 알릴지
+const OUTFIT_LEAD=3;  // 의상확인 — 촬영 며칠 전부터 알릴지 (260904 명진: 2→3. 의상 사진은 촬영 5일 전까지 받는 기준)
 const BASIC_DUE={m:1};                                              // 기본 보정본 = 촬영일 + 1달
 const BUY_DUE={buy_select:{w:2},buy_raw:{w:2},buy_color:{m:1}};     // 구매분 전달 기한
 const DLV_TITLE={basic:'기본 보정본',buy_select:'2번 색보정',buy_raw:'전체 원본',buy_color:'전체 색보정'};
@@ -605,6 +605,75 @@ function buildAlerts(){
   return out.sort((a,b)=>a.left-b.left||a.due.localeCompare(b.due));
 }
 function alertCount(){return buildAlerts().filter(a=>a.urgent).length;}
+
+// ── 수빈 '확인 필요' 가드 (260904) ──
+// 수빈이 들어오면 캘린더보다 '확인 필요'(알림)를 먼저 보게 하고,
+// 캘린더로 넘어가려 하면 지난 건·다가오는 건을 알려 처리를 재촉한다. 명진에게는 적용하지 않는다.
+const SUBIN_EMAILS=['ara030820@gmail.com'];
+// 담당 나누기 (260904 명진 확정)
+//   수빈 = 보정본 전달(기본·구매분·긴급) — 기한 7일 안까지 재촉
+//   명진 = 의상확인 — 촬영 3일 전부터 재촉
+// 알림 탭에는 둘 다 그대로 보인다. 여기서 나누는 건 '누구를 재촉할지'뿐이다.
+const ROLE_KINDS={sb:['basic','buy','rush'],mj:['outfit']};
+const ROLE_LEAD={sb:7,mj:3};
+const ROLE_WHAT={sb:'보정본 전달',mj:'의상확인'};
+let _subinNagged=false;      // 지난 건 없이 임박 건만 있을 때는 세션당 1회만 안내
+let _subinBypass=false;      // '캘린더 볼게요'로 통과할 때만 true
+let _subinEntry=false;       // 로그인 직후 알림으로 보낸 적이 있는지
+function isSubinUser(){
+  const em=((window.MJCAL&&window.MJCAL.user&&window.MJCAL.user.email)||'').toLowerCase();
+  if(em)return SUBIN_EMAILS.includes(em);   // 구글 계정이 가장 정확
+  return selAdminUser==='sb';               // 로그인 확인 전이면 PIN 화면 선택을 따른다
+}
+function myRole(){return isSubinUser()?'sb':'mj';}
+function myTodo(){
+  const r=myRole();
+  const l=buildAlerts().filter(a=>ROLE_KINDS[r].includes(a.kind));
+  return{role:r,late:l.filter(a=>a.left<0),soon:l.filter(a=>a.left>=0&&a.left<=ROLE_LEAD[r])};
+}
+function hasMyTodo(){const t=myTodo();return t.late.length+t.soon.length>0;}
+function todoLine(a){
+  const t=a.kind==='outfit'?'👗 의상확인':(a.kind==='rush'?'🚨 긴급 보정본':(a.kind==='basic'?'📦 기본 보정본':'🎞️ 구매분'));
+  return`<div style="display:flex;gap:8px;padding:6px 0;font-size:12px;border-bottom:1px solid var(--bd)">
+    <span style="flex:1;color:var(--tx)">${esc(a.e.client||'(이름 없음)')} <span style="color:var(--mu)">· ${t}</span></span>
+    <span style="color:${a.left<0?'#c0392b':'#c4763a'};font-weight:700;white-space:nowrap">${dueText(a.left)}</span></div>`;
+}
+function showSubinTodo(){
+  const t=myTodo();
+  const soonLabel=t.role==='sb'?'일주일 안':'3일 안';
+  document.getElementById('pnh').innerHTML='잠깐만요<button class="px" onclick="closeP()">×</button>';
+  document.getElementById('pb').innerHTML=
+   `<div style="text-align:center;padding:2px 0 14px">
+      <div style="font-size:30px">⏰</div>
+      <div style="font-size:15px;font-weight:800;color:var(--tx);margin-top:6px">아직 처리 안 된 일이 있어요</div>
+      <div style="font-size:12px;color:var(--mu);margin-top:4px">${ROLE_WHAT[t.role]} — 캘린더보다 이걸 먼저 해주세요</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <div style="flex:1;text-align:center;background:#fdf4f4;border:1px solid #e0a3a3;border-radius:10px;padding:10px">
+        <div style="font-size:21px;font-weight:800;color:#c0392b">${t.late.length}</div>
+        <div style="font-size:10.5px;color:#a05050">기한 지남</div></div>
+      <div style="flex:1;text-align:center;background:#fffdf5;border:1px solid #c8a456;border-radius:10px;padding:10px">
+        <div style="font-size:21px;font-weight:800;color:#8a6a20">${t.soon.length}</div>
+        <div style="font-size:10.5px;color:#a08040">${soonLabel}</div></div>
+    </div>
+    ${t.late.length?`<div style="font-size:10.5px;font-weight:800;color:#c0392b;margin:4px 0 2px">이미 기한이 지났어요 — 지금 바로 처리해주세요</div>${t.late.slice(0,8).map(todoLine).join('')}`:''}
+    ${t.soon.length?`<div style="font-size:10.5px;font-weight:800;color:#8a6a20;margin:${t.late.length?'12px':'4px'} 0 2px">곧 기한이에요 — 미리 처리해주세요</div>${t.soon.slice(0,8).map(todoLine).join('')}`:''}
+    <div class="act-row" style="margin-top:14px">
+      <button class="btn-ok" style="flex:2" onclick="closeP();navTab('alert')">확인 필요 보러가기</button>
+      <button class="btn-ng" style="flex:1;background:var(--sf2);color:var(--mu);border:1px solid var(--bd)" onclick="closeP();subinForceCal()">캘린더 볼게요</button>
+    </div>`;
+  openP();
+}
+function subinForceCal(){_subinBypass=true;navTab('cal');_subinBypass=false;}
+// 탭 강조까지 같이 옮기는 이동 (버튼 요소 없이 코드에서 탭을 바꿀 때 쓴다)
+function navTab(pg){
+  curPage=pg;
+  const tabs=document.querySelectorAll('.tn-tab');
+  tabs.forEach(x=>x.classList.remove('on'));
+  const i={cal:0,alert:1,req:2,import:3}[pg];
+  if(tabs[i])tabs[i].classList.add('on');
+  showPage(pg);
+}
 
 // 구매 종류가 바뀌면 전달 기한이 새로 잡히므로 이전 구매분 전달 체크를 해제한다.
 // (상세창 버튼 setStatus·편집창 updateEv 양쪽에서 같은 규칙을 쓰도록 여기 모아둔다)
@@ -1140,12 +1209,16 @@ var _mjEntered=false;
 window.onMjAuth=function(u){
   if(!_mjEntered) return;              // 랜딩(PIN) 단계에선 대기
   setSaveStatus(u?'✓ 구글 로그인됨':'로그인 필요', u?'ok':'off');
+  // 구글 계정으로 수빈임이 확인되면(PIN에서 명진으로 눌렀더라도) 확인 필요를 먼저 띄운다
+  if(u&&!_subinEntry&&isSubinUser()&&hasMyTodo()){_subinEntry=true;navTab('alert');}
   if(u) syncFromGithub(); else promptToken();
 };
 function enter(){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').style.display='flex';
-  buildNav();showPage('cal');
+  // 수빈은 '확인 필요'를 먼저 보게 한다 (밀린 일이 있을 때만)
+  if(isSubinUser()&&hasMyTodo()){curPage='alert';_subinEntry=true;}
+  buildNav();showPage(curPage);
   _mjEntered=true;
   if(window.MJCAL&&window.MJCAL.ready) onMjAuth(window.MJCAL.user);   // 로그인 상태 반영
   else setSaveStatus('로그인 확인 중…','loading');                   // 브리지 준비되면 onMjAuth가 이어받음
@@ -1245,6 +1318,15 @@ function buildNav(){
   }
 }
 function switchPage(pg,el){
+  // 수빈이 캘린더로 가려 하면 밀린 일을 먼저 보여준다.
+  // 기한 지난 건이 있으면 갈 때마다, 임박 건만 있으면 세션당 한 번.
+  if(pg==='cal'&&!_subinBypass){
+    const t=myTodo();
+    if(t.late.length||(t.soon.length&&!_subinNagged)){
+      if(!t.late.length)_subinNagged=true;
+      showSubinTodo();return;
+    }
+  }
   curPage=pg;
   document.querySelectorAll('.tn-tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
