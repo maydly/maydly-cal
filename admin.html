@@ -95,7 +95,7 @@ body{font-family:-apple-system,'Pretendard','Apple SD Gothic Neo',sans-serif;hei
 .flt-chip.on{background:#fff;color:var(--tx)}
 .flt-chip:not(.on){opacity:.45}
 .flt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.flt-sync{flex-shrink:0;border:1px solid var(--bd);background:var(--sf2);color:var(--mu);width:30px;height:28px;border-radius:8px;cursor:pointer;font-size:14px;line-height:1}
+.flt-sync{flex-shrink:0;border:1px solid var(--bd);background:var(--sf2);color:var(--mu2);height:28px;padding:0 11px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;line-height:1;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .flt-sync:hover{border-color:var(--R);color:var(--Rd)}
 .nb{
   background:var(--sf2);border:1px solid var(--bd);color:var(--tx);
@@ -471,8 +471,8 @@ const LABELS={
   studio_m:{name:'남스튜디오',color:'#4a9a6a'},
   studio_f:{name:'여스튜디오',color:'#e0608a'},
   outdoor:{name:'야외',color:'#4a8abf'},
-  studio_pay:{name:'스튜디오페이',color:'#e8a0b0'},
-  outdoor_pay:{name:'야외페이',color:'#5abfa8'},
+  studio_pay:{name:'스튜디오페이',color:'#f5c400',tc:'#3a2f00'},   // (260904) 여스튜디오와 헷갈려 노랑으로 — 밝은 색이라 글자는 진하게
+  outdoor_pay:{name:'야외페이',color:'#1a237e'},                    // (260904) 남스튜디오와 헷갈려 남색으로
   pa_shoot:{name:'PA촬영',color:'#7050c0'},
   rest:{name:'휴무',color:'#c03030'},
 
@@ -489,6 +489,8 @@ const LABELS={
 function mergeHoliday(evs){ if(Array.isArray(evs)) evs.forEach(function(e){ if(e&&e.label==='holiday') e.label='rest'; if(e&&e.label==='nopay'){ e.label='studio_f'; var _t='[과거이력1: 원 무페이]'; if((e.note||'').indexOf(_t)<0) e.note=(e.note?e.note+' ':'')+_t; } }); return evs; }
 const EXT_LABELS=['suvin'];
 function isExt(e){return e&&(e.ext||EXT_LABELS.includes(e.label));}
+// 라벨색을 배경으로 쓸 때의 글자색. 밝은 라벨(노랑 등) 위에 흰 글씨를 쓰면 안 보인다.
+function lblTc(k){return (LABELS[k]&&LABELS[k].tc)||'#fff';}
 // ── status 정의 (260630 v4.0 개편): 예약→촬영→구매 흐름 6단계 ──
 // active=true → 실제 예약(고객 공개 '예약불가'·집계에 포함), false → 노쇼/취소
 const STATUS={
@@ -1307,7 +1309,7 @@ function buildFilterBar(){
   const chips=Object.entries(LABELS).map(([k,v])=>
     `<button class="flt-chip${filters[k]?' on':''}" onclick="toggleF('${k}',this)"><span class="flt-dot" style="background:${v.color}"></span>${v.name}</button>`).join('');
   return `<div class="flt-chips">${chips}</div>
-    <button class="flt-sync" onclick="syncAndExport(this)" title="동기화 + 공개 데이터 내보내기">⟳</button>`;
+    <button class="flt-sync" onclick="syncAndExport(this)" title="지금 이 시점 일정으로 고객 페이지(협업·페이 캘린더)를 갱신합니다">⟳ 고객페이지 갱신</button>`;
 }
 function chM(n){
   if(calView==='day'){curDate.setDate(curDate.getDate()+n);}
@@ -1406,10 +1408,10 @@ function mCell(ds,dn,dim){
     if(multi){
       // 이름은 시작일 또는 주 시작(일요일)에만 → 나머지는 색 바만 이어짐
       const showName=!isSpanCont||dow===0;
-      spanHtml+=`<div class="m-bar m-span${isSpanCont?' m-cont':''}" style="background:${isNosh?NOSH_COLOR:L.color};color:${isNosh?NOSH_TEXT:'#fff'};${op}" onclick="event.stopPropagation();openD(${e.id})">${showName?nameTag(e,L.name):'&nbsp;'}</div>`;
+      spanHtml+=`<div class="m-bar m-span${isSpanCont?' m-cont':''}" style="background:${isNosh?NOSH_COLOR:L.color};color:${isNosh?NOSH_TEXT:lblTc(e.label)};${op}" onclick="event.stopPropagation();openD(${e.id})">${showName?nameTag(e,L.name):'&nbsp;'}</div>`;
     }else{
       const mAlpha=e.allDay?'ff':'80';            // 종일=100%, 비종일=50%
-      const mTxc=e.allDay?'#fff':'var(--tx)';
+      const mTxc=e.allDay?lblTc(e.label):'var(--tx)';
       inner+=`<div class="m-bar" style="background:${isNosh?NOSH_COLOR:L.color+mAlpha};color:${isNosh?NOSH_TEXT:mTxc};${op}" onclick="event.stopPropagation();openD(${e.id})">${nameTag(e,L.name)}</div>`;
     }
   });
@@ -1447,7 +1449,7 @@ function placeBlocks(ws,cols){
       const op=e.status==='pending'?'opacity:.7;':'';
       const el=document.createElement('div');
       el.className='t-block';
-      el.style.cssText=`top:${top}px;left:${timeW+i*colW+2}px;width:${colW-4}px;height:${height}px;background:${L.color}${e.allDay?'ff':'80'};pointer-events:auto;${op}`;
+      el.style.cssText=`top:${top}px;left:${timeW+i*colW+2}px;width:${colW-4}px;height:${height}px;background:${L.color}${e.allDay?'ff':'80'};color:${e.allDay?lblTc(e.label):'var(--tx)'};pointer-events:auto;${op}`;
       el.innerHTML=`<div class="tb-lbl">${nameTag(e,L.name)}</div>${height>28?`<div class="tb-time">${e.time} – ${addH(e.time,e.dur)}</div>`:''}`;
       el.onclick=ev=>{ev.stopPropagation();openD(e.id);};
       wrap.appendChild(el);
@@ -1789,7 +1791,7 @@ function openAdd(ds){
   const lastLabel=localStorage.getItem('maydly_lastlabel')||null;  // 이전 라벨 자동선택
   seLabel=lastLabel;
   document.getElementById('pnh').innerHTML=`일정 추가<button class="px" onclick="closeP()">×</button>`;
-  const chips=Object.entries(LABELS).map(([k,v])=>`<div class="label-chip${k===lastLabel?' sel':''}" style="background:${v.color}${k===lastLabel?';border-color:rgba(0,0,0,.35)':''}" onclick="selLbl('${k}',this)">${v.name}</div>`).join('');
+  const chips=Object.entries(LABELS).map(([k,v])=>`<div class="label-chip${k===lastLabel?' sel':''}" style="background:${v.color};color:${lblTc(k)}${k===lastLabel?';border-color:rgba(0,0,0,.35)':''}" onclick="selLbl('${k}',this)">${v.name}</div>`).join('');
   document.getElementById('pb').innerHTML=`
     <div class="fg"><label>고객명 <span style="color:#c4763a">*</span> <span style="color:var(--mu);font-weight:400;font-size:10px">(예약문구 붙여넣으면 날짜·시간 자동입력)</span></label><input type="text" id="f_c" placeholder="이름 (필수) — 예: 최혜주님7/15 14~16시" oninput="tryAutofill(this)" onpaste="setTimeout(()=>tryAutofill(this),0)"></div>
     ${timeFormBlock(ds,'10:00',ds,'12:00',2)}
@@ -1814,6 +1816,13 @@ function selLbl(k,el){
   seLabel=k;
   document.querySelectorAll('.label-chip').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
+  // (260904) 휴무는 예약이 아니다 — 라벨을 고르면 상태를 '개인·휴무'로 자동 전환한다.
+  // 촬영 라벨로 되돌리면 기본 상태(예약완료)로 돌려놓는다.
+  const ss=document.getElementById('f_s');
+  if(ss){
+    if(k==='rest')ss.value='none';
+    else if(ss.value==='none')ss.value='booked';
+  }
 }
 
 function readTimeForm(){
