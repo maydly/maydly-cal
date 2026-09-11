@@ -491,6 +491,15 @@ const EXT_LABELS=['suvin'];
 function isExt(e){return e&&(e.ext||EXT_LABELS.includes(e.label));}
 // 라벨색을 배경으로 쓸 때의 글자색. 밝은 라벨(노랑 등) 위에 흰 글씨를 쓰면 안 보인다.
 function lblTc(k){return (LABELS[k]&&LABELS[k].tc)||'#fff';}
+
+// ── 노쇼 → 재예약 연결 (260904) ──
+// 준비 미흡으로 노쇼가 된 예약을, 새로 잡은 일정과 이어 둔다.
+// 새 일정에만 reFrom(원 예약 id)을 남기고 원 예약 쪽은 거꾸로 찾아 표시한다.
+// (양쪽에 저장하지 않으므로 한쪽만 지워져 어긋날 일이 없다)
+// half=true → 반값으로 다시 받은 건.
+let _reFrom=null;   // '재예약 만들기'로 연 추가 폼에서만 값이 들어간다
+function evById(id){return maydlyEvents.find(x=>x.id===id)||null;}
+function reBookOf(id){return maydlyEvents.filter(x=>x.reFrom===id).sort((a,b)=>String(a.date).localeCompare(String(b.date)));}
 // ── status 정의 (260630 v4.0 개편): 예약→촬영→구매 흐름 6단계 ──
 // active=true → 실제 예약(고객 공개 '예약불가'·집계에 포함), false → 노쇼/취소
 const STATUS={
@@ -523,7 +532,7 @@ function stEmoji(s){return stInfo(s).emoji||'';}
 function stActive(s){return stInfo(s).active!==false;}
 function stOptions(sel){return STATUS_ORDER.map(k=>`<option value="${k}"${k===sel?' selected':''}>${STATUS[k].emoji?STATUS[k].emoji+' ':''}${STATUS[k].name}</option>`).join('');}
 // 고객명 앞 상태 이모지 표시 (+워터마크 제거 표시 이모지)
-function nameTag(e,fallback){const c=e.client||fallback;const em=e.label==='pa_shoot'?'':stEmoji(e.status);const wm=e.wm?(e.wmEmoji||'💧'):'';return wm+(em?em:'')+c;}
+function nameTag(e,fallback){const c=e.client||fallback;const em=e.label==='pa_shoot'?'':stEmoji(e.status);const wm=e.wm?(e.wmEmoji||'💧'):'';const hf=e.half?'½':'';return hf+wm+(em?em:'')+c;}
 // 시간(duration) 옵션 — 종일·다일 포함
 const DUR_OPTS=[1,2,3,4,5,6,7,8,10,12,24,48,72];
 function durLabel(v){return v>=24?(v/24)+'일'+(v===24?' (종일)':''):v+'시간';}
@@ -1509,6 +1518,7 @@ function openD(id){
   if(e.client)b+=`<div class="det-r"><span class="det-l">👤 고객</span>${e.client}</div>`;
   if(e.insta||e.phone)b+=`<div class="det-r"><span class="det-l">📷 인스타</span>${e.insta||e.phone}</div>`;
   if(e.note)b+=`<div class="det-r"><span class="det-l">📝 메모</span>${e.note}</div>`;
+  b+=reLinkRows(e);   // 재예약 연결·반값 표시
   if(!e.priv&&stActive(e.status)){
     const slots=getMaydlySlots(e.date,maydlyEvents.filter(x=>x.date===e.date&&stActive(x.status)&&!isExt(x)));
     const cv=slots.length===1&&slots[0].allDayBlock?'종일 외부 촬영 일정으로 인한 예약 불가':`예약 불가 (${e.time}~${addH(e.time,e.dur)})`;
@@ -1562,7 +1572,11 @@ function openD(id){
     }
     b+=`</div>`;
   }
+  if(!e.priv)b+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--bd);margin-top:8px">
+    <span style="font-size:11px;color:var(--tx);flex:1">½ 반값으로 진행</span>
+    <button onclick="toggleHalf(${e.id})" style="padding:4px 12px;border:none;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;${e.half?'background:var(--R);color:#fff':'background:var(--sf2);color:var(--mu);border:1px solid var(--bd)'}">${e.half?'반값':'정가'}</button></div>`;
   if(stActive(e.status)&&e.status!=='nosh')b+=`<div class="act-row" style="margin-top:10px"><button class="btn-ng" style="flex:1" onclick="setStatus(${e.id},'nosh');closeP()">🚫 노쇼 처리</button></div>`;
+  if(e.status==='nosh')b+=`<div class="act-row" style="margin-top:10px"><button class="btn-ok" style="flex:1;background:#c8a456" onclick="startRebook(${e.id})">🔁 재예약 만들기</button></div>`;
   b+=`<button class="btn-del" style="background:var(--sf2);color:var(--tx);border:1px solid var(--bd);margin-bottom:4px" onclick="closeP();openEdit(${e.id})">✏️ 편집</button>`;
   b+=`<button class="btn-del" onclick="delEv(${e.id})">삭제</button>`;
   document.getElementById('pb').innerHTML=b;openP();
@@ -1791,7 +1805,7 @@ function openAdd(ds){
   const lastLabel=localStorage.getItem('maydly_lastlabel')||null;  // 이전 라벨 자동선택
   seLabel=lastLabel;
   document.getElementById('pnh').innerHTML=`일정 추가<button class="px" onclick="closeP()">×</button>`;
-  const chips=Object.entries(LABELS).map(([k,v])=>`<div class="label-chip${k===lastLabel?' sel':''}" style="background:${v.color};color:${lblTc(k)}${k===lastLabel?';border-color:rgba(0,0,0,.35)':''}" onclick="selLbl('${k}',this)">${v.name}</div>`).join('');
+  const chips=Object.entries(LABELS).map(([k,v])=>`<div class="label-chip${k===lastLabel?' sel':''}" data-lb="${k}" style="background:${v.color};color:${lblTc(k)}${k===lastLabel?';border-color:rgba(0,0,0,.35)':''}" onclick="selLbl('${k}',this)">${v.name}</div>`).join('');
   document.getElementById('pb').innerHTML=`
     <div class="fg"><label>고객명 <span style="color:#c4763a">*</span> <span style="color:var(--mu);font-weight:400;font-size:10px">(예약문구 붙여넣으면 날짜·시간 자동입력)</span></label><input type="text" id="f_c" placeholder="이름 (필수) — 예: 최혜주님7/15 14~16시" oninput="tryAutofill(this)" onpaste="setTimeout(()=>tryAutofill(this),0)"></div>
     ${timeFormBlock(ds,'10:00',ds,'12:00',2)}
@@ -1802,7 +1816,7 @@ function openAdd(ds){
       <select id="f_s">${stOptions('booked')}</select>
     </div>
     <div class="form-foot"><button class="sub-btn" onclick="saveEv()">저장</button></div>`;
-  _editingId=null;
+  _editingId=null;_reFrom=null;
   openP();applyAllDay();bindAllDayNote();
 }
 // 시작 날짜가 바뀌면 종일 촬영 안내를 다시 계산한다
@@ -1812,6 +1826,48 @@ function bindAllDayNote(){
   refreshAllDayNote();
 }
 
+// 노쇼 일정에서 바로 재예약 폼을 연다 (고객명·인스타·라벨을 그대로 채워 준다)
+function startRebook(id){
+  const o=evById(id);if(!o)return;
+  const already=reBookOf(id);
+  if(already.length&&!confirm('이 노쇼는 이미 재예약('+already.map(r=>r.date).join(', ')+')과 연결돼 있어요.\n하나 더 만들까요?'))return;
+  closeP();
+  openAdd();                       // 날짜는 보고 있는 달 기준으로 열고 명진이 직접 고른다
+  _reFrom=id;
+  const c=document.getElementById('f_c');if(c)c.value=o.client||'';
+  const ins=document.getElementById('f_p');if(ins)ins.value=o.insta||o.phone||'';
+  const chip=document.querySelector('.label-chip[data-lb="'+o.label+'"]');
+  if(chip)selLbl(o.label,chip);
+  document.getElementById('pnh').innerHTML='재예약 만들기<button class="px" onclick="closeP()">×</button>';
+  const pb=document.getElementById('pb');
+  if(pb)pb.insertAdjacentHTML('afterbegin',
+    '<div style="border:1px solid #c8a456;background:#fffdf5;border-radius:10px;padding:9px 11px;margin-bottom:12px;font-size:11px;color:#8a6a20;line-height:1.6">'+
+    '🔁 <b>재예약</b> — 원 예약 '+o.date+' '+esc(o.client||'')+' (노쇼)와 연결됩니다.<br>'+
+    '<span style="color:#a08040">저장하면 ½ 반값 표시가 함께 붙습니다.</span></div>');
+}
+// 반값 표시 켜고 끄기
+function toggleHalf(id){
+  const e=evById(id);if(!e)return;
+  e.half=!e.half;saveEvents();
+  if(curPage==='cal')renderBody();
+  if(curPage==='req')renderReq();
+  openD(id);
+}
+// 상세에 붙는 연결·반값 줄
+function reLinkRows(e){
+  let h='';
+  if(e.half)h+='<div class="det-r"><span class="det-l">½ 비용</span>반값 진행</div>';
+  if(e.reFrom){
+    const o=evById(e.reFrom);
+    h+='<div class="det-r"><span class="det-l">🔁 원 예약</span>'+(o
+      ?'<a href="javascript:void(0)" onclick="closeP();openD('+o.id+')" style="color:var(--Rd)">'+o.date+' '+esc(o.client||'')+(o.status==='nosh'?' (노쇼)':'')+'</a>'
+      :'<span style="color:var(--mu)">원 예약이 삭제됨</span>')+'</div>';
+  }
+  const re=reBookOf(e.id);
+  if(re.length)h+='<div class="det-r"><span class="det-l">🔁 재예약</span>'+re.map(function(r){
+    return '<a href="javascript:void(0)" onclick="closeP();openD('+r.id+')" style="color:var(--Rd)">'+r.date+(r.half?' ½':'')+'</a>';}).join(', ')+' 로 이어짐</div>';
+  return h;
+}
 function selLbl(k,el){
   seLabel=k;
   document.querySelectorAll('.label-chip').forEach(c=>c.classList.remove('sel'));
@@ -1849,7 +1905,9 @@ function saveEv(force){
     insta:document.getElementById('f_p').value.trim()||null,
     note:document.getElementById('f_n').value.trim()||'',
     priv:['rest','personal'].includes(seLabel),
-    dlvBasic:null,dlvBuy:null
+    dlvBasic:null,dlvBuy:null,
+    reFrom:_reFrom||null,          // 재예약이면 원 노쇼 예약 id
+    half:!!_reFrom                 // 재예약은 반값으로 진행
   };
   // 중복 시간 차단 — 겹치면 저장을 멈추고, 강제 등록 버튼을 띄운다
   if(!force){
@@ -1858,13 +1916,15 @@ function saveEv(force){
   }
   nextId++;
   try{localStorage.setItem('maydly_lastlabel',seLabel);}catch(_){}  // 라벨 기억
+  const wasRe=_reFrom; _reFrom=null;
   maydlyEvents.push(e);saveEvents();closeP();renderBody();buildNav();
-  toast('일정 추가 완료');
+  if(curPage==='req')renderReq();
+  toast(wasRe?'재예약 등록 완료 (원 예약과 연결됨)':'일정 추가 완료');
 }
 
 function openEdit(id){
   const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
-  const chips=Object.entries(LABELS).map(([k,v])=>`<div class="label-chip${k===e.label?' sel':''}" style="background:${v.color}${k===e.label?';border-color:rgba(0,0,0,.3)':''}" onclick="selLbl('${k}',this)">${v.name}</div>`).join('');
+  const chips=Object.entries(LABELS).map(([k,v])=>`<div class="label-chip${k===e.label?' sel':''}" data-lb="${k}" style="background:${v.color};color:${lblTc(k)}${k===e.label?';border-color:rgba(0,0,0,.3)':''}" onclick="selLbl('${k}',this)">${v.name}</div>`).join('');
   seLabel=e.label;seAllDay=!!e.allDay;
   const st=e.time||'10:00';
   let endDate,endTime;
@@ -2022,6 +2082,29 @@ function renderReq(){
       </div>
     </div>`;
   }).join('');
+  // ── 노쇼 → 재예약 현황 (260904) ── 아직 재예약이 안 잡힌 건을 먼저 보여준다
+  const noshAll=maydlyEvents.filter(e=>e.status==='nosh').sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  const noshOpen=noshAll.filter(e=>reBookOf(e.id).length===0);
+  const noshRow=e=>{
+    const L=LABELS[e.label]||{name:'기타',color:'#999'};
+    const re=reBookOf(e.id);
+    return`<div class="rcard" style="padding:10px 12px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="background:${L.color};color:${lblTc(e.label)};font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">${L.name}</span>
+        <span style="font-size:12.5px;font-weight:600;color:var(--tx);cursor:pointer" onclick="openD(${e.id})">${esc(e.client||'(이름 없음)')}</span>
+        <span style="font-size:11px;color:var(--mu)">${e.date}</span>
+        <span style="margin-left:auto">${re.length
+          ?`<span class="badge bOK">재예약 ${re.map(r=>r.date+(r.half?' ½':'')).join(', ')}</span>`
+          :`<button class="btn-ok" style="padding:5px 11px;font-size:10px;background:#c8a456" onclick="startRebook(${e.id})">🔁 재예약 만들기</button>`}</span>
+      </div></div>`;
+  };
+  const reSect=noshAll.length
+    ?`<div class="sect-label">재예약 대기 (${noshOpen.length}) <span style="font-weight:400;color:var(--mu);font-size:11px">· 전체 노쇼 ${noshAll.length}건</span></div>
+      ${(noshOpen.length?noshOpen:[]).map(noshRow).join('')}
+      ${noshOpen.length===0?'<div style="color:var(--mu);font-size:12px;padding:6px 2px 12px">재예약이 안 잡힌 노쇼가 없습니다.</div>':''}
+      <div class="sect-label" style="margin-top:14px">재예약으로 이어진 건 (${noshAll.length-noshOpen.length})</div>
+      ${noshAll.filter(e=>reBookOf(e.id).length).slice(0,20).map(noshRow).join('')||'<div style="color:var(--mu);font-size:12px;padding:6px 2px">아직 없습니다.</div>'}`
+    :'';
   document.getElementById('pg-req').innerHTML=`
     <div class="rq-wrap">
       <div class="stats">
@@ -2033,8 +2116,9 @@ function renderReq(){
       </div>
       ${pending.length>0
         ?`<div class="sect-label">대기 중 예약 (${pending.length})</div>${pendCards}`
-        :'<div style="color:var(--mu);font-size:13px;text-align:center;padding:40px 0">대기 중인 예약이 없습니다.</div>'
+        :'<div style="color:var(--mu);font-size:13px;text-align:center;padding:24px 0">대기 중인 예약이 없습니다.</div>'
       }
+      ${reSect}
     </div>`;
 }
 
