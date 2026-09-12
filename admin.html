@@ -1776,6 +1776,87 @@ function renderDash(){
   +'</div></div>';
 }
 
+// ── 과거 자료 채우기 (260912) ──
+// 옛 시트(모델 정리·스케줄)에 있던 인스타 아이디와 노쇼/취소 이력을, 이미 등록된 일정에 채운다.
+// 새 일정을 만들지 않고 기존 건만 고친다. id가 어긋났을 때를 대비해 날짜까지 대조한 뒤 적용한다.
+const BACKFILL_KEYS=['insta','status','noshReason','note','amount','half'];
+function backfillParse(){
+  const el=document.getElementById('backfill-json');
+  const raw=(el&&el.value||'').trim();
+  if(!raw)throw new Error('붙여넣은 내용이 없습니다.');
+  const arr=JSON.parse(raw);
+  if(!Array.isArray(arr))throw new Error('배열 형식이어야 합니다.');
+  return arr;
+}
+function backfillPlan(arr){
+  const ok=[],skip=[];
+  arr.forEach(function(it){
+    const e=evById(it&&it.id);
+    if(!e){skip.push({it:it,why:'그 번호의 일정이 없음'});return;}
+    if(it.date&&e.date!==it.date){skip.push({it:it,why:'날짜가 다름 (캘린더 '+e.date+')'});return;}
+    const set=it.set||{};
+    const ch=[];
+    BACKFILL_KEYS.forEach(function(k){
+      if(set[k]===undefined)return;
+      const cur=e[k];
+      if(k==='insta'&&cur&&String(cur).trim()){ch.push({k:k,from:cur,to:set[k],keep:true});return;}  // 이미 있으면 덮지 않음
+      if(String(cur==null?'':cur)===String(set[k]))return;
+      ch.push({k:k,from:cur,to:set[k]});
+    });
+    if(!ch.length){skip.push({it:it,why:'바뀔 내용 없음'});return;}
+    ok.push({e:e,ch:ch});
+  });
+  return{ok:ok,skip:skip};
+}
+function backfillPreview(){
+  const res=document.getElementById('backfill-result');
+  try{
+    const plan=backfillPlan(backfillParse());
+    const applyN=plan.ok.reduce(function(a,p){return a+p.ch.filter(function(c){return !c.keep;}).length;},0);
+    const keepN=plan.ok.reduce(function(a,p){return a+p.ch.filter(function(c){return c.keep;}).length;},0);
+    let h='<b>바꿀 일정 '+plan.ok.length+'건 · 변경 항목 '+applyN+'개</b>';
+    if(keepN)h+=' <span style="color:var(--mu)">(이미 값이 있어 건너뜀 '+keepN+'개)</span>';
+    if(plan.skip.length)h+='<br><span style="color:#c4763a">적용 안 됨 '+plan.skip.length+'건</span>';
+    h+='<div style="max-height:220px;overflow:auto;margin-top:8px;text-align:left">';
+    plan.ok.slice(0,25).forEach(function(p){
+      h+='<div style="padding:5px 0;border-bottom:1px solid var(--bd);font-size:11.5px">'
+        +'<b>'+p.e.date+' '+esc(p.e.client||'(이름 없음)')+'</b> — '
+        +p.ch.map(function(c){return c.keep?('<span style="color:var(--mu)">'+c.k+' 유지</span>')
+          :(c.k+' <span style="color:var(--mu)">'+esc(String(c.from==null?'(없음)':c.from)).slice(0,18)+'</span> → <b>'+esc(String(c.to)).slice(0,24)+'</b>');}).join(' · ')
+        +'</div>';
+    });
+    if(plan.ok.length>25)h+='<div style="font-size:11px;color:var(--mu);padding-top:6px">… 외 '+(plan.ok.length-25)+'건</div>';
+    plan.skip.slice(0,10).forEach(function(s){
+      h+='<div style="padding:4px 0;font-size:11px;color:#c4763a">건너뜀 — id '+(s.it&&s.it.id)+' · '+s.why+'</div>';
+    });
+    h+='</div>';
+    res.className='import-result ok';res.innerHTML=h;
+  }catch(err){res.className='import-result err';res.textContent='읽기 실패: '+err.message;}
+}
+function backfillApply(){
+  const res=document.getElementById('backfill-result');
+  try{
+    const plan=backfillPlan(backfillParse());
+    if(!plan.ok.length){res.className='import-result err';res.textContent='바꿀 내용이 없습니다.';return;}
+    if(!confirm('일정 '+plan.ok.length+'건을 고칩니다.\n되돌리기용 스냅샷을 먼저 저장합니다. 진행할까요?'))return;
+    pushUndoSnapshot();
+    let n=0;
+    plan.ok.forEach(function(p){
+      p.ch.forEach(function(c){
+        if(c.keep)return;
+        p.e[c.k]=c.to;n++;
+      });
+      if(p.e.status==='nosh'&&!p.e.noshAt)p.e.noshAt=p.e.date;
+    });
+    saveEvents();
+    if(curPage==='cal')renderBody();
+    buildNav();
+    res.className='import-result ok';
+    res.innerHTML='✓ 일정 '+plan.ok.length+'건 · 항목 '+n+'개를 채웠습니다. 잘못됐으면 위의 「가져오기 되돌리기」로 복구하세요.';
+    toast('과거 자료 채우기 완료');
+  }catch(err){res.className='import-result err';res.textContent='적용 실패: '+err.message;}
+}
+
 // ── SIDEBAR TOGGLE ──
 function toggleSidebar(){
   sbOpen=!sbOpen;
@@ -2666,6 +2747,17 @@ function renderImport(){
         되돌리기 전 현재 상태도 백업 파일로 자동 저장돼요.</p>
         <button class="sub-btn" style="margin-top:8px;background:#c8a456;color:#fff" onclick="undoImport()">↩️ 최근 가져오기 되돌리기</button>
         <div id="import-undo-result" class="import-result"></div>
+      </div>
+      <div class="import-box" style="border-color:#a9dcc3;background:#f7fcf9">
+        <h3>🧩 과거 자료 채우기 (인스타 · 상태)</h3>
+        <p>예전 시트에 있던 <strong>인스타 아이디</strong>와 <strong>노쇼·취소 이력</strong>을 이미 등록된 일정에 채워 넣어요.<br>
+        새 일정을 만들지 않고 <strong>기존 일정만 고칩니다.</strong> 먼저 「미리보기」로 확인한 뒤 적용하세요.</p>
+        <textarea id="backfill-json" placeholder='[{"id":123,"date":"2023-04-01","set":{"insta":"@abc"}}, ...]'></textarea>
+        <div class="act-row" style="margin-top:8px">
+          <button class="sub-btn" style="flex:1;background:var(--sf2);color:var(--tx);border:1px solid var(--bd)" onclick="backfillPreview()">🔍 미리보기</button>
+          <button class="sub-btn" style="flex:1" onclick="backfillApply()">채워 넣기</button>
+        </div>
+        <div id="backfill-result" class="import-result"></div>
       </div>
       <div class="import-box">
         <h3>TimeTree iCal 가져오기</h3>
