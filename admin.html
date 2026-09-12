@@ -628,6 +628,43 @@ function isSubinUser(){
 // ── 노쇼 사유 (260912 명진) ──
 // 노쇼는 재예약을 재촉하기 위한 게 아니라 '다음에 거르기 위한 기록'이다.
 // 사유가 남아야 같은 고객이 다시 예약할 때 받을지 판단할 수 있다.
+// ── 촬영 금액 (260912 명진) ──
+// 여·남 스튜디오만 단가 고정(8만원), 나머지는 건마다 달라 등록할 때 직접 적는다.
+// 계산 우선순위: 일정에 적은 금액 > 고정 단가(½ 반값이면 절반) > 미입력(집계에서 제외)
+const FIXED_PRICE={studio_f:80000,studio_m:80000};
+const NO_PRICE_LABELS=['rest','personal','suvin'];   // 금액 칸을 아예 안 보여줄 라벨
+function evAmount(e){
+  if(!e)return null;
+  if(e.amount!=null&&e.amount!=='')return Number(e.amount);
+  const p=FIXED_PRICE[e.label];
+  if(p==null)return null;
+  return e.half?Math.round(p/2):p;
+}
+function amountFormBlock(e){
+  const v=(e&&e.amount!=null)?e.amount:'';
+  const hide=e&&NO_PRICE_LABELS.includes(e.label);
+  return`<div class="fg" id="amtBox"${hide?' style="display:none"':''}>
+    <label>금액 <span style="color:var(--mu);font-weight:400;font-size:10px">— 수익 집계용</span></label>
+    <input type="number" id="f_amt" step="10000" value="${v}" placeholder="예: 80000">
+    <div id="priceHint" style="font-size:10.5px;color:var(--mu);margin-top:4px"></div>
+  </div>`;
+}
+// 라벨에 따라 금액 칸 보이기/숨기기 + 안내 문구 갱신
+function refreshPriceHint(){
+  const box=document.getElementById('amtBox');if(!box)return;
+  box.style.display=NO_PRICE_LABELS.includes(seLabel)?'none':'';
+  const h=document.getElementById('priceHint');if(!h)return;
+  const p=FIXED_PRICE[seLabel];
+  h.innerHTML=p
+    ?'비워두면 기본 <b>'+p.toLocaleString('ko-KR')+'원</b>으로 잡힙니다. (½ 반값이면 절반) 다르면 직접 적어주세요.'
+    :'이 라벨은 건마다 금액이 달라서, <b>적어두지 않으면 수익에 안 잡힙니다.</b>';
+}
+function amtFromForm(){
+  const box=document.getElementById('amtBox'),a=document.getElementById('f_amt');
+  if(!a||!box||box.style.display==='none')return null;   // 금액을 안 쓰는 라벨이면 기록하지 않는다
+  const v=a.value.trim();
+  return v===''?null:Number(v);
+}
 const NOSH_REASONS=['의상 미전달(준비 미흡)','당일 취소','무단 불참','연락 두절','일정 변경 요청','기타'];
 // 일정 폼(추가·편집)에서 상태를 '노쇼'로 고르면 나타나는 사유 칸
 function noshFormBlock(e){
@@ -1656,6 +1693,12 @@ function openD(id){
   if(e.client)b+=`<div class="det-r"><span class="det-l">👤 고객</span>${e.client}</div>`;
   if(e.insta||e.phone)b+=`<div class="det-r"><span class="det-l">📷 인스타</span>${e.insta||e.phone}</div>`;
   if(e.note)b+=`<div class="det-r"><span class="det-l">📝 메모</span>${e.note}</div>`;
+  if(!NO_PRICE_LABELS.includes(e.label)){
+    const amt=evAmount(e);
+    b+=`<div class="det-r"><span class="det-l">💰 금액</span>${amt!=null
+      ?amt.toLocaleString('ko-KR')+'원'+(e.amount==null?' <span style="color:var(--mu);font-size:10.5px">(기본 단가'+(e.half?' · ½ 반값':'')+')</span>':'')
+      :'<span style="color:var(--mu)">미입력 — 수익에 안 잡힘</span>'}</div>`;
+  }
   if(e.status==='nosh')b+=`<div class="det-r"><span class="det-l">🚫 노쇼 사유</span>${e.noshReason?esc(e.noshReason):'<span style="color:var(--mu)">기록 없음</span>'} <button onclick="askNosh(${e.id})" style="margin-left:6px;padding:2px 8px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--mu);font-size:10px;cursor:pointer">${e.noshReason?'수정':'남기기'}</button></div>`;
   b+=reLinkRows(e);   // 재예약 연결·반값 표시
   if(!e.priv&&stActive(e.status)){
@@ -1949,6 +1992,7 @@ function openAdd(ds){
     <div class="fg"><label>고객명 <span style="color:#c4763a">*</span> <span style="color:var(--mu);font-weight:400;font-size:10px">(예약문구 붙여넣으면 날짜·시간 자동입력)</span></label><input type="text" id="f_c" placeholder="이름 (필수) — 예: 최혜주님7/15 14~16시" oninput="tryAutofill(this)" onpaste="setTimeout(()=>tryAutofill(this),0)"></div>
     ${timeFormBlock(ds,'10:00',ds,'12:00',2)}
     <div class="fg"><label>라벨</label><div class="label-grid">${chips}</div></div>
+    ${amountFormBlock(null)}
     <div class="fg"><label>인스타 아이디</label><input type="text" id="f_p" placeholder="@instagram_id"></div>
     <div class="fg"><label>메모</label><textarea id="f_n" rows="2" placeholder="특이사항"></textarea></div>
     <div class="fg"><label>상태</label>
@@ -1957,7 +2001,7 @@ function openAdd(ds){
     ${noshFormBlock(null)}
     <div class="form-foot"><button class="sub-btn" onclick="saveEv()">저장</button></div>`;
   _editingId=null;_reFrom=null;
-  openP();applyAllDay();bindAllDayNote();
+  openP();applyAllDay();bindAllDayNote();refreshPriceHint();
 }
 // 시작 날짜가 바뀌면 종일 촬영 안내를 다시 계산한다
 function bindAllDayNote(){
@@ -2019,6 +2063,7 @@ function selLbl(k,el){
     if(k==='rest')ss.value='none';
     else if(ss.value==='none')ss.value='booked';
   }
+  refreshPriceHint();
 }
 
 function readTimeForm(){
@@ -2056,6 +2101,7 @@ function saveEv(force){
   }
   nextId++;
   try{localStorage.setItem('maydly_lastlabel',seLabel);}catch(_){}  // 라벨 기억
+  e.amount=amtFromForm();        // 수익 집계용 금액
   applyNoshFromForm(e);          // 상태를 노쇼로 골랐으면 사유도 함께 기록
   const wasRe=_reFrom; _reFrom=null;
   maydlyEvents.push(e);saveEvents();closeP();renderBody();buildNav();
@@ -2077,6 +2123,7 @@ function openEdit(id){
     <div class="fg"><label>고객명 <span style="color:#c4763a">*</span></label><input type="text" id="f_c" value="${e.client||''}" oninput="tryAutofill(this)"></div>
     ${timeFormBlock(e.date,st,endDate,endTime,durSel)}
     <div class="fg"><label>라벨</label><div class="label-grid">${chips}</div></div>
+    ${amountFormBlock(e)}
     <div class="fg"><label>인스타 아이디</label><input type="text" id="f_p" value="${e.insta||e.phone||''}" placeholder="@instagram_id"></div>
     <div class="fg"><label>메모</label><textarea id="f_n" rows="2">${e.note||''}</textarea></div>
     <div class="fg"><label>상태</label>
@@ -2087,7 +2134,7 @@ function openEdit(id){
     <div class="form-foot"><button class="sub-btn" onclick="updateEv(${id})">저장</button></div>`;
   const rep=document.getElementById('f_rep');if(rep)rep.innerHTML=repeatOptions(e.date,e.repeat||'none');
   _editingId=id;
-  openP();applyAllDay();bindAllDayNote();
+  openP();applyAllDay();bindAllDayNote();refreshPriceHint();
 }
 
 function updateEv(id,force){
@@ -2108,6 +2155,7 @@ function updateEv(id,force){
     note:document.getElementById('f_n').value.trim()||''
   };
   applyStatusChange(next,newStatus);
+  next.amount=amtFromForm();     // 수익 집계용 금액
   applyNoshFromForm(next);       // 상태를 노쇼로 바꿨으면 사유도 함께 기록
   // 중복 시간 차단 — 자기 자신은 빼고 검사
   if(!force){
