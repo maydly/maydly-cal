@@ -738,12 +738,24 @@ function isSubinUser(){
 // ── 촬영 금액 (260912 명진) ──
 // 여·남 스튜디오만 단가 고정(8만원), 나머지는 건마다 달라 등록할 때 직접 적는다.
 // 계산 우선순위: 일정에 적은 금액 > 고정 단가(½ 반값이면 절반) > 미입력(집계에서 제외)
-const FIXED_PRICE={studio_f:80000,studio_m:80000};
+// 기간별 고정 단가 — 단가는 시기에 따라 바뀐다.
+// (260912 명진) 2026년부터 여·남 스튜디오 8만원 확정. 그 이전 연도는 금액 변동이 있어
+// 값을 받기 전까지는 비워둔다. 비워두면 그 시기 촬영은 '금액 미입력'으로 집계에서 빠진다.
+// 과거 단가를 알려주시면 아래에 구간을 추가하면 그 시점부터 소급 계산된다.
+const PRICE_TABLE=[
+  // {from:'2023-01-01',p:{studio_f:00000,studio_m:00000}},   ← 과거 단가 확인되면 추가
+  {from:'2026-01-01',p:{studio_f:80000,studio_m:80000}}
+];
+function fixedPriceOf(label,ds){
+  let hit=null;
+  PRICE_TABLE.forEach(function(r){ if(String(ds)>=r.from) hit=r; });   // 날짜에 해당하는 마지막 구간
+  return hit&&hit.p[label]!=null?hit.p[label]:null;
+}
 const NO_PRICE_LABELS=['rest','personal','suvin'];   // 금액 칸을 아예 안 보여줄 라벨
 function evAmount(e){
   if(!e)return null;
   if(e.amount!=null&&e.amount!=='')return Number(e.amount);
-  const p=FIXED_PRICE[e.label];
+  const p=fixedPriceOf(e.label,e.date);
   if(p==null)return null;
   return e.half?Math.round(p/2):p;
 }
@@ -761,10 +773,12 @@ function refreshPriceHint(){
   const box=document.getElementById('amtBox');if(!box)return;
   box.style.display=NO_PRICE_LABELS.includes(seLabel)?'none':'';
   const h=document.getElementById('priceHint');if(!h)return;
-  const p=FIXED_PRICE[seLabel];
+  const sd=document.getElementById('f_sd');
+  const ds=(sd&&sd.value)||TSTR;
+  const p=fixedPriceOf(seLabel,ds);
   h.innerHTML=p
     ?'비워두면 기본 <b>'+p.toLocaleString('ko-KR')+'원</b>으로 잡힙니다. (½ 반값이면 절반) 다르면 직접 적어주세요.'
-    :'이 라벨은 건마다 금액이 달라서, <b>적어두지 않으면 수익에 안 잡힙니다.</b>';
+    :'이 날짜·라벨은 고정 단가가 없어서, <b>적어두지 않으면 수익에 안 잡힙니다.</b>';
 }
 function amtFromForm(){
   const box=document.getElementById('amtBox'),a=document.getElementById('f_amt');
