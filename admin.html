@@ -1788,12 +1788,30 @@ function backfillParse(){
   if(!Array.isArray(arr))throw new Error('배열 형식이어야 합니다.');
   return arr;
 }
+// 이름 정규화 — '님' 접미사·공백·괄호 제거 후 비교한다
+function bfName(s){return String(s==null?'':s).replace(/\s+/g,'').replace(/\(.*?\)/g,'').replace(/(님)+$/,'');}
+// 날짜+고객명으로 일정을 찾는다. 후보가 2건 이상이면 고르지 않고 돌려보낸다.
+function bfFind(date,client){
+  const key=bfName(client);
+  const hit=maydlyEvents.filter(function(e){return e.date===date&&bfName(e.client)===key;});
+  if(hit.length===1)return{e:hit[0]};
+  if(hit.length===0)return{err:'그 날짜에 같은 이름의 일정이 없음'};
+  return{err:'같은 날 같은 이름이 '+hit.length+'건 — 어느 건지 알 수 없음'};
+}
 function backfillPlan(arr){
   const ok=[],skip=[];
   arr.forEach(function(it){
-    const e=evById(it&&it.id);
-    if(!e){skip.push({it:it,why:'그 번호의 일정이 없음'});return;}
-    if(it.date&&e.date!==it.date){skip.push({it:it,why:'날짜가 다름 (캘린더 '+e.date+')'});return;}
+    if(!it)return;
+    let e=null;
+    if(it.client){                       // 날짜+이름 방식 (권장)
+      const r=bfFind(it.date,it.client);
+      if(r.err){skip.push({it:it,why:r.err});return;}
+      e=r.e;
+    }else{                               // 예전 방식 — 번호로 찾되 날짜까지 맞아야 함
+      e=evById(it.id);
+      if(!e){skip.push({it:it,why:'그 번호의 일정이 없음'});return;}
+      if(it.date&&e.date!==it.date){skip.push({it:it,why:'날짜가 다름 (캘린더 '+e.date+')'});return;}
+    }
     const set=it.set||{};
     const ch=[];
     BACKFILL_KEYS.forEach(function(k){
@@ -1827,7 +1845,8 @@ function backfillPreview(){
     });
     if(plan.ok.length>25)h+='<div style="font-size:11px;color:var(--mu);padding-top:6px">… 외 '+(plan.ok.length-25)+'건</div>';
     plan.skip.slice(0,10).forEach(function(s){
-      h+='<div style="padding:4px 0;font-size:11px;color:#c4763a">건너뜀 — id '+(s.it&&s.it.id)+' · '+s.why+'</div>';
+      const tag=s.it&&(s.it.client?(s.it.date+' '+s.it.client):('id '+s.it.id));
+      h+='<div style="padding:4px 0;font-size:11px;color:#c4763a">건너뜀 — '+esc(String(tag))+' · '+s.why+'</div>';
     });
     h+='</div>';
     res.className='import-result ok';res.innerHTML=h;
@@ -2751,8 +2770,9 @@ function renderImport(){
       <div class="import-box" style="border-color:#a9dcc3;background:#f7fcf9">
         <h3>🧩 과거 자료 채우기 (인스타 · 상태)</h3>
         <p>예전 시트에 있던 <strong>인스타 아이디</strong>와 <strong>노쇼·취소 이력</strong>을 이미 등록된 일정에 채워 넣어요.<br>
-        새 일정을 만들지 않고 <strong>기존 일정만 고칩니다.</strong> 먼저 「미리보기」로 확인한 뒤 적용하세요.</p>
-        <textarea id="backfill-json" placeholder='[{"id":123,"date":"2023-04-01","set":{"insta":"@abc"}}, ...]'></textarea>
+        새 일정을 만들지 않고 <strong>기존 일정만 고칩니다.</strong> 먼저 「미리보기」로 확인한 뒤 적용하세요.<br>
+        <span style="color:var(--mu)">일정은 <strong>날짜 + 고객명</strong>으로 찾습니다. 같은 날 같은 이름이 둘 이상이면 건너뜁니다.</span></p>
+        <textarea id="backfill-json" placeholder='[{"date":"2023-04-01","client":"홍길동님","set":{"insta":"@abc"}}, ...]'></textarea>
         <div class="act-row" style="margin-top:8px">
           <button class="sub-btn" style="flex:1;background:var(--sf2);color:var(--tx);border:1px solid var(--bd)" onclick="backfillPreview()">🔍 미리보기</button>
           <button class="sub-btn" style="flex:1" onclick="backfillApply()">채워 넣기</button>
