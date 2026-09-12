@@ -363,6 +363,40 @@ option{background:#fff}
 .drail .act .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
 .drail .act .n{flex:1}
 .drail .act .s{font-size:10.5px;color:var(--mu)}
+/* ── 260913 추가 ── */
+.kpi.clickable{cursor:pointer;transition:transform .12s,box-shadow .12s}
+.kpi.clickable:active{transform:scale(.985)}
+.kpi .v u.goal{text-decoration:none;font-size:13px;font-weight:700;color:var(--mu);margin-left:3px}
+/* 다가오는 2주 — 빈 자리 경고색 */
+.mini i.freeOpen{background:#e0564a;color:#fff}      /* 안 받아서 빈 자리 = 레드카드 */
+.mini i.freeNosh{background:#f2c230;color:#4a3a00}   /* 노쇼로 빈 자리 = 옐로카드 */
+.mini i{cursor:pointer}
+.mini i.freeOpen u,.mini i.freeNosh u{opacity:.95}
+.mlg b{font-weight:800;color:#c0392b}
+/* 수익 추이 */
+.rbs{position:relative;align-items:flex-end;height:150px;padding-top:4px}
+.rb{position:relative}
+.rbv{display:block;text-align:center;font-size:10.5px;font-weight:800;color:var(--mu2);margin-bottom:3px}
+.rbv.hit{color:#2f6b3a}
+.rb span u{display:block;text-decoration:none;font-size:9px;font-weight:800;margin-top:1px}
+.rb span u.up{color:#3f7a4a}.rb span u.dn{color:#c0483c}
+.goalline{position:absolute;left:0;right:0;border-top:1.5px dashed #c8a456;pointer-events:none;z-index:1}
+.goalline span{position:absolute;right:0;top:-15px;font-size:9.5px;font-weight:800;color:#8a6a20;background:#fff;padding:0 4px}
+/* 3개월 — 수익 비교 */
+.m3money{display:flex;align-items:baseline;gap:7px;margin-top:7px;padding-top:7px;border-top:1px dashed var(--dln);font-size:11.5px;flex-wrap:wrap}
+.m3money b{font-size:15px;font-weight:800;color:#4e8a55}
+.m3ly{color:var(--mu)}
+.m3money em{font-style:normal;font-weight:800;font-size:11.5px}
+.m3money em.up{color:#3f7a4a}.m3money em.dn{color:#c0483c}
+/* 노쇼 이력 — 사람 단위 */
+.nsgrp{font-size:10.5px;font-weight:800;color:var(--mu2);margin:11px 0 5px;padding-top:9px;border-top:1px solid var(--dln)}
+.nsgrp:first-of-type{border-top:0;padding-top:0}
+.prow{display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid var(--dln);font-size:12px;cursor:pointer}
+.prow:last-child{border-bottom:0}
+.prow b{font-weight:700}
+.prow .cnt{font-size:10px;font-weight:800;background:#fdeceb;color:#c0483c;padding:1px 7px;border-radius:20px}
+.prow .s{margin-left:auto;font-size:10.5px;color:var(--mu);text-align:right}
+.prow.rep{background:#fdf6f5;border-radius:9px;padding:8px 9px;margin-bottom:4px;border-bottom:0}
 /* ── 한눈에 보기 (260913) ── 맥북 레이아웃을 그대로 폰 폭에 맞춰 축소한다 */
 #pg-dash.fit{position:relative;overflow:auto;width:100%;max-width:100vw}
 #pg-dash.fit .dwrap{position:absolute;top:0;left:0;width:1280px;max-width:none;transform-origin:top left}
@@ -1613,6 +1647,9 @@ function showPage(pg){
 // 대시보드 (260912) — 읽기 전용. 기존 일정 데이터를 모아 보여주기만 한다.
 // ══════════════════════════════════════════════════════════════
 const DASH_SHOOT=['studio_m','studio_f','outdoor','studio_pay','outdoor_pay','brand'];
+// 목표 기준 (260913 명진) — 차이가 나면 사유를 확인해야 하는 기준선
+const WEEK_TARGET=10;        // 이번 주 촬영 10명 고정
+const MONTH_TARGET=3200000;  // 이번 달 수익 320만원 고정
 function isShootEv(e){return !!e&&DASH_SHOOT.includes(e.label)&&stActive(e.status);}
 function mkOf(ds){return String(ds).slice(0,7);}
 function addMk(mk,n){const a=mk.split('-').map(Number);const d=new Date(a[0],a[1]-1+n,1);return d.getFullYear()+'-'+pad(d.getMonth()+1);}
@@ -1636,11 +1673,20 @@ function daySlots(ds){
     }
   });
   if(blocked)return{kind:'off'};
+  // 그날 노쇼로 비어버린 시간대 — 빈 자리의 '원인'을 가른다
+  const noshR=[];
+  maydlyEvents.forEach(function(e){
+    if(e.status!=='nosh'||e.date!==ds||!e.time)return;
+    const t=e.time.split(':').map(Number);const st=t[0]+(t[1]||0)/60;
+    noshR.push([st,st+(e.dur||2)]);
+  });
   const ts=dow===0?[[11,13],[14,16],[17,19],[20,22]]:[[14,16],[17,19],[20,22]];
   const preHol=isPreHoliday(ds)&&!PREHOL_EXCEPT.includes(ds);
   return{kind:'slots',slots:ts.map(function(r){
     const s=r[0],e=r[1];
-    return{s:s,e:e,avail:!busy.some(function(b){return !(e<=b[0]||s>=b[1]);})&&!(preHol&&s>=19)};
+    const av=!busy.some(function(b){return !(e<=b[0]||s>=b[1]);})&&!(preHol&&s>=19);
+    return{s:s,e:e,avail:av,
+           byNosh:av&&noshR.some(function(b){return !(e<=b[0]||s>=b[1]);})};   // 노쇼 때문에 빈 자리
   })};
 }
 
@@ -1657,10 +1703,12 @@ function dashData(){
   maydlyEvents.forEach(function(e){
     if(!isShootEv(e))return;
     const mk=mkOf(e.date);if(!mk)return;
-    const b=D.byMonth[mk]||(D.byMonth[mk]={n:0,sum:0,noAmt:0,noAmtEvs:[],upto:{}});
+    const b=D.byMonth[mk]||(D.byMonth[mk]={n:0,sum:0,noAmt:0,noAmtEvs:[],upto:{},uptoSum:{}});
     b.n++;const a=evAmount(e);
     if(a==null){b.noAmt++;if(b.noAmtEvs.length<6)b.noAmtEvs.push(e);}else b.sum+=a;
-    const dd=Number(e.date.slice(8));(b.upto[dd]=(b.upto[dd]||0)+1);
+    const dd=Number(e.date.slice(8));
+    b.upto[dd]=(b.upto[dd]||0)+1;
+    if(a!=null)b.uptoSum[dd]=(b.uptoSum[dd]||0)+a;
   });
   D.mk=thisMk; D.day=day;
   // 알림
@@ -1680,6 +1728,26 @@ function dashData(){
     D.reason[r]=(D.reason[r]||0)+1;
   });
   D.reLinked=nosh.filter(function(e){return reBookOf(e.id).length>0;}).length;
+  // 사람 단위 정리 — '다시 안 받은 사람'을 판단하기 위한 집계
+  const pk=function(e){return String(e.client||'').replace(/\s+/g,'').replace(/\(.*?\)/g,'').replace(/(님)+$/,'');};
+  const pmap={};
+  nosh.forEach(function(e){
+    const k=pk(e); if(!k)return;
+    const o=pmap[k]||(pmap[k]={name:e.client,cnt:0,last:'',reasons:[],ids:[],relinked:false});
+    o.cnt++; o.ids.push(e.id);
+    if(e.date>o.last)o.last=e.date;
+    const r=(e.noshReason||'').split(' — ')[0]; if(r&&o.reasons.indexOf(r)<0)o.reasons.push(r);
+    if(reBookOf(e.id).length)o.relinked=true;
+  });
+  // 노쇼 이후에 다시 예약이 잡혔는지 (같은 이름 기준)
+  Object.keys(pmap).forEach(function(k){
+    const o=pmap[k];
+    o.after=maydlyEvents.some(function(x){return isShootEv(x)&&pk(x)===k&&x.date>o.last;});
+  });
+  D.people=Object.keys(pmap).map(function(k){return pmap[k];})
+    .sort(function(a,b){return (b.cnt-a.cnt)||String(b.last).localeCompare(String(a.last));});
+  D.notBack=D.people.filter(function(o){return !o.relinked&&!o.after;});
+  D.repeat=D.people.filter(function(o){return o.cnt>=2;});
   D.noshSoon=nosh.filter(function(e){
     return maydlyEvents.some(function(x){return isShootEv(x)&&x.date>today&&x.client&&e.client&&x.client===e.client;});
   });
@@ -1705,11 +1773,16 @@ function dashData(){
   D.two=[];
   for(let i=0;i<14;i++){
     const ds=addDays(today,i),info=daySlots(ds);
-    let cls='off',n=0;
+    let cls='off',n=0,nn=0;
     if(info.kind==='inq')cls='inq';
     else if(info.kind==='off')cls='off';
-    else{n=info.slots.filter(function(x){return x.avail;}).length;cls=n?'free':'full';}
-    D.two.push({ds:ds,cls:cls,n:n});
+    else{
+      const open=info.slots.filter(function(x){return x.avail;});
+      n=open.length; nn=open.filter(function(x){return x.byNosh;}).length;
+      // 빈 자리가 있으면 경고. 원인이 전부 노쇼면 옐로(고객 사정), 아니면 레드(안 받아서 비었음)
+      cls=n?(nn===n?'freeNosh':'freeOpen'):'full';
+    }
+    D.two.push({ds:ds,cls:cls,n:n,nn:nn});
   }
   return D;
 }
@@ -1746,12 +1819,28 @@ function applyDashFit(){
   if(!sp){sp=document.createElement('div');sp.className='fitspacer';pg.appendChild(sp);}
   sp.style.height=Math.ceil(h*s)+'px';          // 스크롤 높이 확보
 }
+// 이번 달 금액이 안 적힌 촬영 목록 — 눌러서 바로 채우라고 띄운다
+function dashNoAmt(){
+  const mk=mkOf(TSTR);
+  const list=maydlyEvents.filter(function(e){return isShootEv(e)&&mkOf(e.date)===mk&&evAmount(e)==null;})
+    .sort(function(a,b){return String(a.date).localeCompare(String(b.date));});
+  document.getElementById('pnh').innerHTML='이번 달 금액 미입력<button class="px" onclick="closeP()">×</button>';
+  document.getElementById('pb').innerHTML=list.length
+    ? '<div style="font-size:12px;color:var(--mu2);margin-bottom:10px">아래 '+list.length+'건은 금액이 없어 <b>수익에 안 잡힙니다.</b> 눌러서 채워주세요.</div>'
+      +list.map(function(e){const L=LABELS[e.label]||{name:'기타',color:'#999'};
+        return '<div class="act" style="cursor:pointer;border-bottom:1px solid var(--bd);padding:9px 0" onclick="closeP();openEdit('+e.id+')">'
+          +'<span style="background:'+L.color+';color:'+lblTc(e.label)+';font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">'+L.name+'</span>'
+          +'<div class="n" style="margin-left:8px">'+esc(e.client||'(이름 없음)')+'<div class="s">'+e.date+(e.time?' '+e.time:'')+'</div></div></div>';}).join('')
+    : '<div style="text-align:center;padding:24px 0;color:var(--mu)">이번 달은 금액이 모두 입력돼 있습니다 🍀</div>';
+  openP();
+}
 function renderDash(){
   const D=dashData(),W=['일','월','화','수','목','금','토'];
   const cur=D.byMonth[D.mk]||{n:0,sum:0,noAmt:0,noAmtEvs:[]};
   const prevMk=addMk(D.mk,-1),nextMk=addMk(D.mk,1);
   const ly=function(mk){return addMk(mk,-12);};
   const cntUpto=function(mk,dd){const b=D.byMonth[mk];if(!b)return 0;let t=0;for(const k in b.upto)if(Number(k)<=dd)t+=b.upto[k];return t;};
+  const sumUpto=function(mk,dd){const b=D.byMonth[mk];if(!b)return 0;let t=0;for(const k in b.uptoSum)if(Number(k)<=dd)t+=b.uptoSum[k];return t;};
   const M=function(mk,isCur,isNext){
     const b=D.byMonth[mk]||{n:0,sum:0,noAmt:0};
     const lyB=D.byMonth[ly(mk)]||{n:0};
@@ -1765,8 +1854,15 @@ function renderDash(){
       +'<div class="m3row"><div class="m3n">'+b.n+'<u>건</u></div>'
       +'<div class="m3cmp"><i style="height:'+Math.max(4,Math.round(64*b.n/mx))+'px;background:'+(isNext?'#d8e85c':'#3f7a4a')+'"></i>'
       +'<i style="height:'+Math.max(4,Math.round(64*lyN/mx))+'px;background:#cfe0d2"></i></div></div>'
-      +'<div class="m3s">작년 '+lyN+'건 · '+(isNext?('빈 자리 <b class="l">'+freeN+'</b>자리'):('수익 <b class="g">'+manwon(b.sum)+'</b>'))
-      +' · 노쇼 '+noshN+'</div></div>';
+      +'<div class="m3s">작년 '+lyN+'건 · 노쇼 '+noshN+(isNext?(' · 빈 자리 <b class="l">'+freeN+'</b>자리'):'')+'</div>'
+      +(isNext?'':(function(){
+          const lySum=isCur?sumUpto(ly(mk),D.day):(D.byMonth[ly(mk)]||{sum:0}).sum;
+          const gap=b.sum-lySum;
+          return '<div class="m3money">수익 <b>'+manwon(b.sum)+'</b>'
+            +'<span class="m3ly">작년 '+manwon(lySum)+'</span>'
+            +'<em class="'+(gap>=0?'up':'dn')+'">'+(gap>=0?'▲ ':'▼ ')+manwon(Math.abs(gap))+'</em></div>';
+        })())
+      +'</div>';
   };
 
   const kindName={outfit:'👗 의상확인',rush:'🚨 긴급 보정본',basic:'📦 기본 보정본',buy:'🎞️ 구매분'};
@@ -1779,8 +1875,10 @@ function renderDash(){
       +'<div class="n">'+esc(a.e.client||'(이름 없음)')+' · '+kindName[a.kind]+'</div></div>';
   }).join('')||'<div class="dempty">지금 챙길 일이 없습니다 🍀</div>';
 
+  const twoTitle={freeOpen:'예약을 안 받아 비어 있음',freeNosh:'노쇼로 비어 있음',full:'다 참',inq:'야외 문의만',off:'휴무·불가'};
   const two=D.two.map(function(t){
-    return '<i class="'+t.cls+'" title="'+t.ds+'">'+Number(t.ds.slice(8))+(t.n?'<u>'+t.n+'</u>':'')+'</i>';
+    const lb=t.ds+' · '+(twoTitle[t.cls]||'')+(t.n?' ('+t.n+'자리'+(t.nn?', 노쇼 '+t.nn:'')+')':'');
+    return '<i class="'+t.cls+'" title="'+lb+'" onclick="openDay(\''+t.ds+'\')">'+Number(t.ds.slice(8))+(t.n?'<u>'+t.n+'</u>':'')+'</i>';
   }).join('');
   const pad0=Array.from({length:dowOf(D.two[0].ds)},function(){return '<i class="pad"></i>';}).join('');
 
@@ -1794,9 +1892,18 @@ function renderDash(){
   const mks=[];for(let i=5;i>=0;i--)mks.push(addMk(D.mk,-i));
   const sums=mks.map(function(m){return (D.byMonth[m]||{sum:0}).sum;});
   const smx=Math.max.apply(null,sums.concat([1]));
+  const H=104, base=Math.max(smx,MONTH_TARGET);
   const bars=mks.map(function(m,i){
-    return '<div class="rb"><i style="height:'+Math.max(3,Math.round(96*sums[i]/smx))+'px;background:'+(i===5?'#3f7a4a':'#a9dcc3')+'" title="'+manwon(sums[i])+'"></i><span>'+mkLabel(m)+'</span></div>';
+    const v=sums[i], prev=i?sums[i-1]:null;
+    const d=prev==null?null:v-prev;
+    const hit=v>=MONTH_TARGET;
+    return '<div class="rb">'
+      +'<b class="rbv'+(hit?' hit':'')+'">'+manwon(v)+'</b>'
+      +'<i style="height:'+Math.max(3,Math.round(H*v/base))+'px;background:'+(i===5?'#3f7a4a':(hit?'#7ab87a':'#c3ddc9'))+'"></i>'
+      +'<span>'+mkLabel(m)+(d!=null&&Math.abs(d)>=10000?'<u class="'+(d>0?'up':'dn')+'">'+(d>0?'▲':'▼')+manwon(Math.abs(d))+'</u>':'')+'</span>'
+      +'</div>';
   }).join('');
+  const goalTop=Math.round(H*(1-MONTH_TARGET/base));
 
   const tot=D.yrDone+D.yrPlan+D.yrNosh||1;
   const rsn=Object.keys(D.reason).sort(function(a,b){return D.reason[b]-D.reason[a];});
@@ -1810,21 +1917,37 @@ function renderDash(){
    +'<div class="dhd"><div><h1>대시보드</h1><div class="ddate">'+TODAY.getFullYear()+'년 '+(TODAY.getMonth()+1)+'월 '+TODAY.getDate()+'일 '+W[TODAY.getDay()]+'요일</div></div>'
      +'<span class="rothint">↻ 가로로 돌리면 맥북 화면처럼 보여요</span></div>'
    +'<div class="kpis">'
-     +'<div class="kpi hl"><div class="t"><span class="lb">오늘 촬영</span><span class="ic">📸</span></div><div class="v">'+D.todayEvs.length+'</div>'
-       +'<span class="dtag nt">'+(D.todayEvs.length?esc((D.todayEvs[0].time||'')+' '+(D.todayEvs[0].client||'')):'일정 없음')+'</span></div>'
-     +'<div class="kpi"><div class="t"><span class="lb">이번 주 촬영</span><span class="ic">🗓️</span></div><div class="v">'+D.weekEvs.length+'</div><span class="dtag nt">일~토 기준</span></div>'
-     +'<div class="kpi"><div class="t"><span class="lb">이번 달 수익</span><span class="ic">💰</span></div><div class="v">'+manwon(cur.sum)+'</div>'
-       +'<span class="dtag '+(cur.noAmt?'dn':'up')+'">'+(cur.noAmt?'금액 미입력 '+cur.noAmt+'건':'모두 입력됨')+'</span></div>'
-     +'<div class="kpi"><div class="t"><span class="lb">기한 지난 일</span><span class="ic">⏰</span></div><div class="v" style="color:'+(D.late.length?'#c0483c':'inherit')+'">'+D.late.length+'</div>'
-       +'<span class="dtag '+(D.late.length?'dn':'up')+'">'+(D.late.length?'지금 처리 필요':'밀린 것 없음')+'</span></div>'
+     +'<div class="kpi hl clickable" onclick="openDay(\''+TSTR+'\')"><div class="t"><span class="lb">오늘 촬영</span><span class="ic">📸</span></div><div class="v">'+D.todayEvs.length+'</div>'
+       +'<span class="dtag nt">'+(D.todayEvs.length?esc((D.todayEvs[0].time||'')+' '+(D.todayEvs[0].client||''))+(D.todayEvs.length>1?' 외 '+(D.todayEvs.length-1):''):'일정 없음')+'</span></div>'
+     +(function(){
+        const n=D.weekEvs.length,d=n-WEEK_TARGET;
+        const tag=d===0?'<span class="dtag up">목표 '+WEEK_TARGET+'명 맞음</span>'
+          :'<span class="dtag '+(d<0?'dn':'up')+'">목표 '+WEEK_TARGET+'명 · '+(d<0?(-d)+'명 부족 — 사유 확인':'+'+d+'명')+'</span>';
+        return '<div class="kpi clickable" onclick="navTab(\'cal\');setTimeout(function(){var b=document.querySelectorAll(\'.vb\')[1];if(b)setV(\'week\',b);},80)">'
+          +'<div class="t"><span class="lb">이번 주 촬영</span><span class="ic">🗓️</span></div>'
+          +'<div class="v" style="color:'+(d<0?'#c0483c':'inherit')+'">'+n+'<u class="goal">/'+WEEK_TARGET+'</u></div>'+tag+'</div>';
+      })()
+     +(function(){
+        const gap=cur.sum-MONTH_TARGET;
+        return '<div class="kpi clickable" onclick="dashNoAmt()"><div class="t"><span class="lb">이번 달 수익</span><span class="ic">💰</span></div>'
+          +'<div class="v" style="color:'+(gap<0?'#c0483c':'#2f6b3a')+'">'+manwon(cur.sum)+'<u class="goal">/'+manwon(MONTH_TARGET)+'</u></div>'
+          +'<span class="dtag '+(gap<0?'dn':'up')+'">'+(gap<0?manwon(-gap)+' 부족':manwon(gap)+' 초과')
+          +(cur.noAmt?' · 미입력 '+cur.noAmt+'건':'')+'</span></div>';
+      })()
+     +'<div class="kpi clickable" onclick="navTab(\'alert\')"><div class="t"><span class="lb">기한 지난 일</span><span class="ic">⏰</span></div><div class="v" style="color:'+(D.late.length?'#c0483c':'inherit')+'">'+D.late.length+'</div>'
+       +'<span class="dtag '+(D.late.length?'dn':'up')+'">'+(D.late.length?'눌러서 알림으로':'밀린 것 없음')+'</span></div>'
    +'</div>'
    +'<div class="dg2">'
      +'<div class="dcard c-two"><div class="dch"><h2>다가오는 2주</h2></div>'
        +'<div class="mini"><b>일</b><b>월</b><b>화</b><b>수</b><b>목</b><b>금</b><b>토</b>'+pad0+two+'</div>'
-       +'<div class="mlg"><span><i style="background:#d8e85c"></i>빈 자리</span><span><i style="background:#a9dcc3"></i>다 참</span>'
-       +'<span><i style="background:#eef3e8"></i>야외 문의</span><span><i style="background:#e6e9e4"></i>휴무·불가</span></div></div>'
-     +'<div class="dcard c-rev"><div class="dch"><h2>수익 추이</h2><span class="dpill">최근 6개월</span></div><div class="rbs">'+bars+'</div>'
-       +'<div class="dnote">막대에 올리면 금액이 보입니다 · 금액 미입력 건은 빠져 있습니다</div></div>'
+       +'<div class="mlg"><span><i style="background:#e0564a"></i><b>안 받아서 빈 자리</b></span>'
+       +'<span><i style="background:#f2c230"></i>노쇼로 빈 자리</span>'
+       +'<span><i style="background:#a9dcc3"></i>다 참</span>'
+       +'<span><i style="background:#eef3e8"></i>야외 문의</span><span><i style="background:#e6e9e4"></i>휴무</span></div>'
+       +'<div class="dnote">빈 자리는 경고입니다. <b style="color:#c0392b">빨강</b>은 열어두지 않아 비었고, <b style="color:#9a7a10">노랑</b>은 노쇼로 비었습니다.</div></div>'
+     +'<div class="dcard c-rev"><div class="dch"><h2>수익 추이</h2><span class="dpill">최근 6개월</span></div>'
+       +'<div class="rbs"><div class="goalline" style="bottom:'+(H-goalTop)+'px"><span>목표 '+manwon(MONTH_TARGET)+'</span></div>'+bars+'</div>'
+       +'<div class="dnote">점선이 목표 '+manwon(MONTH_TARGET)+'입니다 · 막대 아래 숫자는 전월 대비 증감 · 금액 미입력 건은 빠져 있습니다</div></div>'
    +'</div>'
    +'<div class="dcard full c-m3"><div class="dch"><h2>전월 · 당월 · 익월</h2>'
      +'<div class="mgl"><span><i style="background:#3f7a4a"></i>올해</span><span><i style="background:#cfe0d2"></i>작년 같은 달</span></div></div>'
@@ -1848,14 +1971,23 @@ function renderDash(){
        +'<i style="flex:'+D.prop.inq+';background:#eef3e8"></i><i style="flex:'+D.prop.off+';background:#e6e9e4"></i></div>'
      +'<div class="fplg"><span>찬 '+D.prop.full+'</span><span>빈 '+D.prop.free+'</span><span>문의 '+D.prop.inq+'일</span><span>휴무 '+D.prop.off+'일</span></div>'
      +'<div class="flist">'+freeRows+(D.free.length>6?'<div class="fmore">'+(D.free.length-6)+'일 더 있습니다 (앞으로 2개월)</div>':'')+'</div></div>'
-   +'<div class="dcard c-noshlist"><div class="dch"><h2>노쇼 이력</h2></div>'
+   +'<div class="dcard c-noshlist"><div class="dch"><h2>노쇼 이력</h2><span class="dpill">다시 안 받은 '+D.notBack.length+'명</span></div>'
      +(D.noshSoon.length?D.noshSoon.slice(0,3).map(function(e){
         return '<div class="nswarn" onclick="openD('+e.id+')"><div class="t">⚠️ 예약이 다시 잡혔어요</div><div class="n">'+esc(e.client||'')+'</div>'
           +'<div class="s">'+e.date+' '+esc((e.noshReason||'사유 없음').split(' — ')[0])+' — 받을지 판단하세요</div></div>';}).join(''):'')
-     +D.noshAll.slice(0,4).map(function(e){
-        return '<div class="act" onclick="openD('+e.id+')"><span class="dot" style="background:#e0736b"></span><div class="n">'+esc(e.client||'(이름 없음)')
-          +'<div class="s">'+e.date+' · '+esc((e.noshReason||'사유 없음').split(' — ')[0])+'</div></div></div>';}).join('')
-     +'<div class="dnote">올해 '+D.yrNosh+'명 · 누적 '+D.noshAll.length+'명</div></div>'
+     +(D.repeat.length?'<div class="nsgrp">🔁 반복 노쇼 '+D.repeat.length+'명 — 다시 받을지 정해두세요</div>'
+        +D.repeat.slice(0,4).map(function(o){
+          return '<div class="prow rep" onclick="openD('+o.ids[0]+')"><b>'+esc(o.name||'')+'</b>'
+            +'<span class="cnt">'+o.cnt+'회</span>'
+            +'<span class="s">마지막 '+o.last+(o.reasons.length?' · '+esc(o.reasons[0]):'')+'</span></div>';}).join(''):'')
+     +'<div class="nsgrp">그 뒤로 안 온 사람</div>'
+     +(D.notBack.length?D.notBack.slice(0,6).map(function(o){
+          return '<div class="prow" onclick="openD('+o.ids[0]+')"><b>'+esc(o.name||'')+'</b>'
+            +(o.cnt>1?'<span class="cnt">'+o.cnt+'회</span>':'')
+            +'<span class="s">'+o.last+(o.reasons.length?' · '+esc(o.reasons[0]):'')+'</span></div>';}).join('')
+        :'<div class="dempty">전부 다시 예약이 잡혔습니다</div>')
+     +(D.notBack.length>6?'<div class="dnote">외 '+(D.notBack.length-6)+'명</div>':'')
+     +'<div class="dnote">올해 노쇼 '+D.yrNosh+'건 · 사람 '+D.people.length+'명 · 재예약으로 이어진 '+D.reLinked+'건</div></div>'
   +'</div></div>';
   requestAnimationFrame(applyDashFit);          // 그린 뒤 실제 높이를 재서 축소 비율을 잡는다
 }
