@@ -363,6 +363,42 @@ option{background:#fff}
 .drail .act .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
 .drail .act .n{flex:1}
 .drail .act .s{font-size:10.5px;color:var(--mu)}
+/* ── 한눈에 보기 (260913) ── 맥북 레이아웃을 그대로 폰 폭에 맞춰 축소한다 */
+#pg-dash.fit{position:relative;overflow:auto;width:100%;max-width:100vw}
+#pg-dash.fit .dwrap{position:absolute;top:0;left:0;width:1280px;max-width:none;transform-origin:top left}
+.fitspacer{pointer-events:none}
+.fitbtn{margin-left:auto;border:1px solid var(--bd);background:var(--sf2);color:var(--mu2);
+  font-size:11px;font-weight:800;padding:6px 12px;border-radius:20px;cursor:pointer;white-space:nowrap}
+.fitbtn.on{background:var(--dlime2);color:#4a5a12;border-color:#dbe89a}
+@media(min-width:761px){.fitbtn{display:none}}
+/* ── 폰 (260912) ── 좁은 폭에서 가로로 넘치지 않게 */
+#pg-dash,.dwrap,.dmain,.drail,.dcard{min-width:0;max-width:100%}
+.dcard{overflow:hidden}
+@media(max-width:520px){
+  .dwrap{padding:12px;gap:10px}
+  .dcard{padding:13px 12px;border-radius:15px}
+  .kpis{gap:8px}
+  .kpi{padding:11px 12px;border-radius:14px}
+  .kpi .v{font-size:22px;margin:5px 0 6px}
+  .dtag{font-size:9.5px;padding:2px 7px}
+  .mini{max-width:none;gap:3px}
+  .mini i{height:33px;font-size:10.5px}
+  .rbs{gap:7px;height:100px}
+  .m3{gap:9px}
+  .m3c{padding:12px 13px}
+  .m3n{font-size:27px}
+  .m3cmp{height:56px}
+  .m3cmp i{width:16px}
+  .nsw{gap:16px}
+  .nsrate{grid-template-columns:repeat(3,1fr);gap:6px}
+  .nsrate div{padding:8px 4px}
+  .nsrate em{font-size:16px}
+  .nsrate span{font-size:9.5px;line-height:1.35}
+  .rsn span{width:70px;font-size:11px}
+  .dhd h1{font-size:20px}
+  .fhero{padding:11px 12px}
+  .flist .fr b{width:50px}
+}
 </style>
 <style id="hub-skin">
 body,#landing,#calPage,#app{background:#f0f6ef url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'112'%20height%3D'112'%3E%3Cg%20fill%3D'%234f9a6a'%20fill-opacity%3D'0.035'%3E%3Cg%20transform%3D'translate(28%2C28)'%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.46)%20rotate(0)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.46)%20rotate(90)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.46)%20rotate(180)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.46)%20rotate(270)'%2F%3E%3C%2Fg%3E%3Cg%20transform%3D'translate(84%2C86)'%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.32)%20rotate(0)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.32)%20rotate(90)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.32)%20rotate(180)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.32)%20rotate(270)'%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E") !important;background-attachment:fixed !important}
@@ -1664,6 +1700,37 @@ function dashData(){
   return D;
 }
 
+// 한눈에 보기 — 맥북 폭(1280)으로 그린 뒤 화면 폭에 맞춰 축소한다.
+// 세로로 쌓아 내리는 폰 보기와 토글로 오간다. 선택은 기기에 기억된다.
+let dashFit=(function(){try{return localStorage.getItem('maydly_dash_fit')==='1';}catch(_){return false;}})();
+function toggleDashFit(){
+  dashFit=!dashFit;
+  try{localStorage.setItem('maydly_dash_fit',dashFit?'1':'0');}catch(_){}
+  renderDash();
+}
+function applyDashFit(){
+  const pg=document.getElementById('pg-dash');if(!pg)return;
+  const w=pg.querySelector('.dwrap');if(!w)return;
+  let sp=pg.querySelector('.fitspacer');
+  const on=dashFit&&pg.clientWidth<=760;
+  pg.classList.toggle('fit',on);
+  if(!on){
+    w.style.width='';w.style.transform='';
+    if(sp)sp.remove();
+    return;
+  }
+  w.style.width='1280px';
+  w.style.transform='none';
+  const h=w.scrollHeight;                       // 축소 전 자연 높이
+  // 기준 폭은 '실제 보이는 화면 폭'이어야 한다. 부모가 콘텐츠 때문에 넓어져 있을 수 있으므로
+  // 뷰포트 폭과 함께 비교해 더 작은 값을 쓴다.
+  const vw=Math.min(pg.clientWidth||99999, window.innerWidth||99999,
+                    document.documentElement.clientWidth||99999);
+  const s=vw/1280;
+  w.style.transform='scale('+s+')';
+  if(!sp){sp=document.createElement('div');sp.className='fitspacer';pg.appendChild(sp);}
+  sp.style.height=Math.ceil(h*s)+'px';          // 스크롤 높이 확보
+}
 function renderDash(){
   const D=dashData(),W=['일','월','화','수','목','금','토'];
   const cur=D.byMonth[D.mk]||{n:0,sum:0,noAmt:0,noAmtEvs:[]};
@@ -1725,7 +1792,8 @@ function renderDash(){
 
   document.getElementById('pg-dash').innerHTML=
   '<div class="dwrap"><div class="dmain">'
-   +'<div class="dhd"><div><h1>대시보드</h1><div class="ddate">'+TODAY.getFullYear()+'년 '+(TODAY.getMonth()+1)+'월 '+TODAY.getDate()+'일 '+W[TODAY.getDay()]+'요일</div></div></div>'
+   +'<div class="dhd"><div><h1>대시보드</h1><div class="ddate">'+TODAY.getFullYear()+'년 '+(TODAY.getMonth()+1)+'월 '+TODAY.getDate()+'일 '+W[TODAY.getDay()]+'요일</div></div>'
+     +'<button class="fitbtn'+(dashFit?' on':'')+'" onclick="toggleDashFit()">'+(dashFit?'📱 폰 보기':'🔍 한눈에')+'</button></div>'
    +'<div class="kpis">'
      +'<div class="kpi hl"><div class="t"><span class="lb">오늘 촬영</span><span class="ic">📸</span></div><div class="v">'+D.todayEvs.length+'</div>'
        +'<span class="dtag nt">'+(D.todayEvs.length?esc((D.todayEvs[0].time||'')+' '+(D.todayEvs[0].client||'')):'일정 없음')+'</span></div>'
@@ -1774,7 +1842,10 @@ function renderDash(){
           +'<div class="s">'+e.date+' · '+esc((e.noshReason||'사유 없음').split(' — ')[0])+'</div></div></div>';}).join('')
      +'<div class="dnote">올해 '+D.yrNosh+'명 · 누적 '+D.noshAll.length+'명</div></div>'
   +'</div></div>';
+  requestAnimationFrame(applyDashFit);          // 그린 뒤 실제 높이를 재서 축소 비율을 잡는다
 }
+// 화면 회전·창 크기 변경 시 축소 비율 다시 계산
+window.addEventListener('resize',function(){if(curPage==='dash')applyDashFit();});
 
 // ── 과거 자료 채우기 (260912) ──
 // 옛 시트(모델 정리·스케줄)에 있던 인스타 아이디와 노쇼/취소 이력을, 이미 등록된 일정에 채운다.
