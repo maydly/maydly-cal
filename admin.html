@@ -370,6 +370,21 @@ option{background:#fff}
 .rothint{margin-left:auto;font-size:10.5px;color:var(--mu);white-space:nowrap}
 @media(min-width:761px){.rothint{display:none}}
 @media(orientation:landscape){.rothint{display:none}}
+/* ── 세로(폰) 카드 순서 (260913 명진) ── 빈 자리를 '다가오는 2주' 바로 밑으로 ── */
+@media(max-width:760px){
+  #pg-dash:not(.fit) .dwrap{display:flex;flex-direction:column}
+  #pg-dash:not(.fit) .dmain,
+  #pg-dash:not(.fit) .drail{display:contents}
+  #pg-dash:not(.fit) .kpis{order:1}
+  #pg-dash:not(.fit) .c-two{order:2}
+  #pg-dash:not(.fit) .c-free{order:3}
+  #pg-dash:not(.fit) .c-rev{order:4}
+  #pg-dash:not(.fit) .c-m3{order:5}
+  #pg-dash:not(.fit) .c-nsw{order:6}
+  #pg-dash:not(.fit) .c-todo{order:7}
+  #pg-dash:not(.fit) .c-noshlist{order:8}
+  #pg-dash:not(.fit) .dhd{order:0}
+}
 /* ── 폰 (260912) ── 좁은 폭에서 가로로 넘치지 않게 */
 #pg-dash,.dwrap,.dmain,.drail,.dcard{min-width:0;max-width:100%}
 .dcard{overflow:hidden}
@@ -1668,9 +1683,9 @@ function dashData(){
   D.noshSoon=nosh.filter(function(e){
     return maydlyEvents.some(function(x){return isShootEv(x)&&x.date>today&&x.client&&e.client&&x.client===e.client;});
   });
-  // 빈 자리 (앞으로 한 달)
+  // 빈 자리 (앞으로 2개월 — 260913 명진)
   D.free=[];
-  for(let i=0;i<31;i++){
+  for(let i=0;i<62;i++){
     const ds=addDays(today,i), info=daySlots(ds);
     if(info.kind!=='slots')continue;
     const open=info.slots.filter(function(x){return x.avail;});
@@ -1679,7 +1694,7 @@ function dashData(){
   D.freeCnt=D.free.reduce(function(a,b){return a+b.times.length;},0);
   // 한 달 슬롯 비중
   let cFull=0,cFree=0,cInq=0,cOff=0;
-  for(let i=0;i<31;i++){
+  for(let i=0;i<62;i++){
     const info=daySlots(addDays(today,i));
     if(info.kind==='inq'){cInq++;continue;}
     if(info.kind==='off'){cOff++;continue;}
@@ -1703,8 +1718,10 @@ function dashData(){
 // 세로일 때는 기존대로 세로로 쌓는다. 버튼 없이 회전만으로 바뀐다.
 function wantDashFit(){
   const w=window.innerWidth||0, h=window.innerHeight||0;
-  if(w>1100) return false;            // 맥북·태블릿 가로는 원래 배치 그대로
-  return w>h;                          // 가로로 돌린 상태
+  if(w>1100) return false;                       // 맥북·태블릿 가로는 원래 배치 그대로
+  // 아이폰은 회전 직후 innerWidth가 늦게 갱신되므로 방향을 직접 본다
+  try{ if(window.matchMedia) return window.matchMedia('(orientation: landscape)').matches; }catch(_){}
+  return w>h;
 }
 function applyDashFit(){
   const pg=document.getElementById('pg-dash');if(!pg)return;
@@ -1802,18 +1819,18 @@ function renderDash(){
        +'<span class="dtag '+(D.late.length?'dn':'up')+'">'+(D.late.length?'지금 처리 필요':'밀린 것 없음')+'</span></div>'
    +'</div>'
    +'<div class="dg2">'
-     +'<div class="dcard"><div class="dch"><h2>다가오는 2주</h2></div>'
+     +'<div class="dcard c-two"><div class="dch"><h2>다가오는 2주</h2></div>'
        +'<div class="mini"><b>일</b><b>월</b><b>화</b><b>수</b><b>목</b><b>금</b><b>토</b>'+pad0+two+'</div>'
        +'<div class="mlg"><span><i style="background:#d8e85c"></i>빈 자리</span><span><i style="background:#a9dcc3"></i>다 참</span>'
        +'<span><i style="background:#eef3e8"></i>야외 문의</span><span><i style="background:#e6e9e4"></i>휴무·불가</span></div></div>'
-     +'<div class="dcard"><div class="dch"><h2>수익 추이</h2><span class="dpill">최근 6개월</span></div><div class="rbs">'+bars+'</div>'
+     +'<div class="dcard c-rev"><div class="dch"><h2>수익 추이</h2><span class="dpill">최근 6개월</span></div><div class="rbs">'+bars+'</div>'
        +'<div class="dnote">막대에 올리면 금액이 보입니다 · 금액 미입력 건은 빠져 있습니다</div></div>'
    +'</div>'
-   +'<div class="dcard full"><div class="dch"><h2>전월 · 당월 · 익월</h2>'
+   +'<div class="dcard full c-m3"><div class="dch"><h2>전월 · 당월 · 익월</h2>'
      +'<div class="mgl"><span><i style="background:#3f7a4a"></i>올해</span><span><i style="background:#cfe0d2"></i>작년 같은 달</span></div></div>'
      +'<div class="m3">'+M(prevMk,false,false)+M(D.mk,true,false)+M(nextMk,false,true)+'</div>'
      +'<div class="dnote">다음 달은 아직 <b>예약을 받는 중</b>이라 작년과 바로 비교하면 낮게 보입니다 — 빈 자리 수를 같이 봐주세요 · 이번 달은 <b>같은 날짜까지로 잘라</b> 비교합니다</div></div>'
-   +'<div class="dcard full"><div class="dch"><h2>진행한 예약과 노쇼</h2><span class="dpill">올해</span></div>'
+   +'<div class="dcard full c-nsw"><div class="dch"><h2>진행한 예약과 노쇼</h2><span class="dpill">올해</span></div>'
      +'<div class="nsw"><div class="nsl">'
        +'<div class="nsbar"><i style="width:'+(100*D.yrDone/tot)+'%;background:#a9dcc3"></i><i style="width:'+(100*D.yrPlan/tot)+'%;background:#d8e85c"></i><i style="width:'+(100*D.yrNosh/tot)+'%;background:#e0736b"></i></div>'
        +'<div class="nslg"><span><i style="background:#a9dcc3"></i>진행 완료 <b>'+D.yrDone+'</b></span><span><i style="background:#d8e85c"></i>예정 <b>'+D.yrPlan+'</b></span><span><i style="background:#e0736b"></i>노쇼 <b>'+D.yrNosh+'</b></span></div>'
@@ -1823,15 +1840,15 @@ function renderDash(){
        +'<div class="nsr"><div class="nsrh">노쇼 사유</div>'+rsnRows
        +'<div class="nsnote">사유는 <b>9/12부터</b> 쌓입니다. 그 전 노쇼는 비어 있어요 — 일정 상세에서 「남기기」로 채울 수 있습니다.</div></div></div></div>'
   +'</div><div class="drail">'
-   +'<div class="dcard"><div class="dch"><h2>챙겨야 할 일</h2></div>'+taskRows+'</div>'
-   +'<div class="dcard"><div class="dch"><h2>빈 자리</h2><span class="dpill">한 달</span></div>'
+   +'<div class="dcard c-todo"><div class="dch"><h2>챙겨야 할 일</h2></div>'+taskRows+'</div>'
+   +'<div class="dcard c-free"><div class="dch"><h2>빈 자리</h2><span class="dpill">2개월</span></div>'
      +'<div class="fhero"><div class="fbig"><b>'+D.freeCnt+'</b><span>자리 비어 있어요</span></div>'
      +(nx?'<div class="fnext"><span>가장 빠른 자리</span><b>'+Number(nx.ds.slice(5,7))+'/'+Number(nx.ds.slice(8))+' '+W[dowOf(nx.ds)]+' · '+nx.times[0]+'시</b></div>':'')+'</div>'
      +'<div class="fprop"><i style="width:'+(D.prop.full*3)+'px;background:#a9dcc3;flex:'+D.prop.full+'"></i><i style="flex:'+D.prop.free+';background:#d8e85c"></i>'
        +'<i style="flex:'+D.prop.inq+';background:#eef3e8"></i><i style="flex:'+D.prop.off+';background:#e6e9e4"></i></div>'
      +'<div class="fplg"><span>찬 '+D.prop.full+'</span><span>빈 '+D.prop.free+'</span><span>문의 '+D.prop.inq+'일</span><span>휴무 '+D.prop.off+'일</span></div>'
-     +'<div class="flist">'+freeRows+(D.free.length>6?'<div class="fmore">'+(D.free.length-6)+'일 더 있습니다</div>':'')+'</div></div>'
-   +'<div class="dcard"><div class="dch"><h2>노쇼 이력</h2></div>'
+     +'<div class="flist">'+freeRows+(D.free.length>6?'<div class="fmore">'+(D.free.length-6)+'일 더 있습니다 (앞으로 2개월)</div>':'')+'</div></div>'
+   +'<div class="dcard c-noshlist"><div class="dch"><h2>노쇼 이력</h2></div>'
      +(D.noshSoon.length?D.noshSoon.slice(0,3).map(function(e){
         return '<div class="nswarn" onclick="openD('+e.id+')"><div class="t">⚠️ 예약이 다시 잡혔어요</div><div class="n">'+esc(e.client||'')+'</div>'
           +'<div class="s">'+e.date+' '+esc((e.noshReason||'사유 없음').split(' — ')[0])+' — 받을지 판단하세요</div></div>';}).join(''):'')
@@ -1844,11 +1861,18 @@ function renderDash(){
 }
 // 화면 회전·창 크기 변경 시 축소 비율 다시 계산
 window.addEventListener('resize',function(){if(curPage==='dash')applyDashFit();});
+function reflowDash(){ if(curPage==='dash') applyDashFit(); }
 window.addEventListener('orientationchange',function(){
-  if(curPage!=='dash')return;
-  applyDashFit();
-  setTimeout(applyDashFit,250);   // 회전 직후엔 크기가 아직 안 바뀌어 있어 한 번 더
+  // 회전 직후엔 창 크기가 아직 안 바뀌어 있다 — 몇 번 나눠 다시 잡는다
+  [0,120,350,700,1200].forEach(function(ms){setTimeout(reflowDash,ms);});
 });
+try{
+  const mq=window.matchMedia('(orientation: landscape)');
+  const onmq=function(){[0,150,450].forEach(function(ms){setTimeout(reflowDash,ms);});};
+  if(mq.addEventListener)mq.addEventListener('change',onmq);
+  else if(mq.addListener)mq.addListener(onmq);
+}catch(_){}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)reflowDash();});
 
 // ── 과거 자료 채우기 (260912) ──
 // 옛 시트(모델 정리·스케줄)에 있던 인스타 아이디와 노쇼/취소 이력을, 이미 등록된 일정에 채운다.
