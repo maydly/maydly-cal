@@ -1820,6 +1820,47 @@ function applyDashFit(){
   sp.style.height=Math.ceil(h*s)+'px';          // 스크롤 높이 확보
 }
 // 이번 달 금액이 안 적힌 촬영 목록 — 눌러서 바로 채우라고 띄운다
+// 대시보드에서 어디를 눌러도 같은 모양으로 뜨는 일정 목록 팝업
+function dashList(title,evs,note){
+  document.getElementById('pnh').innerHTML=esc(title)+'<button class="px" onclick="closeP()">×</button>';
+  const rows=(evs||[]).slice(0,60).map(function(e){
+    const L=LABELS[e.label]||{name:'기타',color:'#999'};
+    const amt=evAmount(e);
+    return '<div class="act" style="cursor:pointer;border-bottom:1px solid var(--bd);padding:9px 0" onclick="closeP();openD('+e.id+')">'
+      +'<span style="background:'+L.color+';color:'+lblTc(e.label)+';font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0">'+L.name+'</span>'
+      +'<div class="n" style="margin-left:8px">'+esc(e.client||'(이름 없음)')
+      +'<div class="s">'+e.date+(e.time?' '+e.time:'')+(amt!=null?' · '+amt.toLocaleString('ko-KR')+'원':'')
+      +(e.status==='nosh'?' · 🚫 '+esc((e.noshReason||'사유 없음').split(' — ')[0]):'')+'</div></div></div>';
+  }).join('');
+  document.getElementById('pb').innerHTML=
+    (note?'<div style="font-size:12px;color:var(--mu2);margin-bottom:10px">'+note+'</div>':'')
+    +(rows||'<div style="text-align:center;padding:24px 0;color:var(--mu)">해당하는 일정이 없습니다</div>')
+    +((evs&&evs.length>60)?'<div style="font-size:11px;color:var(--mu);padding-top:8px">외 '+(evs.length-60)+'건</div>':'');
+  openP();
+}
+function dashMonth(mk){
+  const evs=maydlyEvents.filter(function(e){return isShootEv(e)&&mkOf(e.date)===mk;})
+    .sort(function(a,b){return String(a.date+(a.time||'')).localeCompare(String(b.date+(b.time||'')));});
+  const b=(dashData().byMonth||{})[mk]||{sum:0,n:0};
+  dashList(mkLabel(mk)+' 촬영 '+evs.length+'건', evs, '수익 <b>'+manwon(b.sum)+'</b>'+(b.noAmt?' · 금액 미입력 '+b.noAmt+'건':''));
+}
+function dashStatus(kind){
+  const yr=String(TODAY.getFullYear()),today=TSTR;
+  let evs=[],t='';
+  if(kind==='done'){t='올해 진행 완료';evs=maydlyEvents.filter(function(e){return isShootEv(e)&&String(e.date).slice(0,4)===yr&&e.date<=today;});}
+  else if(kind==='plan'){t='올해 남은 예정';evs=maydlyEvents.filter(function(e){return isShootEv(e)&&String(e.date).slice(0,4)===yr&&e.date>today;});}
+  else{t='올해 노쇼';evs=maydlyEvents.filter(function(e){return e.status==='nosh'&&String(e.date).slice(0,4)===yr;});}
+  evs.sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+  dashList(t+' '+evs.length+'건',evs);
+}
+function dashReason(r){
+  const evs=maydlyEvents.filter(function(e){
+    if(e.status!=='nosh')return false;
+    const k=(e.noshReason||'').split(' — ')[0]||'(사유 없음)';
+    return k===r;
+  }).sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+  dashList('노쇼 · '+r+' '+evs.length+'건',evs,'같은 사유로 남은 노쇼입니다. 다시 받을지 판단에 쓰세요.');
+}
 function dashNoAmt(){
   const mk=mkOf(TSTR);
   const list=maydlyEvents.filter(function(e){return isShootEv(e)&&mkOf(e.date)===mk&&evAmount(e)==null;})
@@ -1848,7 +1889,7 @@ function renderDash(){
     const d=b.n-lyN, mx=Math.max(b.n,lyN,1);
     const noshN=D.noshAll.filter(function(e){return mkOf(e.date)===mk;}).length;
     const freeN=D.free.filter(function(f){return mkOf(f.ds)===mk;}).reduce(function(a,c){return a+c.times.length;},0);
-    return '<div class="m3c'+(isCur?' on':'')+'">'
+    return '<div class="m3c'+(isCur?' on':'')+'" style="cursor:pointer" onclick="dashMonth(\''+mk+'\')">'
       +'<div class="m3h">'+mkLabel(mk)+' <span>'+(isCur?'이번 달':isNext?'다음 달':'지난달')+'</span>'
       +(isNext?'<em class="wt">받는 중</em>':'<em class="'+(d>=0?'up':'dn')+'">'+(d>=0?'▲ ':'▼ ')+Math.abs(d)+'</em>')+'</div>'
       +'<div class="m3row"><div class="m3n">'+b.n+'<u>건</u></div>'
@@ -1883,7 +1924,7 @@ function renderDash(){
   const pad0=Array.from({length:dowOf(D.two[0].ds)},function(){return '<i class="pad"></i>';}).join('');
 
   const freeRows=D.free.slice(0,6).map(function(f){
-    return '<div class="fr"><b>'+Number(f.ds.slice(5,7))+'/'+Number(f.ds.slice(8))+'<u>'+W[dowOf(f.ds)]+'</u></b>'
+    return '<div class="fr" style="cursor:pointer" onclick="openDay(\''+f.ds+'\')"><b>'+Number(f.ds.slice(5,7))+'/'+Number(f.ds.slice(8))+'<u>'+W[dowOf(f.ds)]+'</u></b>'
       +'<div class="ft">'+f.times.map(function(h){return '<s>'+h+'시</s>';}).join('')+'</div></div>';
   }).join('')||'<div class="dempty">한 달 안에 빈 자리가 없습니다</div>';
   const nx=D.free[0];
@@ -1897,7 +1938,7 @@ function renderDash(){
     const v=sums[i], prev=i?sums[i-1]:null;
     const d=prev==null?null:v-prev;
     const hit=v>=MONTH_TARGET;
-    return '<div class="rb">'
+    return '<div class="rb" style="cursor:pointer" onclick="dashMonth(\''+m+'\')">'
       +'<b class="rbv'+(hit?' hit':'')+'">'+manwon(v)+'</b>'
       +'<i style="height:'+Math.max(3,Math.round(H*v/base))+'px;background:'+(i===5?'#3f7a4a':(hit?'#7ab87a':'#c3ddc9'))+'"></i>'
       +'<span>'+mkLabel(m)+(d!=null&&Math.abs(d)>=10000?'<u class="'+(d>0?'up':'dn')+'">'+(d>0?'▲':'▼')+manwon(Math.abs(d))+'</u>':'')+'</span>'
@@ -1909,7 +1950,7 @@ function renderDash(){
   const rsn=Object.keys(D.reason).sort(function(a,b){return D.reason[b]-D.reason[a];});
   const rmx=Math.max.apply(null,rsn.map(function(k){return D.reason[k];}).concat([1]));
   const rsnRows=rsn.length?rsn.map(function(k){
-    return '<div class="rsn"><span>'+esc(k)+'</span><i style="width:'+Math.round(100*D.reason[k]/rmx)+'%"></i><b>'+D.reason[k]+'</b></div>';
+    return '<div class="rsn" style="cursor:pointer" onclick="dashReason('+JSON.stringify(k).replace(/"/g,'&quot;')+')"><span>'+esc(k)+'</span><i style="width:'+Math.round(100*D.reason[k]/rmx)+'%"></i><b>'+D.reason[k]+'</b></div>';
   }).join(''):'<div class="dempty">아직 기록된 사유가 없습니다</div>';
 
   document.getElementById('pg-dash').innerHTML=
@@ -1955,8 +1996,12 @@ function renderDash(){
      +'<div class="dnote">다음 달은 아직 <b>예약을 받는 중</b>이라 작년과 바로 비교하면 낮게 보입니다 — 빈 자리 수를 같이 봐주세요 · 이번 달은 <b>같은 날짜까지로 잘라</b> 비교합니다</div></div>'
    +'<div class="dcard full c-nsw"><div class="dch"><h2>진행한 예약과 노쇼</h2><span class="dpill">올해</span></div>'
      +'<div class="nsw"><div class="nsl">'
-       +'<div class="nsbar"><i style="width:'+(100*D.yrDone/tot)+'%;background:#a9dcc3"></i><i style="width:'+(100*D.yrPlan/tot)+'%;background:#d8e85c"></i><i style="width:'+(100*D.yrNosh/tot)+'%;background:#e0736b"></i></div>'
-       +'<div class="nslg"><span><i style="background:#a9dcc3"></i>진행 완료 <b>'+D.yrDone+'</b></span><span><i style="background:#d8e85c"></i>예정 <b>'+D.yrPlan+'</b></span><span><i style="background:#e0736b"></i>노쇼 <b>'+D.yrNosh+'</b></span></div>'
+       +'<div class="nsbar"><i style="width:'+(100*D.yrDone/tot)+'%;background:#a9dcc3;cursor:pointer" onclick="dashStatus(\'done\')"></i>'
+       +'<i style="width:'+(100*D.yrPlan/tot)+'%;background:#d8e85c;cursor:pointer" onclick="dashStatus(\'plan\')"></i>'
+       +'<i style="width:'+(100*D.yrNosh/tot)+'%;background:#e0736b;cursor:pointer" onclick="dashStatus(\'nosh\')"></i></div>'
+       +'<div class="nslg"><span style="cursor:pointer" onclick="dashStatus(\'done\')"><i style="background:#a9dcc3"></i>진행 완료 <b>'+D.yrDone+'</b></span>'
+       +'<span style="cursor:pointer" onclick="dashStatus(\'plan\')"><i style="background:#d8e85c"></i>예정 <b>'+D.yrPlan+'</b></span>'
+       +'<span style="cursor:pointer" onclick="dashStatus(\'nosh\')"><i style="background:#e0736b"></i>노쇼 <b>'+D.yrNosh+'</b></span></div>'
        +'<div class="nsrate"><div><em>'+(D.yrNosh?(100*D.yrNosh/tot).toFixed(1):'0')+'%</em><span>노쇼 비율</span></div>'
          +'<div><em style="color:#3f7a4a">'+D.reLinked+'</em><span>재예약으로 이어짐</span></div>'
          +'<div><em style="color:#c0483c">'+(D.noshAll.length-D.reLinked)+'</em><span>다시 안 받음</span></div></div></div>'
