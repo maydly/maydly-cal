@@ -625,6 +625,36 @@ function isSubinUser(){
   if(em)return SUBIN_EMAILS.includes(em);   // 구글 계정이 가장 정확
   return selAdminUser==='sb';               // 로그인 확인 전이면 PIN 화면 선택을 따른다
 }
+// ── 노쇼 사유 (260912 명진) ──
+// 노쇼는 재예약을 재촉하기 위한 게 아니라 '다음에 거르기 위한 기록'이다.
+// 사유가 남아야 같은 고객이 다시 예약할 때 받을지 판단할 수 있다.
+const NOSH_REASONS=['의상 미전달(준비 미흡)','당일 취소','무단 불참','연락 두절','일정 변경 요청','기타'];
+function askNosh(id){
+  const e=evById(id);if(!e)return;
+  document.getElementById('pnh').innerHTML='노쇼 사유<button class="px" onclick="closeP()">×</button>';
+  document.getElementById('pb').innerHTML=
+    '<div style="font-size:12px;color:var(--mu2);line-height:1.7;margin-bottom:12px">'+
+      '왜 진행되지 못했는지 남겨주세요.<br><span style="color:var(--mu)">같은 고객이 다시 예약할 때 받을지 판단하는 기준이 됩니다.</span></div>'+
+    '<div class="fg"><label>덧붙일 메모 (선택)</label><input type="text" id="f_noshmemo" placeholder="예: 촬영 3일 전까지 의상 사진 연락 없음"></div>'+
+    '<div style="font-size:10.5px;font-weight:800;color:var(--mu2);margin:12px 0 6px">사유를 고르면 노쇼로 처리됩니다</div>'+
+    NOSH_REASONS.map(function(r){
+      return '<button class="sub-btn" style="width:100%;margin-bottom:6px;background:var(--sf2);color:var(--tx);border:1px solid var(--bd);font-weight:600" onclick="setNosh('+id+',this.dataset.r)" data-r="'+r+'">'+r+'</button>';
+    }).join('');
+  openP();
+}
+function setNosh(id,reason){
+  const e=evById(id);if(!e)return;
+  const m=document.getElementById('f_noshmemo');
+  const memo=m&&m.value.trim()?' — '+m.value.trim():'';
+  e.noshReason=reason+memo;
+  e.noshAt=fd(TODAY);
+  applyStatusChange(e,'nosh');
+  saveEvents();closeP();
+  if(curPage==='cal')renderBody();
+  if(curPage==='req')renderReq();
+  buildNav();
+  toast('노쇼 처리 — 사유 기록됨');
+}
 function myRole(){return isSubinUser()?'sb':'mj';}
 function myTodo(){
   const r=myRole();
@@ -1600,6 +1630,7 @@ function openD(id){
   if(e.client)b+=`<div class="det-r"><span class="det-l">👤 고객</span>${e.client}</div>`;
   if(e.insta||e.phone)b+=`<div class="det-r"><span class="det-l">📷 인스타</span>${e.insta||e.phone}</div>`;
   if(e.note)b+=`<div class="det-r"><span class="det-l">📝 메모</span>${e.note}</div>`;
+  if(e.status==='nosh')b+=`<div class="det-r"><span class="det-l">🚫 노쇼 사유</span>${e.noshReason?esc(e.noshReason):'<span style="color:var(--mu)">기록 없음</span>'} <button onclick="askNosh(${e.id})" style="margin-left:6px;padding:2px 8px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--mu);font-size:10px;cursor:pointer">${e.noshReason?'수정':'남기기'}</button></div>`;
   b+=reLinkRows(e);   // 재예약 연결·반값 표시
   if(!e.priv&&stActive(e.status)){
     const slots=getMaydlySlots(e.date,maydlyEvents.filter(x=>x.date===e.date&&stActive(x.status)&&!isExt(x)));
@@ -1657,7 +1688,7 @@ function openD(id){
   if(!e.priv)b+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--bd);margin-top:8px">
     <span style="font-size:11px;color:var(--tx);flex:1">½ 반값으로 진행</span>
     <button onclick="toggleHalf(${e.id})" style="padding:4px 12px;border:none;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;${e.half?'background:var(--R);color:#fff':'background:var(--sf2);color:var(--mu);border:1px solid var(--bd)'}">${e.half?'반값':'정가'}</button></div>`;
-  if(stActive(e.status)&&e.status!=='nosh')b+=`<div class="act-row" style="margin-top:10px"><button class="btn-ng" style="flex:1" onclick="setStatus(${e.id},'nosh');closeP()">🚫 노쇼 처리</button></div>`;
+  if(stActive(e.status)&&e.status!=='nosh')b+=`<div class="act-row" style="margin-top:10px"><button class="btn-ng" style="flex:1" onclick="askNosh(${e.id})">🚫 노쇼 처리</button></div>`;
   if(e.status==='nosh')b+=`<div class="act-row" style="margin-top:10px"><button class="btn-ok" style="flex:1;background:#c8a456" onclick="startRebook(${e.id})">🔁 재예약 만들기</button></div>`;
   b+=`<button class="btn-del" style="background:var(--sf2);color:var(--tx);border:1px solid var(--bd);margin-bottom:4px" onclick="closeP();openEdit(${e.id})">✏️ 편집</button>`;
   b+=`<button class="btn-del" onclick="delEv(${e.id})">삭제</button>`;
@@ -2175,16 +2206,17 @@ function renderReq(){
         <span style="background:${L.color};color:${lblTc(e.label)};font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">${L.name}</span>
         <span style="font-size:12.5px;font-weight:600;color:var(--tx);cursor:pointer" onclick="openD(${e.id})">${esc(e.client||'(이름 없음)')}</span>
         <span style="font-size:11px;color:var(--mu)">${e.date}</span>
+        ${e.noshReason?`<span style="font-size:10.5px;color:#b05555;background:rgba(200,96,96,.1);padding:2px 7px;border-radius:20px">${esc(e.noshReason)}</span>`:''}
         <span style="margin-left:auto">${re.length
           ?`<span class="badge bOK">재예약 ${re.map(r=>r.date+(r.half?' ½':'')).join(', ')}</span>`
           :`<button class="btn-ok" style="padding:5px 11px;font-size:10px;background:#c8a456" onclick="startRebook(${e.id})">🔁 재예약 만들기</button>`}</span>
       </div></div>`;
   };
   const reSect=noshAll.length
-    ?`<div class="sect-label">재예약 대기 (${noshOpen.length}) <span style="font-weight:400;color:var(--mu);font-size:11px">· 전체 노쇼 ${noshAll.length}건</span></div>
+    ?`<div class="sect-label">🚫 노쇼 이력 (${noshOpen.length}) <span style="font-weight:400;color:var(--mu);font-size:11px">· 전체 ${noshAll.length}건 · 다시 받을지 판단하는 기준입니다</span></div>
       ${(noshOpen.length?noshOpen:[]).map(noshRow).join('')}
-      ${noshOpen.length===0?'<div style="color:var(--mu);font-size:12px;padding:6px 2px 12px">재예약이 안 잡힌 노쇼가 없습니다.</div>':''}
-      <div class="sect-label" style="margin-top:14px">재예약으로 이어진 건 (${noshAll.length-noshOpen.length})</div>
+      ${noshOpen.length===0?'<div style="color:var(--mu);font-size:12px;padding:6px 2px 12px">재예약 없이 남아 있는 노쇼가 없습니다.</div>':''}
+      <div class="sect-label" style="margin-top:14px">한 번 더 기회를 준 건 (${noshAll.length-noshOpen.length})</div>
       ${noshAll.filter(e=>reBookOf(e.id).length).slice(0,20).map(noshRow).join('')||'<div style="color:var(--mu);font-size:12px;padding:6px 2px">아직 없습니다.</div>'}`
     :'';
   document.getElementById('pg-req').innerHTML=`
