@@ -629,6 +629,32 @@ function isSubinUser(){
 // 노쇼는 재예약을 재촉하기 위한 게 아니라 '다음에 거르기 위한 기록'이다.
 // 사유가 남아야 같은 고객이 다시 예약할 때 받을지 판단할 수 있다.
 const NOSH_REASONS=['의상 미전달(준비 미흡)','당일 취소','무단 불참','연락 두절','일정 변경 요청','기타'];
+// 일정 폼(추가·편집)에서 상태를 '노쇼'로 고르면 나타나는 사유 칸
+function noshFormBlock(e){
+  const cur=(e&&e.noshReason)||'';
+  const i=cur.indexOf(' — ');
+  const r=i>=0?cur.slice(0,i):cur;
+  const memo=i>=0?cur.slice(i+3):'';
+  const show=!!(e&&e.status==='nosh');
+  return`<div class="fg" id="noshBox"${show?'':' style="display:none"'}>
+    <label>노쇼 사유 <span style="color:var(--mu);font-weight:400;font-size:10px">— 다음에 거를 판단 기준이 됩니다</span></label>
+    <select id="f_noshr">${NOSH_REASONS.map(function(x){return'<option'+(x===r?' selected':'')+'>'+x+'</option>';}).join('')}</select>
+    <input type="text" id="f_noshmemo2" value="${esc(memo)}" placeholder="덧붙일 메모 (선택)" style="margin-top:6px">
+  </div>`;
+}
+// 상태 드롭다운을 바꿀 때 사유 칸을 보였다 숨긴다
+function onStatusPick(){
+  const sel=document.getElementById('f_s'),box=document.getElementById('noshBox');
+  if(sel&&box)box.style.display=sel.value==='nosh'?'':'none';
+}
+// 폼에 적힌 노쇼 사유를 일정에 담는다 (상태가 노쇼일 때만)
+function applyNoshFromForm(ev){
+  if(!ev||ev.status!=='nosh')return;
+  const r=document.getElementById('f_noshr'),m=document.getElementById('f_noshmemo2');
+  const memo=m&&m.value.trim()?' — '+m.value.trim():'';
+  ev.noshReason=(r?r.value:'기타')+memo;
+  if(!ev.noshAt)ev.noshAt=fd(TODAY);
+}
 function askNosh(id){
   const e=evById(id);if(!e)return;
   document.getElementById('pnh').innerHTML='노쇼 사유<button class="px" onclick="closeP()">×</button>';
@@ -1926,8 +1952,9 @@ function openAdd(ds){
     <div class="fg"><label>인스타 아이디</label><input type="text" id="f_p" placeholder="@instagram_id"></div>
     <div class="fg"><label>메모</label><textarea id="f_n" rows="2" placeholder="특이사항"></textarea></div>
     <div class="fg"><label>상태</label>
-      <select id="f_s">${stOptions('booked')}</select>
+      <select id="f_s" onchange="onStatusPick()">${stOptions('booked')}</select>
     </div>
+    ${noshFormBlock(null)}
     <div class="form-foot"><button class="sub-btn" onclick="saveEv()">저장</button></div>`;
   _editingId=null;_reFrom=null;
   openP();applyAllDay();bindAllDayNote();
@@ -2029,6 +2056,7 @@ function saveEv(force){
   }
   nextId++;
   try{localStorage.setItem('maydly_lastlabel',seLabel);}catch(_){}  // 라벨 기억
+  applyNoshFromForm(e);          // 상태를 노쇼로 골랐으면 사유도 함께 기록
   const wasRe=_reFrom; _reFrom=null;
   maydlyEvents.push(e);saveEvents();closeP();renderBody();buildNav();
   if(curPage==='req')renderReq();
@@ -2052,8 +2080,9 @@ function openEdit(id){
     <div class="fg"><label>인스타 아이디</label><input type="text" id="f_p" value="${e.insta||e.phone||''}" placeholder="@instagram_id"></div>
     <div class="fg"><label>메모</label><textarea id="f_n" rows="2">${e.note||''}</textarea></div>
     <div class="fg"><label>상태</label>
-      <select id="f_s">${stOptions(e.status)}</select>
+      <select id="f_s" onchange="onStatusPick()">${stOptions(e.status)}</select>
     </div>
+    ${noshFormBlock(e)}
     <button class="btn-del" onclick="delEv(${id})">삭제</button>
     <div class="form-foot"><button class="sub-btn" onclick="updateEv(${id})">저장</button></div>`;
   const rep=document.getElementById('f_rep');if(rep)rep.innerHTML=repeatOptions(e.date,e.repeat||'none');
@@ -2079,6 +2108,7 @@ function updateEv(id,force){
     note:document.getElementById('f_n').value.trim()||''
   };
   applyStatusChange(next,newStatus);
+  applyNoshFromForm(next);       // 상태를 노쇼로 바꿨으면 사유도 함께 기록
   // 중복 시간 차단 — 자기 자신은 빼고 검사
   if(!force){
     const ovl=findOverlaps(next,id);
