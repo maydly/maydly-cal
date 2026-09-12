@@ -1779,7 +1779,7 @@ function renderDash(){
 // ── 과거 자료 채우기 (260912) ──
 // 옛 시트(모델 정리·스케줄)에 있던 인스타 아이디와 노쇼/취소 이력을, 이미 등록된 일정에 채운다.
 // 새 일정을 만들지 않고 기존 건만 고친다. id가 어긋났을 때를 대비해 날짜까지 대조한 뒤 적용한다.
-const BACKFILL_KEYS=['insta','status','noshReason','note','amount','half'];
+const BACKFILL_KEYS=['insta','status','noshReason','note','amount','half','date'];   // date = 잘못 저장된 날짜 교정용
 function backfillParse(){
   const el=document.getElementById('backfill-json');
   const raw=(el&&el.value||'').trim();
@@ -1822,6 +1822,13 @@ function backfillPlan(arr){
       ch.push({k:k,from:cur,to:set[k]});
     });
     if(!ch.length){skip.push({it:it,why:'바뀔 내용 없음'});return;}
+    // 날짜를 옮기는 경우 — 옮길 날짜에 같은 이름이 이미 있으면 중복이 되므로 막는다
+    const dch=ch.filter(function(c){return c.k==='date';})[0];
+    if(dch){
+      const key=bfName(e.client);
+      const dupe=maydlyEvents.filter(function(x){return x!==e&&x.date===dch.to&&bfName(x.client)===key;});
+      if(dupe.length){skip.push({it:it,why:'옮길 날짜('+dch.to+')에 같은 이름이 이미 있음'});return;}
+    }
     ok.push({e:e,ch:ch});
   });
   return{ok:ok,skip:skip};
@@ -1840,7 +1847,9 @@ function backfillPreview(){
       h+='<div style="padding:5px 0;border-bottom:1px solid var(--bd);font-size:11.5px">'
         +'<b>'+p.e.date+' '+esc(p.e.client||'(이름 없음)')+'</b> — '
         +p.ch.map(function(c){return c.keep?('<span style="color:var(--mu)">'+c.k+' 유지</span>')
-          :(c.k+' <span style="color:var(--mu)">'+esc(String(c.from==null?'(없음)':c.from)).slice(0,18)+'</span> → <b>'+esc(String(c.to)).slice(0,24)+'</b>');}).join(' · ')
+          :(c.k==='date'
+             ?('<span style="color:#c4763a;font-weight:700">📅 날짜 '+esc(String(c.from))+' → '+esc(String(c.to))+'</span>')
+             :(c.k+' <span style="color:var(--mu)">'+esc(String(c.from==null?'(없음)':c.from)).slice(0,18)+'</span> → <b>'+esc(String(c.to)).slice(0,24)+'</b>'));}).join(' · ')
         +'</div>';
     });
     if(plan.ok.length>25)h+='<div style="font-size:11px;color:var(--mu);padding-top:6px">… 외 '+(plan.ok.length-25)+'건</div>';
@@ -1857,7 +1866,10 @@ function backfillApply(){
   try{
     const plan=backfillPlan(backfillParse());
     if(!plan.ok.length){res.className='import-result err';res.textContent='바꿀 내용이 없습니다.';return;}
-    if(!confirm('일정 '+plan.ok.length+'건을 고칩니다.\n되돌리기용 스냅샷을 먼저 저장합니다. 진행할까요?'))return;
+    const moveN=plan.ok.filter(function(p){return p.ch.some(function(c){return c.k==='date';});}).length;
+    const msg='일정 '+plan.ok.length+'건을 고칩니다.'+(moveN?'\n\n\u26a0\ufe0f 그중 '+moveN+'건은 날짜가 옮겨집니다.':'')
+      +'\n\n되돌리기용 스냅샷을 먼저 저장합니다. 진행할까요?';
+    if(!confirm(msg))return;
     pushUndoSnapshot();
     let n=0;
     plan.ok.forEach(function(p){
@@ -2771,7 +2783,8 @@ function renderImport(){
         <h3>🧩 과거 자료 채우기 (인스타 · 상태)</h3>
         <p>예전 시트에 있던 <strong>인스타 아이디</strong>와 <strong>노쇼·취소 이력</strong>을 이미 등록된 일정에 채워 넣어요.<br>
         새 일정을 만들지 않고 <strong>기존 일정만 고칩니다.</strong> 먼저 「미리보기」로 확인한 뒤 적용하세요.<br>
-        <span style="color:var(--mu)">일정은 <strong>날짜 + 고객명</strong>으로 찾습니다. 같은 날 같은 이름이 둘 이상이면 건너뜁니다.</span></p>
+        <span style="color:var(--mu)">일정은 <strong>날짜 + 고객명</strong>으로 찾습니다. 같은 날 같은 이름이 둘 이상이면 건너뜁니다.<br>
+        잘못 저장된 <strong>날짜 교정</strong>도 됩니다 — 옮길 날짜에 같은 이름이 있으면 막습니다.</span></p>
         <textarea id="backfill-json" placeholder='[{"date":"2023-04-01","client":"홍길동님","set":{"insta":"@abc"}}, ...]'></textarea>
         <div class="act-row" style="margin-top:8px">
           <button class="sub-btn" style="flex:1;background:var(--sf2);color:var(--tx);border:1px solid var(--bd)" onclick="backfillPreview()">🔍 미리보기</button>
