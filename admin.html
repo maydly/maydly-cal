@@ -367,10 +367,9 @@ option{background:#fff}
 #pg-dash.fit{position:relative;overflow:auto;width:100%;max-width:100vw}
 #pg-dash.fit .dwrap{position:absolute;top:0;left:0;width:1280px;max-width:none;transform-origin:top left}
 .fitspacer{pointer-events:none}
-.fitbtn{margin-left:auto;border:1px solid var(--bd);background:var(--sf2);color:var(--mu2);
-  font-size:11px;font-weight:800;padding:6px 12px;border-radius:20px;cursor:pointer;white-space:nowrap}
-.fitbtn.on{background:var(--dlime2);color:#4a5a12;border-color:#dbe89a}
-@media(min-width:761px){.fitbtn{display:none}}
+.rothint{margin-left:auto;font-size:10.5px;color:var(--mu);white-space:nowrap}
+@media(min-width:761px){.rothint{display:none}}
+@media(orientation:landscape){.rothint{display:none}}
 /* ── 폰 (260912) ── 좁은 폭에서 가로로 넘치지 않게 */
 #pg-dash,.dwrap,.dmain,.drail,.dcard{min-width:0;max-width:100%}
 .dcard{overflow:hidden}
@@ -1700,19 +1699,18 @@ function dashData(){
   return D;
 }
 
-// 한눈에 보기 — 맥북 폭(1280)으로 그린 뒤 화면 폭에 맞춰 축소한다.
-// 세로로 쌓아 내리는 폰 보기와 토글로 오간다. 선택은 기기에 기억된다.
-let dashFit=(function(){try{return localStorage.getItem('maydly_dash_fit')==='1';}catch(_){return false;}})();
-function toggleDashFit(){
-  dashFit=!dashFit;
-  try{localStorage.setItem('maydly_dash_fit',dashFit?'1':'0');}catch(_){}
-  renderDash();
+// 한눈에 보기 — 폰을 가로로 돌리면 맥북 레이아웃(1280px 폭)을 그대로 그린 뒤 화면 폭에 맞춰 축소한다.
+// 세로일 때는 기존대로 세로로 쌓는다. 버튼 없이 회전만으로 바뀐다.
+function wantDashFit(){
+  const w=window.innerWidth||0, h=window.innerHeight||0;
+  if(w>1100) return false;            // 맥북·태블릿 가로는 원래 배치 그대로
+  return w>h;                          // 가로로 돌린 상태
 }
 function applyDashFit(){
   const pg=document.getElementById('pg-dash');if(!pg)return;
   const w=pg.querySelector('.dwrap');if(!w)return;
   let sp=pg.querySelector('.fitspacer');
-  const on=dashFit&&pg.clientWidth<=760;
+  const on=wantDashFit();
   pg.classList.toggle('fit',on);
   if(!on){
     w.style.width='';w.style.transform='';
@@ -1793,7 +1791,7 @@ function renderDash(){
   document.getElementById('pg-dash').innerHTML=
   '<div class="dwrap"><div class="dmain">'
    +'<div class="dhd"><div><h1>대시보드</h1><div class="ddate">'+TODAY.getFullYear()+'년 '+(TODAY.getMonth()+1)+'월 '+TODAY.getDate()+'일 '+W[TODAY.getDay()]+'요일</div></div>'
-     +'<button class="fitbtn'+(dashFit?' on':'')+'" onclick="toggleDashFit()">'+(dashFit?'📱 폰 보기':'🔍 한눈에')+'</button></div>'
+     +'<span class="rothint">↻ 가로로 돌리면 맥북 화면처럼 보여요</span></div>'
    +'<div class="kpis">'
      +'<div class="kpi hl"><div class="t"><span class="lb">오늘 촬영</span><span class="ic">📸</span></div><div class="v">'+D.todayEvs.length+'</div>'
        +'<span class="dtag nt">'+(D.todayEvs.length?esc((D.todayEvs[0].time||'')+' '+(D.todayEvs[0].client||'')):'일정 없음')+'</span></div>'
@@ -1846,6 +1844,11 @@ function renderDash(){
 }
 // 화면 회전·창 크기 변경 시 축소 비율 다시 계산
 window.addEventListener('resize',function(){if(curPage==='dash')applyDashFit();});
+window.addEventListener('orientationchange',function(){
+  if(curPage!=='dash')return;
+  applyDashFit();
+  setTimeout(applyDashFit,250);   // 회전 직후엔 크기가 아직 안 바뀌어 있어 한 번 더
+});
 
 // ── 과거 자료 채우기 (260912) ──
 // 옛 시트(모델 정리·스케줄)에 있던 인스타 아이디와 노쇼/취소 이력을, 이미 등록된 일정에 채운다.
