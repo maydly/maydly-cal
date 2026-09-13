@@ -374,14 +374,20 @@ option{background:#fff}
 .mini i.freeOpen u,.mini i.freeNosh u{opacity:.95}
 .mlg b{font-weight:800;color:#c0392b}
 /* 수익 추이 */
-.rbs{position:relative;align-items:flex-end;height:150px;padding-top:4px}
-.rb{position:relative}
-.rbv{display:block;text-align:center;font-size:10.5px;font-weight:800;color:var(--mu2);margin-bottom:3px}
+.rbs{display:flex;flex-direction:column}
+.rbarea{position:relative;display:flex;align-items:flex-end;gap:10px;height:136px;border-bottom:1px solid var(--dln)}
+.rcol{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;position:relative;z-index:2}
+.rbv{text-align:center;font-size:10.5px;font-weight:800;color:var(--mu2);line-height:15px;margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rbv.hit{color:#2f6b3a}
-.rb span u{display:block;text-decoration:none;font-size:9px;font-weight:800;margin-top:1px}
-.rb span u.up{color:#3f7a4a}.rb span u.dn{color:#c0483c}
+.rcol i{display:block;width:100%;border-radius:5px 5px 0 0}
+.rlabs{display:flex;gap:10px;padding-top:6px}
+.rlab{flex:1;min-width:0;text-align:center;font-size:10px;color:var(--mu);line-height:1.35}
+.rlab u{display:block;text-decoration:none;font-size:9px;font-weight:800;margin-top:1px;white-space:nowrap}
+.rlab u.up{color:#3f7a4a}.rlab u.dn{color:#c0483c}
 .goalline{position:absolute;left:0;right:0;border-top:1.5px dashed #c8a456;pointer-events:none;z-index:1}
-.goalline span{position:absolute;right:0;top:-15px;font-size:9.5px;font-weight:800;color:#8a6a20;background:#fff;padding:0 4px}
+.goalpill{background:#fdf6e6;color:#8a6a20;border:1px solid #ecdcb4;margin-left:auto}
+.dch .goalpill+.dpill{margin-left:6px}
 /* 3개월 — 수익 비교 */
 .m3money{display:flex;align-items:baseline;gap:7px;margin-top:7px;padding-top:7px;border-top:1px dashed var(--dln);font-size:11.5px;flex-wrap:wrap}
 .m3money b{font-size:15px;font-weight:800;color:#4e8a55}
@@ -1934,18 +1940,21 @@ function renderDash(){
   const mks=[];for(let i=5;i>=0;i--)mks.push(addMk(D.mk,-i));
   const sums=mks.map(function(m){return (D.byMonth[m]||{sum:0}).sum;});
   const smx=Math.max.apply(null,sums.concat([1]));
-  const H=104, base=Math.max(smx,MONTH_TARGET);
-  const bars=mks.map(function(m,i){
-    const v=sums[i], prev=i?sums[i-1]:null;
-    const d=prev==null?null:v-prev;
-    const hit=v>=MONTH_TARGET;
-    return '<div class="rb" style="cursor:pointer" onclick="dashMonth(\''+m+'\')">'
+  const H=118, base=Math.max(smx,MONTH_TARGET);   // 막대 영역 높이
+  const barCols=mks.map(function(m,i){
+    const v=sums[i], hit=v>=MONTH_TARGET;
+    return '<div class="rcol" onclick="dashMonth(\''+m+'\')" title="'+mkLabel(m)+' '+manwon(v)+'">'
       +'<b class="rbv'+(hit?' hit':'')+'">'+manwon(v)+'</b>'
       +'<i style="height:'+Math.max(3,Math.round(H*v/base))+'px;background:'+(i===5?'#3f7a4a':(hit?'#7ab87a':'#c3ddc9'))+'"></i>'
-      +'<span>'+mkLabel(m)+(d!=null&&Math.abs(d)>=10000?'<u class="'+(d>0?'up':'dn')+'">'+(d>0?'▲':'▼')+manwon(Math.abs(d))+'</u>':'')+'</span>'
       +'</div>';
   }).join('');
-  const goalTop=Math.round(H*(1-MONTH_TARGET/base));
+  const labCols=mks.map(function(m,i){
+    const v=sums[i], prev=i?sums[i-1]:null, d=prev==null?null:v-prev;
+    return '<div class="rlab">'+mkLabel(m)
+      +(d!=null&&Math.abs(d)>=10000?'<u class="'+(d>0?'up':'dn')+'">'+(d>0?'▲':'▼')+manwon(Math.abs(d))+'</u>':'')
+      +'</div>';
+  }).join('');
+  const goalBottom=Math.round(H*MONTH_TARGET/base);
 
   const tot=D.yrDone+D.yrPlan+D.yrNosh||1;
   const rsn=Object.keys(D.reason).sort(function(a,b){return D.reason[b]-D.reason[a];});
@@ -1987,8 +1996,9 @@ function renderDash(){
        +'<span><i style="background:#a9dcc3"></i>다 참</span>'
        +'<span><i style="background:#eef3e8"></i>야외 문의</span><span><i style="background:#e6e9e4"></i>휴무</span></div>'
        +'<div class="dnote">빈 자리는 경고입니다. <b style="color:#c0392b">빨강</b>은 열어두지 않아 비었고, <b style="color:#9a7a10">노랑</b>은 노쇼로 비었습니다.</div></div>'
-     +'<div class="dcard c-rev"><div class="dch"><h2>수익 추이</h2><span class="dpill">최근 6개월</span></div>'
-       +'<div class="rbs"><div class="goalline" style="bottom:'+(H-goalTop)+'px"><span>목표 '+manwon(MONTH_TARGET)+'</span></div>'+bars+'</div>'
+     +'<div class="dcard c-rev"><div class="dch"><h2>수익 추이</h2><span class="dpill goalpill">┄ 목표 '+manwon(MONTH_TARGET)+'</span><span class="dpill">최근 6개월</span></div>'
+       +'<div class="rbs"><div class="rbarea"><div class="goalline" style="bottom:'+goalBottom+'px"></div>'+barCols+'</div>'
+       +'<div class="rlabs">'+labCols+'</div></div>'
        +'<div class="dnote">점선이 목표 '+manwon(MONTH_TARGET)+'입니다 · 막대 아래 숫자는 전월 대비 증감 · 금액 미입력 건은 빠져 있습니다</div></div>'
    +'</div>'
    +'<div class="dcard full c-m3"><div class="dch"><h2>전월 · 당월 · 익월</h2>'
