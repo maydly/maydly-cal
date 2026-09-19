@@ -3583,5 +3583,19 @@ window.MJCAL={
 };
 onAuthStateChanged(auth,(u)=>{ window.MJCAL.user=u; window.MJCAL.ready=true; if(typeof window.onMjAuth==='function') window.onMjAuth(u); });
 </script>
+<!-- ?embed=1 로 열면 홈 대시보드에 끼워 넣기용 화면(로고·「← 홈」 숨김, 페이지 탭은 유지). 파라미터가 없으면 기존 동작 그대로. -->
+<script>
+(function(){
+  try{
+    if(new URLSearchParams(location.search).get('embed')!=='1') return;
+    document.documentElement.classList.add('embed-cal');
+    var css=document.createElement('style');
+    css.textContent=
+      'html.embed-cal .tn-logo,html.embed-cal .tn-back,html.embed-cal #maydlyHubBtn{display:none!important}'
+     +'html.embed-cal .topnav{padding-left:10px!important;padding-right:10px!important}';
+    document.head.appendChild(css);
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
