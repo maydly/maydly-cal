@@ -1200,6 +1200,7 @@ function saveEvents(){
 // ── 국가공휴일 목록 (다음날이 공휴일이면 그날은 19시까지만 촬영 = 20~22 타임 마감,
 //    그날이 수·목이면 대신 11~13시 타임을 연다 — 260925) ──
 // ※ 여기 날짜만 고치면 규칙이 바뀜. 매년 갱신 필요 (음력 명절·대체공휴일 포함)
+//   목록이 공개 범위(앞으로 185일)보다 짧아지면 대시보드 「챙겨야 할 일」에 알림이 뜬다 (260926)
 // (260912) 예외 목록을 전역으로 — 공개 데이터 생성과 대시보드가 같은 규칙을 쓴다
 const LEAD_EXCEPT=['2026-09-09','2026-09-10'];      // 리드타임 7일 예외 (그 날만 고객에게 연다)
 const PREHOL_EXCEPT=['2026-09-23','2026-09-24'];    // 공휴일 전날 20시 마감 예외 (막타임까지 연다)
@@ -1218,11 +1219,32 @@ const KR_HOLIDAYS=[
   '2026-10-03','2026-10-05',               // 개천절(토) + 대체공휴일
   '2026-10-09',                            // 한글날
   '2026-12-25',                            // 성탄절
-  // 2027년 초
+  // 2027년 (260926 구글 공휴일 캘린더 + date.nager.at 대조)
   '2027-01-01',                            // 신정
+  '2027-02-06','2027-02-07','2027-02-08',  // 설 연휴
+  '2027-02-09',                            // 설 대체공휴일 (설날이 일요일)
+  '2027-03-01',                            // 삼일절
+  '2027-05-01','2027-05-03',               // 노동절(토) + 대체공휴일
+  '2027-05-05',                            // 어린이날
+  '2027-05-13',                            // 부처님오신날
+  '2027-06-06',                            // 현충일
+  '2027-07-17','2027-07-19',               // 제헌절(토) + 대체공휴일
+  '2027-08-15','2027-08-16',               // 광복절(일) + 대체공휴일
+  '2027-09-14','2027-09-15','2027-09-16',  // 추석 연휴
+  '2027-10-03','2027-10-04',               // 개천절(일) + 대체공휴일
+  '2027-10-09','2027-10-11',               // 한글날(토) + 대체공휴일
+  '2027-12-25','2027-12-27',               // 성탄절(토) + 대체공휴일
+  // 2028년은 아직 넣지 않음 — 설 날짜가 자료마다 다르고 4월 국회의원 선거일이 미반영(260926)
 ];
 // 다음날이 공휴일인 날인가?
 function isPreHoliday(ds){return KR_HOLIDAYS.includes(addDays(ds,1));}
+// 공휴일 목록이 공개 범위보다 짧으면 목록의 마지막 날짜를 돌려준다 (넉넉하면 null).
+// 목록 밖 공휴일은 전날 규칙(막타임 마감·수목 첫타임 당김)이 안 걸리므로 미리 알린다.
+function holidayListShort(){
+  const last=KR_HOLIDAYS.slice().sort().pop();
+  const need=fd(new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()+185));
+  return last<need?last:null;
+}
 // 스튜디오 2시간 타임 목록. 일요일은 11시부터, 수·목은 14시부터.
 // (260925) 공휴일 전날이 수·목이면 밤 20~22시를 닫는 대신 오전 11~13시를 연다.
 // preHol은 PREHOL_EXCEPT가 이미 빠진 값을 넘긴다 — 예외 날짜는 평소 수·목과 같다.
@@ -1924,13 +1946,18 @@ function renderDash(){
 
   const kindName={outfit:'👗 의상확인',rush:'🚨 긴급 보정본',basic:'📦 기본 보정본',buy:'🎞️ 구매분'};
   const owner=function(k){return k==='outfit'?['명진','#6a7a2a']:['수빈','#a4603c'];};
-  const taskRows=D.alerts.slice(0,6).map(function(a){
+  // (260926) 공휴일 목록이 떨어져 가면 맨 위에 알림
+  const holLast=holidayListShort();
+  const holRow=holLast?'<div class="task" style="background:var(--dambbg)">'
+    +'<div class="d">공휴일 목록 '+holLast+'까지</div>'
+    +'<div class="n">'+(Number(holLast.slice(0,4))+1)+'년 공휴일 추가 필요 — 목록 밖 공휴일은 전날 규칙이 안 걸림</div></div>':'';
+  const taskRows=holRow+(D.alerts.slice(0,6).map(function(a){
     const bg=a.left<0?'var(--dredbg)':(a.left<=1?'var(--dambbg)':'var(--dlime2)');
     const ow=owner(a.kind);
     return '<div class="task" style="background:'+bg+'" onclick="switchPage(\'alert\',null)">'
       +'<div class="d">'+dueText(a.left)+' <span class="o" style="color:'+ow[1]+'">'+ow[0]+'</span></div>'
       +'<div class="n">'+esc(a.e.client||'(이름 없음)')+' · '+kindName[a.kind]+'</div></div>';
-  }).join('')||'<div class="dempty">지금 챙길 일이 없습니다 🍀</div>';
+  }).join('')||(holRow?'':'<div class="dempty">지금 챙길 일이 없습니다 🍀</div>'));
 
   const twoTitle={freeOpen:'예약을 안 받아 비어 있음',freeNosh:'노쇼로 비어 있음',full:'다 참',inq:'야외 문의만',off:'휴무·불가'};
   const two=D.two.map(function(t){
