@@ -1197,7 +1197,8 @@ function saveEvents(){
   pushToGithub();
 }
 
-// ── 국가공휴일 목록 (다음날이 공휴일이면 그날은 19시까지만 촬영 = 20~22 타임 마감) ──
+// ── 국가공휴일 목록 (다음날이 공휴일이면 그날은 19시까지만 촬영 = 20~22 타임 마감,
+//    그날이 수·목이면 대신 11~13시 타임을 연다 — 260925) ──
 // ※ 여기 날짜만 고치면 규칙이 바뀜. 매년 갱신 필요 (음력 명절·대체공휴일 포함)
 // (260912) 예외 목록을 전역으로 — 공개 데이터 생성과 대시보드가 같은 규칙을 쓴다
 const LEAD_EXCEPT=['2026-09-09','2026-09-10'];      // 리드타임 7일 예외 (그 날만 고객에게 연다)
@@ -1222,6 +1223,13 @@ const KR_HOLIDAYS=[
 ];
 // 다음날이 공휴일인 날인가?
 function isPreHoliday(ds){return KR_HOLIDAYS.includes(addDays(ds,1));}
+// 스튜디오 2시간 타임 목록. 일요일은 11시부터, 수·목은 14시부터.
+// (260925) 공휴일 전날이 수·목이면 밤 20~22시를 닫는 대신 오전 11~13시를 연다.
+// preHol은 PREHOL_EXCEPT가 이미 빠진 값을 넘긴다 — 예외 날짜는 평소 수·목과 같다.
+function studioSlots(dow,preHol){
+  if(dow===0||(preHol&&(dow===3||dow===4)))return[[11,13],[14,16],[17,19],[20,22]];
+  return[[14,16],[17,19],[20,22]];
+}
 
 // ── 공개용 가용시간 계산 (개인정보는 여기서 전부 버려짐 — 숫자만 남긴다) ──
 // 저장 시 이 결과를 public.json으로 커밋하고, 고객 페이지가 그걸 읽는다.
@@ -1314,9 +1322,10 @@ function buildPublicSchedule(){
     if(busy&&busy.allDay){schedule[ds]={unavailable:true};continue;}
     const bSlots=(busy&&busy.slots)||[];
     const overlap=(s,e)=>bSlots.some(r=>!(e<=r.s||s>=r.e));
-    const timeSlots=dow===0?[[11,13],[14,16],[17,19],[20,22]]:[[14,16],[17,19],[20,22]];
     // 다음날이 국가공휴일이면 19시까지만 촬영 (20~22 타임 마감). 단 PREHOL_EXCEPT 날짜는 예외.
+    // 수·목이면 대신 11~13시를 연다(260925).
     const preHol=isPreHoliday(ds)&&!PREHOL_EXCEPT.includes(ds);
+    const timeSlots=studioSlots(dow,preHol);
     schedule[ds]={
       slots:timeSlots.map(([s,e])=>({s:`${pad(s)}:00`,e:`${pad(e)}:00`,avail:!overlap(s,e)&&!(preHol&&s>=19)})),
       // 페이용 1시간 단위 캘린더 계산용 — 예약된 시간 범위(숫자만, 개인정보 없음)
@@ -1687,8 +1696,8 @@ function daySlots(ds){
     const t=e.time.split(':').map(Number);const st=t[0]+(t[1]||0)/60;
     noshR.push([st,st+(e.dur||2)]);
   });
-  const ts=dow===0?[[11,13],[14,16],[17,19],[20,22]]:[[14,16],[17,19],[20,22]];
   const preHol=isPreHoliday(ds)&&!PREHOL_EXCEPT.includes(ds);
+  const ts=studioSlots(dow,preHol);
   return{kind:'slots',slots:ts.map(function(r){
     const s=r[0],e=r[1];
     const av=!busy.some(function(b){return !(e<=b[0]||s>=b[1]);})&&!(preHol&&s>=19);
@@ -3256,9 +3265,9 @@ function exportPublicData(){
     const bSlots=busy?.slots||[];
     function isOverlap(s,e){return bSlots.some(r=>!(e<=r.s||s>=r.e));}
 
-    const timeSlots=dow===0?[[11,13],[14,16],[17,19],[20,22]]:[[14,16],[17,19],[20,22]];
     // 다음날이 국가공휴일이면 19시까지만 촬영 (20~22 타임 마감). 단 PREHOL_EXCEPT 날짜는 예외.
     const preHol=isPreHoliday(ds)&&!['2026-09-23','2026-09-24'].includes(ds);
+    const timeSlots=studioSlots(dow,preHol);
     const result=timeSlots.map(([s,e])=>({s:`${pad(s)}:00`,e:`${pad(e)}:00`,avail:!isOverlap(s,e)&&!(preHol&&s>=19)}));
     publicSlots[ds]={slots:result,busy:bSlots.map(r=>[r.s,r.e]),...(preHol?{preHol:true}:{})};
   });

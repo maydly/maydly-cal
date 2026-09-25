@@ -415,7 +415,8 @@ function getMaydlySlots(ds){
     const _dow=dowOf(ds);
     return PAY_HOURS.map(h=>{
       // 수·목 오전 11~13시는 (야외처럼) 협의가 필요한 시간 — '가능'이 아니라 '협의 필요'로
-      if((_dow===3||_dow===4)&&(h===11||h===12))
+      // 단 공휴일 전날(preHol)인 수·목은 밤 타임을 닫는 대신 오전을 연다 → 일반 시간처럼 계산 (260925)
+      if((_dow===3||_dow===4)&&(h===11||h===12)&&!pd.preHol)
         return {avail:false,slotConsult:true,allDayBlock:false,label:`${pad(h)}:00 ~ ${pad(h+1)}:00`};
       return {
         avail:!PAY_FIXED_BLOCK.includes(h)&&!overlap(h,h+1)&&!(pd.preHol&&h>=19), // 고정불가 + 예약겹침 + 다음날 공휴일 19시 이후 마감
