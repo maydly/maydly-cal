@@ -3608,7 +3608,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const cfg={ apiKey:"AIzaSyBfyRE7CNENjgSfe25xHAdr87gOllpYtvM", authDomain:"subin-routine.firebaseapp.com", projectId:"subin-routine" };
-const app=initializeApp(cfg,"mjcal"); const auth=getAuth(app), db=getFirestore(app);
+// ?embed=1(홈 대시보드 앱 창)일 때만 기본 이름표로 — 홈과 같은 로그인을 함께 쓴다(홈에서 한 번 로그인하면 창도 로그인 상태).
+// 평소(파라미터 없음)에는 지금처럼 "mjcal" — 이미 해 둔 로그인이 그대로 유지된다. (운영-018, 260928)
+const _EMBED=new URLSearchParams(location.search).get("embed")==="1";
+const app=_EMBED?initializeApp(cfg):initializeApp(cfg,"mjcal"); const auth=getAuth(app), db=getFirestore(app);
 setPersistence(auth, browserLocalPersistence).catch(()=>{});
 window.MJCAL={
   user:null, ready:false,
