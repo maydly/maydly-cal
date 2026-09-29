@@ -3658,7 +3658,9 @@ onAuthStateChanged(auth,(u)=>{ window.MJCAL.user=u; window.MJCAL.ready=true; if(
     var css=document.createElement('style');
     css.textContent=
       'html.embed-cal .tn-logo,html.embed-cal .tn-back,html.embed-cal #maydlyHubBtn{display:none!important}'
-     +'html.embed-cal .topnav{padding-left:10px!important;padding-right:10px!important}';
+     +'html.embed-cal .topnav{padding-left:10px!important;padding-right:10px!important}'
+     // 홈 앱 창(끼워넣기)에서는 시작 화면의 옛 '보안 주의사항' 상자를 숨긴다(평소 화면은 그대로) — 운영-018 260929
+     +'html.embed-cal #landing div[style*="fff3cd"]{display:none!important}';
     document.head.appendChild(css);
   }catch(e){}
 })();
