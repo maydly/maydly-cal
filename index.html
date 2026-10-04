@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f0f6ef">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"></noscript><!-- 글꼴 CSS 는 화면을 막지 않고 받는다(외부 CDN 이 느리거나 막혀도 첫 화면이 하얗게 멈추지 않게, 261004) -->
 <title>maydly — 예약 가능 시간 확인</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -130,6 +133,172 @@ body{font-family:-apple-system,'Pretendard','Apple SD Gothic Neo',sans-serif;bac
 body,#landing,#calPage,#app{background:#f0f6ef url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'112'%20height%3D'112'%3E%3Cg%20fill%3D'%234f9a6a'%20fill-opacity%3D'0.035'%3E%3Cg%20transform%3D'translate(28%2C28)'%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.46)%20rotate(0)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.46)%20rotate(90)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.46)%20rotate(180)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.46)%20rotate(270)'%2F%3E%3C%2Fg%3E%3Cg%20transform%3D'translate(84%2C86)'%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.32)%20rotate(0)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.32)%20rotate(90)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.32)%20rotate(180)'%2F%3E%3Cpath%20d%3D'M0%200%20C-2.4%2C-10.5%20-17%2C-15.5%20-17%2C-27.5%20C-17%2C-36.5%20-8%2C-40.5%200%2C-32.5%20C8%2C-40.5%2017%2C-36.5%2017%2C-27.5%20C17%2C-15.5%202.4%2C-10.5%200%2C0%20Z'%20transform%3D'scale(0.32)%20rotate(270)'%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E") !important;background-attachment:fixed !important}
 .land-clover-wrap{display:none !important}
 </style>
+<style id="mc-skin">
+/* ═══════════════════════════════════════════════════════════════════════════
+   mc-skin · 고객 캘린더 (운영-003·14, 261004) — 명진허브와 같은 디자인 언어
+   · 문구·데이터·계산은 그대로. 겉모습과 움직임만 덮어쓴다(되돌리기: 이 <style> 통째로 빼기)
+   · 데이터를 못 불러왔을 때 «가능»처럼 보이는 표시는 절대 만들지 않는다(로딩도 회색 줄만)
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --hz-g:#4f9a6a;--hz-gl:#eaf3e7;--hz-pri:#3d7a52;--hz-ink:#1c2620;--hz-sub:#5d6b5f;--hz-mute:#687568;--hz-line:#e3e9e0;--hz-soft:#f7faf6;
+  --hz-sh:0 1px 2px rgba(28,38,32,.035),0 10px 30px rgba(28,38,32,.055);
+  --hz-ease:cubic-bezier(.2,.75,.25,1);
+  --bg:#f0f6ef;--bg2:#f4f8f3;--sf:#fff;--sf2:#f7faf6;--sf3:#eef3ec;--bd:#e3e9e0;--bd2:#d4ddd1;
+  --tx:#1c2620;--mu:#687568;--mu2:#5d6b5f;--R:#3d7a52;--Rl:rgba(79,154,106,.12);--Rd:#2f6e47;--ok:#3b8053;--ng:#c9372c;
+}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  letter-spacing:-.2px;-webkit-font-smoothing:antialiased;word-break:keep-all;font-variant-numeric:tabular-nums;color:var(--hz-ink)}
+*{-webkit-tap-highlight-color:transparent}
+@supports(min-height:100dvh){ body,#landing,#calPage{min-height:100dvh} }
+button,a{font-family:inherit}
+a:focus-visible,button:focus-visible,.mc:focus-visible{outline:2px solid var(--hz-g);outline-offset:2px;border-radius:12px}
+
+/* ── 첫 화면: 차례로 떠오르고, 클로버는 살랑 ── */
+@keyframes mcRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes mcSway{0%,100%{transform:rotate(0)}50%{transform:rotate(-7deg)}}
+@keyframes mcFade{from{opacity:0}to{opacity:1}}
+@keyframes mcPop{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes mcSheet{from{opacity:.4;transform:translateY(46px)}to{opacity:1;transform:none}}
+.mc-land>*{animation:mcRise .55s var(--hz-ease) backwards}
+.mc-land>*:nth-child(1){animation-delay:.02s}.mc-land>*:nth-child(2){animation-delay:.1s}.mc-land>*:nth-child(3){animation-delay:.18s}.mc-land>*:nth-child(4){animation-delay:.26s}
+.mc-clv{transform-origin:50% 88%;animation:mcSway 6.5s ease-in-out infinite}
+#landing button,#landing a{transition:transform .12s,box-shadow .18s,filter .12s,background .15s!important}
+#landing button:active,#landing a:active{transform:scale(.97)}
+#landing button[onclick="goCalendar()"]{background:linear-gradient(135deg,#3b8053,#2f6e47)!important;box-shadow:0 8px 20px -9px rgba(61,122,82,.7)!important;min-height:52px;font-size:15px!important}
+#landing button[onclick="goCalendar()"]:hover{filter:brightness(1.06)}
+#landing a[href*="pf.kakao.com"]{min-height:50px;font-size:15px!important;box-shadow:0 8px 18px -10px rgba(58,29,29,.45)!important}
+#landing div[style*="f4f8f2"]{background:rgba(255,255,255,.92)!important;border:0!important;border-radius:20px!important;box-shadow:var(--hz-sh),inset 0 0 0 1px rgba(127,184,119,.22)!important;padding:18px 20px!important}
+#landing div[style*="f4f8f2"]>div:first-child{font-size:13.5px!important;color:#2f5a38!important;line-height:1.7}
+#landing div[style*="f4f8f2"]>div:last-child{font-size:12.5px!important;color:var(--hz-sub)!important;line-height:1.75}
+#landing div[style*="8aaa8a"]{font-size:13px!important;color:#6f8f73!important}
+
+/* ── 달력 위쪽 바 ── */
+#calPage.mc-in .cal-header,#calPage.mc-in .cal-wrap>*{animation:mcRise .32s var(--hz-ease) backwards}
+#calPage.mc-in .cal-wrap>*:nth-child(2){animation-delay:.04s}#calPage.mc-in .cal-wrap>*:nth-child(3){animation-delay:.08s}
+#calPage.mc-in .cal-wrap>*:nth-child(4){animation-delay:.12s}#calPage.mc-in .cal-wrap>*:nth-child(5){animation-delay:.16s}
+#calPage.mc-in .cal-wrap>*:nth-child(n+6){animation-delay:.2s}
+.cal-header{position:sticky;top:0;z-index:20;height:60px;padding:0 max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));gap:10px;
+  background:rgba(250,253,249,.88);-webkit-backdrop-filter:saturate(1.5) blur(14px);backdrop-filter:saturate(1.5) blur(14px);border-bottom:1px solid var(--hz-line)}
+.hdr-logo span[style*="font-size:17px"]{font-size:19px!important;font-weight:700!important;letter-spacing:-.7px!important}
+.hdr-nav{gap:6px}
+.nb{height:40px;min-width:40px;padding:0 13px;border-radius:12px;border:1px solid var(--hz-line);background:#fff;color:var(--hz-sub);
+  font-size:15px;font-weight:600;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s,color .12s,transform .1s}
+.nb:hover{background:#f5f8f4;border-color:#d4ddd1;color:var(--hz-ink)}
+.nb:active{transform:scale(.95)}
+.hdr-nav .nb:nth-child(2){font-size:13.5px}
+.ml{font-size:18px;font-weight:700;letter-spacing:-.5px;min-width:0;margin-left:8px;white-space:nowrap;color:var(--hz-ink)}
+.back-btn{height:40px;padding:0 13px;border-radius:12px;border:1px solid var(--hz-line);background:#fff;color:var(--hz-sub);font-size:13px;font-weight:600;
+  transition:background .12s,border-color .12s,color .12s,transform .1s}
+.back-btn:hover{background:#f5f8f4;border-color:#d4ddd1;color:var(--hz-ink)}
+.back-btn:active{transform:scale(.96)}
+@media(max-width:600px){
+  .cal-header{flex-wrap:wrap;height:auto;padding:8px 12px 10px;row-gap:8px}
+  .hdr-logo{order:0}.hdr-right{order:1}
+  .hdr-nav{order:2;width:100%;justify-content:flex-start}
+  .ml{margin-left:auto;margin-right:2px;font-size:19px}
+}
+
+/* ── 본문 ── */
+.cal-wrap{padding:14px 16px 30px;max-width:980px}
+.legend-bar{background:#fff;border:0;border-radius:14px;box-shadow:var(--hz-sh),inset 0 0 0 1px rgba(227,233,224,.6);padding:10px 14px;gap:8px 12px;
+  font-size:12.5px;font-weight:600;color:var(--hz-sub);flex-wrap:wrap;margin-bottom:10px}
+.legend-bar span[style*="margin-left:auto"]{font-size:12px!important;color:var(--hz-mute)!important}
+.leg-dot{width:9px;height:9px}
+#noDataBanner{border-radius:14px!important;font-size:12.5px!important;padding:12px 16px!important;line-height:1.7!important}
+.cal-wrap>div[style*="fbf6ec"]{border-radius:14px!important;border-color:#f1e3c4!important;font-size:12.5px!important;padding:11px 15px!important;line-height:1.75!important}
+.mg-hdr{grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:4px;padding:0 1px}
+.dl{font-size:12px;font-weight:700;color:var(--hz-mute);letter-spacing:0}
+.mg-hdr .dl:first-child{color:#c0392b}.mg-hdr .dl:last-child{color:#3b6ea5}
+/* 7칸이 늘 같은 폭 — 글씨가 길어도 칸이 밀리지 않는다(페이 캘린더 폰에서 토요일이 잘리던 고장 수리) */
+.mg{grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;padding:1px;background:transparent;border:0;border-radius:0;overflow:visible}
+.mc{background:#fff;border-radius:13px;padding:6px 5px 7px;min-height:80px;gap:4px;min-width:0;
+  box-shadow:0 1px 2px rgba(28,38,32,.04),inset 0 0 0 1px rgba(227,233,224,.8);transition:background .12s,box-shadow .18s,transform .12s}
+.mc:hover{background:#fbfdfa;box-shadow:0 8px 18px -12px rgba(28,38,32,.28),inset 0 0 0 1px #d6e2d2;transform:translateY(-1px)}
+.mc:active{transform:scale(.97)}
+.mc.dim{opacity:1;background:rgba(255,255,255,.45);box-shadow:inset 0 0 0 1px rgba(227,233,224,.5)}
+.mc.dim>*{opacity:.45}
+.mc.tdc{background:linear-gradient(165deg,#e6f3e2 0%,#fff 62%);box-shadow:0 8px 18px -12px rgba(61,122,82,.5),inset 0 0 0 1.5px #b6d8b1}
+.dn{font-size:12.5px;font-weight:700;color:var(--hz-sub);margin:0 0 1px 2px;line-height:22px}
+.mg .mc:nth-child(7n+1) .dn{color:#c0392b}
+.mg .mc:nth-child(7n) .dn{color:#3b6ea5}
+.tdc .dn{width:24px;height:24px;margin:0 0 1px;font-size:12px;font-weight:800;background:linear-gradient(160deg,#3b8053,#2c6843);color:#fff!important;box-shadow:0 4px 10px -4px rgba(61,122,82,.65)}
+.avail-pill{font-size:11px;font-weight:700;padding:4px 6px;border-radius:9px;white-space:normal;overflow:hidden;text-overflow:clip;line-height:1.25;word-break:keep-all;overflow-wrap:anywhere}
+.ng-full{font-size:11px;font-weight:700;color:#c0392b;line-height:1.35;padding:2px 2px}
+.cl-pill{width:11px;height:12px;flex:0 0 auto}
+#gcalStatus{border-radius:999px!important;font-size:12px!important;padding:6px 12px!important;border-width:1px!important;margin-top:12px!important}
+/* 아래 두 카드: 카카오(브랜드색 그대로) · 시안(연한 초록 위 흰 글자가 잘 안 읽혀 진초록으로) */
+.cal-wrap>div[style*="clear:both"] a{border-radius:18px!important;min-height:76px;transition:transform .12s,box-shadow .18s,filter .12s}
+.cal-wrap>div[style*="clear:both"] a:active{transform:scale(.98)}
+.cal-wrap>div[style*="clear:both"] a[href*="pf.kakao.com"]{box-shadow:0 8px 18px -10px rgba(58,29,29,.45)!important}
+.cal-wrap>div[style*="clear:both"] a[href="https://maydly.github.io/"]{background:linear-gradient(135deg,#3b8053,#2f6e47)!important;box-shadow:0 8px 18px -10px rgba(61,122,82,.7)!important}
+.cal-wrap>div[style*="clear:both"] a span[style*="9.5px"]{font-size:11.5px!important}
+.cal-wrap>div[style*="clear:both"] a span[style*="12.5px"]{font-size:14px!important}
+.cal-wrap>div[style*="clear:both"] a[href="https://maydly.github.io/"] span{font-size:12.5px!important}
+@media(hover:hover){ .cal-wrap>div[style*="clear:both"] a:hover{filter:brightness(1.04);transform:translateY(-2px)} }
+
+/* 데이터를 불러오는 동안 — 회색 줄만 반짝(«가능»으로 보일 색은 쓰지 않는다) */
+@keyframes mcSk{0%{background-position:100% 0}100%{background-position:0 0}}
+.mg.mc-loading .mc:not(.dim)::after{content:'';display:block;height:9px;width:70%;margin:6px 0 0 2px;border-radius:5px;
+  background:linear-gradient(90deg,#ebf0e9 25%,#f5f8f3 45%,#ebf0e9 65%);background-size:300% 100%;animation:mcSk 1.4s ease-in-out infinite}
+/* 불러온 뒤 — 표시가 칸마다 살짝 떠오른다 */
+@keyframes mcPill{from{opacity:0;transform:translateY(5px) scale(.92)}to{opacity:1;transform:none}}
+.mg.mc-loaded .avail-pill,.mg.mc-loaded .ng-full{animation:mcPill .34s var(--hz-ease) backwards}
+.mg.mc-loaded .mc:nth-child(7n+2) .avail-pill,.mg.mc-loaded .mc:nth-child(7n+2) .ng-full{animation-delay:.03s}
+.mg.mc-loaded .mc:nth-child(7n+3) .avail-pill,.mg.mc-loaded .mc:nth-child(7n+3) .ng-full{animation-delay:.06s}
+.mg.mc-loaded .mc:nth-child(7n+4) .avail-pill,.mg.mc-loaded .mc:nth-child(7n+4) .ng-full{animation-delay:.09s}
+.mg.mc-loaded .mc:nth-child(7n+5) .avail-pill,.mg.mc-loaded .mc:nth-child(7n+5) .ng-full{animation-delay:.12s}
+.mg.mc-loaded .mc:nth-child(7n+6) .avail-pill,.mg.mc-loaded .mc:nth-child(7n+6) .ng-full{animation-delay:.15s}
+.mg.mc-loaded .mc:nth-child(7n) .avail-pill,.mg.mc-loaded .mc:nth-child(7n) .ng-full{animation-delay:.18s}
+/* 달 넘김 — 넘긴 쪽으로 */
+@keyframes mcSlideL{from{opacity:.25;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes mcSlideR{from{opacity:.25;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.mg.mc-slide-l{animation:mcSlideL .26s var(--hz-ease)}
+.mg.mc-slide-r{animation:mcSlideR .26s var(--hz-ease)}
+
+/* ── 날짜 창 — 밝은 서리 막 + 둥근 카드, 폰은 아래에서 올라오는 시트 ── */
+.ov{background:rgba(240,246,239,.62);-webkit-backdrop-filter:saturate(1.2) blur(6px);backdrop-filter:saturate(1.2) blur(6px);padding:20px;animation:mcFade .16s ease-out}
+.pn{border:0;border-radius:24px;width:410px;max-width:92vw;padding:22px 22px 24px;
+  box-shadow:0 4px 12px rgba(28,38,32,.08),0 24px 60px rgba(28,38,32,.16);animation:mcPop .26s var(--hz-ease)}
+.pn-h{font-size:17px;font-weight:700;letter-spacing:-.4px;margin-bottom:14px;gap:10px;color:var(--hz-ink)}
+.px{width:38px;height:38px;flex:0 0 auto;border-radius:12px;background:var(--hz-soft);color:var(--hz-sub);font-size:22px;opacity:1;
+  display:inline-flex;align-items:center;justify-content:center;transition:background .12s,transform .1s}
+.px:hover{background:#eef3ec}.px:active{transform:scale(.92)}
+#pb a[href*="pf.kakao.com"]{border-radius:14px!important;min-height:48px;display:flex!important;align-items:center;justify-content:center;transition:filter .12s,transform .1s}
+#pb a[href*="pf.kakao.com"]:active{transform:scale(.98)}
+/* 시간표가 길 때(페이) 문의 버튼이 아래에 붙어 늘 보이게 */
+#pb>a[href*="pf.kakao.com"]:last-child{position:sticky;bottom:0;z-index:2;box-shadow:0 -14px 16px -2px rgba(255,255,255,.96),0 30px 0 10px #fff,0 8px 18px -10px rgba(58,29,29,.45)}
+@media(max-width:560px){
+  .ov{align-items:flex-end;padding:0}
+  .pn{width:100%;max-width:100%;max-height:min(88vh,calc(100% - 12px));border-radius:24px 24px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom,0px));animation:mcSheet .3s var(--hz-ease)}
+  .pn::before{content:'';display:block;width:38px;height:5px;border-radius:3px;background:#dfe6dc;margin:0 auto 12px}
+}
+
+/* ── 폰 ── */
+@media(max-width:560px){
+  .cal-wrap{padding:10px 8px 26px}
+  .legend-bar{border-radius:12px;padding:9px 12px;font-size:12px}
+  .mg,.mg-hdr{gap:4px}
+  .mc{border-radius:10px;padding:4px 3px 5px;min-height:68px;gap:3px}
+  .dn{font-size:11.5px;line-height:20px}
+  .tdc .dn{width:21px;height:21px;font-size:11px}
+  .avail-pill{font-size:10px;padding:3px 3px;border-radius:7px;letter-spacing:-.4px;line-height:1.2}
+  .avail-pill .cl-pill{width:9px;height:10px}
+  .ng-full{font-size:10px;letter-spacing:-.3px}
+  .cal-wrap>div[style*="clear:both"]{flex-direction:column}
+}
+@media(max-width:360px){ .nb{height:38px;min-width:38px;padding:0 11px} .ml{font-size:17px} .back-btn{height:38px;padding:0 11px} .avail-pill{font-size:9.5px} }
+
+/* ── 움직임 줄이기 ── */
+@media(prefers-reduced-motion:reduce){
+  .mc-land>*,.mc-clv,#calPage.mc-in .cal-header,#calPage.mc-in .cal-wrap>*,.mg.mc-loaded .avail-pill,.mg.mc-loaded .ng-full,.mg.mc-slide-l,.mg.mc-slide-r,.ov,.pn,
+  .mg.mc-loading .mc:not(.dim)::after{animation:none!important}
+  .mc:hover,.mc:active{transform:none}
+}
+@media(hover:none){ .mc:hover{transform:none} .mc:not(.tdc):not(.dim):hover{background:#fff;box-shadow:0 1px 2px rgba(28,38,32,.04),inset 0 0 0 1px rgba(227,233,224,.8)} }
+
+.leg-i{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+</style>
 </head>
 <body>
 
@@ -162,10 +331,10 @@ body,#landing,#calPage,#app{background:#f0f6ef url("data:image/svg+xml,%3Csvg%20
     <svg class="cl-bg cl-bg6 cl-slot" viewBox="-40 -40 80 88"></svg>
   </div>
 
-  <div style="text-align:center;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center">
+  <div class="mc-land" style="text-align:center;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center">
     <div style="display:flex;align-items:center;justify-content:center;gap:3px;margin-bottom:12px">
       <span style="font-size:44px;font-weight:800;color:#2e2a26;letter-spacing:-.8px;font-family:'Pretendard','Apple SD Gothic Neo',-apple-system,BlinkMacSystemFont,sans-serif;line-height:1">maydly<span style="color:#4f9a6a">.</span></span>
-      <svg viewBox="0 0 100 100" width="46" height="46" style="margin-left:6px;margin-bottom:-3px">
+      <svg class="mc-clv" viewBox="0 0 100 100" width="46" height="46" style="margin-left:6px;margin-bottom:-3px">
         <defs>
           <linearGradient id="gcA" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0" stop-color="#86d2a0"/><stop offset="0.55" stop-color="#4f9a6a"/><stop offset="1" stop-color="#357a51"/></linearGradient>
           <linearGradient id="gcsA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9a6a"/><stop offset="1" stop-color="#2f6a45"/></linearGradient>
@@ -220,7 +389,7 @@ body,#landing,#calPage,#app{background:#f0f6ef url("data:image/svg+xml,%3Csvg%20
   <div class="cal-header">
     <div class="hdr-logo">
       <span style="font-size:17px;font-weight:800;color:#2e2a26;letter-spacing:-.5px;font-family:'Pretendard','Apple SD Gothic Neo',-apple-system,BlinkMacSystemFont,sans-serif">maydly<span style="color:#4f9a6a">.</span></span>
-      <svg viewBox="0 0 100 100" width="22" height="22" style="margin-left:4px">
+      <svg class="mc-clv" viewBox="0 0 100 100" width="22" height="22" style="margin-left:4px">
         <defs>
           <linearGradient id="gcB" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0" stop-color="#86d2a0"/><stop offset="0.55" stop-color="#4f9a6a"/><stop offset="1" stop-color="#357a51"/></linearGradient>
           <linearGradient id="gcsB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9a6a"/><stop offset="1" stop-color="#2f6a45"/></linearGradient>
@@ -253,8 +422,8 @@ body,#landing,#calPage,#app{background:#f0f6ef url("data:image/svg+xml,%3Csvg%20
       ⚠️ 현재 일정 정보를 불러오지 못했습니다. 날짜를 클릭하면 카카오로 직접 문의하실 수 있습니다.
     </div>
     <div id="legendBar" class="legend-bar">
-      <span class="leg-dot" style="background:#6ab87a"></span><span>촬영 가능</span>
-      <span class="leg-dot" style="background:#c86060"></span><span>예약 불가</span>
+      <span class="leg-i"><span class="leg-dot" style="background:#6ab87a"></span><span>촬영 가능</span></span>
+      <span class="leg-i"><span class="leg-dot" style="background:#c86060"></span><span>예약 불가</span></span>
       <span style="margin-left:auto;font-size:10px;color:var(--mu)">날짜를 클릭하면 시간대별 확인 가능합니다</span>
     </div>
     <div style="background:#fbf6ec;border:1px solid #ecdcbe;border-radius:8px;padding:9px 13px;margin-bottom:10px;font-size:10.5px;color:#8a6d3a;line-height:1.7">
@@ -416,13 +585,20 @@ function goCalendar(){
   document.getElementById('calPage').style.flexDirection='column';
   updLabel();
   renderCal();
-  loadPublicData(); // admin에서 내보낸 공개 데이터 로드 (최우선)
+  if(window.mcCalLoading)mcCalLoading(true);   // (261004) 불러오는 동안 회색 줄만 반짝(«가능»으로 보이는 표시는 없음)
+  const _ld=loadPublicData(); // admin에서 내보낸 공개 데이터 로드 (최우선)
+  if(_ld&&_ld.then)_ld.then(function(){if(window.mcCalLoading)mcCalLoading(false);},function(){if(window.mcCalLoading)mcCalLoading(false);});
 }
 function goLanding(){
   document.getElementById('landing').style.display='flex';
   document.getElementById('calPage').style.display='none';
 }
-function chM(n){curDate.setMonth(curDate.getMonth()+n);updLabel();renderCal();}
+function chM(n){
+  // (261004) 말일(29~31일)에 넘기면 한 달을 건너뛰던 고장 수리 — 1일로 내렸다가 그 달 말일 안으로 되돌린다
+  const d=curDate.getDate();curDate.setDate(1);curDate.setMonth(curDate.getMonth()+n);
+  curDate.setDate(Math.min(d,new Date(curDate.getFullYear(),curDate.getMonth()+1,0).getDate()));
+  updLabel();renderCal();if(window.mcSlide)mcSlide(n);
+}
 function goToday(){curDate=new Date(TODAY);updLabel();renderCal();}
 function updLabel(){
   const ms=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
@@ -558,6 +734,23 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 
 // 페이지 뜨면 네잎클로버 도형을 각 자리에 채운다
 fillClovers();
+</script>
+<script id="mc-ui">
+/* 운영-003·14 (261004) — 고객 캘린더 움직임(달 넘김 · 불러오는 중 · 첫 화면). 데이터·계산·문구는 건드리지 않는다. 되돌리기: 이 블록 통째로 빼기 */
+(function(){
+  var RM=window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):null;
+  function reduced(){return !!(RM&&RM.matches);}
+  var sT=null,lT=null;
+  window.mcSlide=function(n){try{var g=document.getElementById('calGrid');if(!g||reduced()||!n)return;
+    g.classList.remove('mc-slide-l','mc-slide-r','mc-loaded');void g.offsetWidth;g.classList.add(n>0?'mc-slide-l':'mc-slide-r');
+    clearTimeout(sT);sT=setTimeout(function(){g.classList.remove('mc-slide-l','mc-slide-r');},320);}catch(e){}};
+  window.mcCalLoading=function(on){try{var g=document.getElementById('calGrid');if(!g)return;
+    if(on){g.classList.remove('mc-loaded');g.classList.add('mc-loading');
+      var p=document.getElementById('calPage');if(p&&!reduced()){p.classList.remove('mc-in');void p.offsetWidth;p.classList.add('mc-in');setTimeout(function(){p.classList.remove('mc-in');},900);}}
+    else{g.classList.remove('mc-loading');if(reduced())return;g.classList.remove('mc-loaded');void g.offsetWidth;g.classList.add('mc-loaded');
+      clearTimeout(lT);lT=setTimeout(function(){g.classList.remove('mc-loaded');},900);}
+  }catch(e){}};
+})();
 </script>
 </body>
 </html>
