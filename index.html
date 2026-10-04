@@ -242,7 +242,8 @@ a:focus-visible,button:focus-visible,.mc:focus-visible{outline:2px solid var(--h
 .mg.mc-loading .mc:not(.dim)::after{content:'';display:block;height:9px;width:70%;margin:6px 0 0 2px;border-radius:5px;
   background:linear-gradient(90deg,#ebf0e9 25%,#f5f8f3 45%,#ebf0e9 65%);background-size:300% 100%;animation:mcSk 1.4s ease-in-out infinite}
 /* 불러온 뒤 — 표시가 칸마다 살짝 떠오른다 */
-@keyframes mcPill{from{opacity:0;transform:translateY(5px) scale(.92)}to{opacity:1;transform:none}}
+@keyframes mcPill{from{opacity:0;transform:translateY(5px) scale(.92)}}
+@keyframes mcPillFade{from{opacity:0}}
 .mg.mc-loaded .avail-pill,.mg.mc-loaded .ng-full{animation:mcPill .34s var(--hz-ease) backwards}
 .mg.mc-loaded .mc:nth-child(7n+2) .avail-pill,.mg.mc-loaded .mc:nth-child(7n+2) .ng-full{animation-delay:.03s}
 .mg.mc-loaded .mc:nth-child(7n+3) .avail-pill,.mg.mc-loaded .mc:nth-child(7n+3) .ng-full{animation-delay:.06s}
@@ -298,6 +299,29 @@ a:focus-visible,button:focus-visible,.mc:focus-visible{outline:2px solid var(--h
 @media(hover:none){ .mc:hover{transform:none} .mc:not(.tdc):not(.dim):hover{background:#fff;box-shadow:0 1px 2px rgba(28,38,32,.04),inset 0 0 0 1px rgba(227,233,224,.8)} }
 
 .leg-i{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+/* ── 보강 6 (261004) 달 넘김 «넘어가는» 움직임 + 폰 칸 표시 한 줄 ── */
+html:has(#calPage[style*="display: flex"]),html:has(#calPage[style*="display: flex"]) body{overscroll-behavior-x:none}   /* 달력이 보일 때만 — 손가락 가로 끌기 때 브라우저가 페이지 전체를 밀던 효과 끔(세로는 그대로) */
+.cal-wrap{position:relative}
+.cal-wrap.mc-turning{overflow:hidden;overflow:clip}   /* 넘어가는 동안만 — 옆으로 밀린 달력이 화면 밖으로 삐져나오지 않게 */
+.mg.mc-ghost,.mg.mc-peek{z-index:1;animation:none!important}
+#calGrid.mc-drag{will-change:transform}
+#calGrid.mc-drag .mc{transition:none}
+@media(max-width:560px){
+  /* 칸 사이·칸 안 여백을 줄여 표시 자리 38px → 45px, 클로버는 칸 오른쪽 위로(자리 있는 날 표시는 그대로) */
+  .mg,.mg-hdr{gap:2px}
+  .mc{position:relative;padding:4px 1px 5px}
+  .dn{margin-left:4px}
+  .tdc .dn{margin-left:2px}
+  .avail-pill{padding:3px 2px}
+  .avail-pill .cl-pill{position:absolute;top:8px;right:5px;width:10px;height:11px}
+  .avail-pill.mc-1l,.ng-full.mc-1l,.mg.mc-meas .avail-pill,.mg.mc-meas .ng-full{white-space:nowrap;word-break:normal;overflow-wrap:normal}
+  .ng-full.mc-1l br,.mg.mc-meas .ng-full br{display:none}
+  .mg.mc-meas .avail-pill,.mg.mc-meas .ng-full{width:max-content!important;max-width:none!important}
+  .avail-pill.mc-fit1,.ng-full.mc-fit1{font-size:9.5px;letter-spacing:-.5px}
+  .avail-pill.mc-fit2,.ng-full.mc-fit2{font-size:9px;letter-spacing:-.55px}
+  .avail-pill.mc-fit3,.ng-full.mc-fit3{font-size:8.5px;letter-spacing:-.6px}
+  .mg.mc-loaded .avail-pill,.mg.mc-loaded .ng-full{animation-name:mcPillFade}
+}
 </style>
 </head>
 <body>
@@ -594,6 +618,7 @@ function goLanding(){
   document.getElementById('calPage').style.display='none';
 }
 function chM(n){
+  if(window.mcTurnStart)mcTurnStart(n);   // (261004) 넘기기 직전 달력을 붙잡아 둔다 — 새 달과 함께 «넘어가는» 움직임용
   // (261004) 말일(29~31일)에 넘기면 한 달을 건너뛰던 고장 수리 — 1일로 내렸다가 그 달 말일 안으로 되돌린다
   const d=curDate.getDate();curDate.setDate(1);curDate.setMonth(curDate.getMonth()+n);
   curDate.setDate(Math.min(d,new Date(curDate.getFullYear(),curDate.getMonth()+1,0).getDate()));
@@ -629,7 +654,7 @@ function mCell(ds,dn,dim){
     // 데이터 없음 — 셀에 아무것도 표시 안 함 (클릭하면 카카오 안내)
     inner='';
   }else if(slots.length===1&&slots[0].allDayBlock){
-    inner=`<div class="ng-full">예약<br>불가</div>`;
+    inner=`<div class="ng-full">예약 <br>불가</div>`;
   }else{
     const availCount=slots.filter(s=>s.avail).length;
     if(availCount>0){
@@ -736,14 +761,203 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 fillClovers();
 </script>
 <script id="mc-ui">
-/* 운영-003·14 (261004) — 고객 캘린더 움직임(달 넘김 · 불러오는 중 · 첫 화면). 데이터·계산·문구는 건드리지 않는다. 되돌리기: 이 블록 통째로 빼기 */
+/* 운영-003·14 (261004) — 고객 캘린더 움직임(달 넘김 · 불러오는 중 · 첫 화면) + 폰 칸 표시 한 줄 맞춤.
+   데이터·계산·문구는 건드리지 않는다(읽기만). 되돌리기: 이 블록 통째로 빼기 — 달은 원래처럼 바로 바뀐다 */
 (function(){
   var RM=window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):null;
   function reduced(){return !!(RM&&RM.matches);}
-  var sT=null,lT=null;
-  window.mcSlide=function(n){try{var g=document.getElementById('calGrid');if(!g||reduced()||!n)return;
-    g.classList.remove('mc-slide-l','mc-slide-r','mc-loaded');void g.offsetWidth;g.classList.add(n>0?'mc-slide-l':'mc-slide-r');
-    clearTimeout(sT);sT=setTimeout(function(){g.classList.remove('mc-slide-l','mc-slide-r');},320);}catch(e){}};
+  function $(id){return document.getElementById(id);}
+  var sT=null,lT=null,GAP=14;
+  function ease(){var v='';try{v=getComputedStyle(document.documentElement).getPropertyValue('--hz-ease').trim();}catch(e){}return v||'cubic-bezier(.22,.8,.24,1)';}
+  function gw(el){return parseFloat(getComputedStyle(el).width)||el.offsetWidth;}
+  function curX(el){   // 지금 «보이는» 가로 위치(움직이는 중이면 그 순간 값)
+    try{var t=getComputedStyle(el).transform;if(!t||t==='none')return 0;var m=t.match(/matrix(3d)?\(([^)]+)\)/);if(!m)return 0;var a=m[2].split(',').map(parseFloat);return (m[1]?a[12]:a[4])||0;}catch(e){return 0;}
+  }
+
+  /* ── 폰 칸 표시 한 줄 맞춤 (보강 6, 명진 «4~5글자는 한 줄로») ──
+     한 줄로 재 봐서 들어가면 한 줄(.mc-1l). 넘치면 그 표시만 글자를 9.5 → 9 → 8.5px 로 줄여 본다.
+     그래도 안 들어가는 긴 표시(「야외 문의 가능」 등)는 원래처럼 두 줄 — 글자를 자르지 않는다. 자바스크립트가 안 돌면 원래 모양.
+     잴 때는 달력 높이를 붙잡아 둔다(문서가 잠깐 짧아져 맨 아래 보던 화면이 튀지 않게) · 읽기를 먼저 다 하고 쓰기는 나중에 */
+  var FIT=['mc-fit1','mc-fit2','mc-fit3'],PHONE=window.matchMedia?matchMedia('(max-width:560px)'):null,fitQ=0,lastW=-1;
+  function fitIn(box){
+    if(!box)return;
+    var els=[].slice.call(box.querySelectorAll('.avail-pill,.ng-full'));
+    els.forEach(function(b){b.classList.remove('mc-1l','mc-fit1','mc-fit2','mc-fit3');});
+    if(!PHONE||!PHONE.matches||!els.length||!box.getClientRects().length)return;
+    var todo=els,keepH=box.style.minHeight;
+    box.style.minHeight=box.offsetHeight+'px';
+    try{
+      for(var s=0;s<=FIT.length&&todo.length;s++){
+        box.classList.add('mc-meas');
+        var need=todo.map(function(b){return parseFloat(getComputedStyle(b).width)||0;});
+        box.classList.remove('mc-meas');
+        var have=todo.map(function(b){return parseFloat(getComputedStyle(b).width)||0;});
+        var rest=[];
+        todo.forEach(function(b,i){if(need[i]<=have[i]+0.05)b.classList.add('mc-1l');else rest.push(b);});
+        if(s===FIT.length){rest.forEach(function(b){b.classList.remove(FIT[FIT.length-1]);});break;}   // 끝까지 안 들어가면 원래대로(두 줄)
+        rest.forEach(function(b){if(s)b.classList.remove(FIT[s-1]);b.classList.add(FIT[s]);});
+        todo=rest;
+      }
+    }finally{box.classList.remove('mc-meas');box.style.minHeight=keepH;}
+  }
+
+  /* ── 달 넘김 (보강 6): 넘기기 전 달은 밀려 나가고 새 달이 반대쪽에서 들어온다 ──
+     chM → mcTurnStart(n)[넘기기 전 달력을 복사해 그 자리에 겹쳐 둠] → 새 달 그리기 → mcSlide(n)[둘이 함께 미끄러짐]
+     폰에서 끌면 달력이 손가락을 따라오고 옆 달이 미리 보인다. 넘길지 말지는 원래 스와이프 처리(가로 50px 이상·가로가 세로의 1.5배)가
+     그대로 정한다 — 여기서는 움직임만. 넘어가는 중에 손을 대면 그 순간 자리에서 이어받는다(순간이동 없음) */
+  var turn=null,drag=null,peek=null,spring=null,own=0,swallowAt=0;
+  function strip(el){
+    el.removeAttribute('id');el.removeAttribute('onclick');el.setAttribute('aria-hidden','true');
+    ['mc-loading','mc-loaded','mc-slide-l','mc-slide-r','mc-drag','mc-meas'].forEach(function(c){el.classList.remove(c);});
+    [].forEach.call(el.querySelectorAll('[id],[onclick]'),function(x){x.removeAttribute('id');x.removeAttribute('onclick');});
+  }
+  function over(el,g){var s=el.style;s.position='absolute';s.left=g.offsetLeft+'px';s.top=g.offsetTop+'px';s.width=gw(g)+'px';s.margin='0';s.pointerEvents='none';}
+  function hasGhost(){return !!document.querySelector('.mc-ghost');}
+  function clipOn(g){if(g&&g.parentNode)g.parentNode.classList.add('mc-turning');}
+  function clipOff(){
+    var g=$('calGrid');if(!g||!g.parentNode)return;
+    if(turn||spring||(drag&&(drag.on||drag.base))||peek||hasGhost()||curX(g))return;
+    g.parentNode.classList.remove('mc-turning');
+  }
+  function dropPeek(){if(peek&&peek.el.parentNode)peek.el.parentNode.removeChild(peek.el);peek=null;}
+  function killGhost(gh){if(gh&&gh.parentNode)gh.parentNode.removeChild(gh);clipOff();}
+  function stopIn(){var p=$('calPage');if(p)p.classList.remove('mc-in');}   // 첫 화면 떠오르기(CSS 움직임)가 손가락 위치를 덮어쓰지 않게
+  function freeze(){   // 진행 중인 넘김·되돌아감을 «지금 보이는 자리»에 멈추고 그 위치를 돌려준다
+    var g=$('calGrid');if(!g)return 0;
+    var x=curX(g);
+    if(turn){var t=turn;turn=null;try{if(t.gridAnim)t.gridAnim.cancel();}catch(e){}if(!t.ghostAnim)killGhost(t.ghost);}   // 밀려 나가던 복사본은 끝까지 가고 스스로 사라진다
+    if(spring){var s=spring;spring=null;try{s.cancel();}catch(e){}}
+    dropPeek();
+    g.style.transform=x?'translateX('+x+'px)':'';
+    return x;
+  }
+  window.mcTurnStart=function(n){
+    try{
+      var g=$('calGrid');
+      if(!g||!n||reduced()||!g.animate||!g.getClientRects().length){
+        freeze();drag=null;if(g){g.style.transform='';g.classList.remove('mc-drag');}clipOff();return;   // 움직임 없이 원래처럼 바로
+      }
+      stopIn();
+      var off=freeze();                      // 끄는 중이면 손가락 위치, 넘어가는 중이면 그 순간 위치에서
+      drag=null;                             // 끌던 손은 여기서 끝 — 놓을 때 되돌리지 않게
+      var gh=g.cloneNode(true);strip(gh);gh.classList.add('mc-ghost');over(gh,g);
+      gh.style.transform='translateX('+off+'px)';
+      g.parentNode.appendChild(gh);clipOn(g);
+      own++;                                 // 곧 올 «이 넘김이 그린» 달력 변화 알림은 넘김을 끊지 않는다
+      var tk=turn={ghost:gh,off:off};
+      setTimeout(function(){if(turn===tk&&!tk.gridAnim){turn=null;own=0;killGhost(gh);g.style.transform='';clipOff();}},0);   // 새 달 그리기가 중간에 멈췄으면 복사본을 치운다
+    }catch(e){turn=null;}
+  };
+  window.mcSlide=function(n){
+    var g=$('calGrid');if(!g)return;
+    try{
+      var t=turn;
+      if(t&&!t.gridAnim&&!reduced()){
+        var W=gw(g)+GAP,off=t.off,ez=ease(),dist=Math.abs(off+n*W),D=Math.round(Math.max(200,Math.min(400,180+220*dist/W)));
+        g.classList.remove('mc-drag');g.style.transform='';
+        var gh=t.ghost;gh.style.maxHeight=g.offsetHeight+'px';gh.style.overflow='hidden';   // 새 달이 더 짧으면(6줄→5줄) 아래 버튼 위로 지나가지 않게
+        t.ghostAnim=gh.animate([{transform:'translateX('+off+'px)',opacity:1},{transform:'translateX('+(-n*W)+'px)',opacity:.3}],{duration:D,easing:ez,fill:'forwards'});
+        t.ghostAnim.onfinish=t.ghostAnim.oncancel=function(){killGhost(gh);};
+        t.gridAnim=g.animate([{transform:'translateX('+(off+n*W)+'px)'},{transform:'translateX(0px)'}],{duration:D,easing:ez});
+        t.gridAnim.onfinish=function(){if(turn===t){turn=null;clipOff();}};
+        var lb=$('calLabel');if(lb&&lb.animate)lb.animate([{opacity:0,transform:'translateX('+(n*14)+'px)'},{opacity:1,transform:'none'}],{duration:280,easing:ez});
+        return;
+      }
+      if(t&&!t.gridAnim){turn=null;killGhost(t.ghost);}
+      g.style.transform='';clipOff();
+      if(reduced()||!n)return;
+      // 복사본을 못 만든 경우(아주 옛 브라우저) — 예전처럼 살짝 미끄러짐
+      g.classList.remove('mc-slide-l','mc-slide-r','mc-loaded');void g.offsetWidth;g.classList.add(n>0?'mc-slide-l':'mc-slide-r');
+      clearTimeout(sT);sT=setTimeout(function(){g.classList.remove('mc-slide-l','mc-slide-r');},320);
+    }catch(e){if(turn&&!turn.gridAnim){killGhost(turn.ghost);turn=null;}g.style.transform='';clipOff();}
+  };
+  function monthHTML(y,m){   // renderCal 과 같은 칸 — 끄는 동안 옆 달 미리보기(누를 수 없음)
+    var first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate(),h='',d;
+    for(d=0;d<first;d++){var pd=prev-first+1+d;h+=mCell(fd(new Date(y,m-1,pd)),pd,true);}
+    for(d=1;d<=days;d++)h+=mCell(fd(new Date(y,m,d)),d,false);
+    var rem=(7-(first+days)%7)%7;for(d=1;d<=rem;d++)h+=mCell(fd(new Date(y,m+1,d)),d,true);
+    return h;
+  }
+  function ensurePeek(dir,g){
+    if(peek&&peek.dir===dir)return peek;
+    dropPeek();
+    try{
+      if(typeof mCell!=='function'||typeof fd!=='function'||typeof curDate==='undefined')return null;
+      var b=new Date(curDate.getFullYear(),curDate.getMonth()+dir,1);
+      var el=document.createElement('div');el.className='mg mc-peek';
+      el.innerHTML=monthHTML(b.getFullYear(),b.getMonth());strip(el);over(el,g);
+      el.style.maxHeight=g.offsetHeight+'px';el.style.overflow='hidden';   // 지금 달 높이까지만(늘리지 않고 자른다 — 아래 버튼을 덮지 않게)
+      g.parentNode.appendChild(el);fitIn(el);
+      peek={el:el,dir:dir};
+    }catch(e){peek=null;}
+    return peek;
+  }
+  function settle(x,p){   // x 에서 제자리(0)로 — 미리보기도 함께
+    var g=$('calGrid');if(!g){dropPeek();return;}
+    g.style.transform='';
+    if(!x||!g.animate||reduced()){g.classList.remove('mc-drag');dropPeek();clipOff();return;}
+    var W=gw(g)+GAP,ez=ease();
+    try{
+      var a=g.animate([{transform:'translateX('+x+'px)'},{transform:'translateX(0px)'}],{duration:240,easing:ez});
+      if(p)p.el.animate([{transform:'translateX('+(x+p.dir*W)+'px)'},{transform:'translateX('+(p.dir*W)+'px)'}],{duration:240,easing:ez,fill:'forwards'});
+      spring=a;
+      a.onfinish=a.oncancel=function(){if(spring!==a)return;spring=null;g.classList.remove('mc-drag');if(peek===p)dropPeek();clipOff();};
+    }catch(e){spring=null;g.classList.remove('mc-drag');dropPeek();clipOff();}
+  }
+  function release(){   // 손을 뗐는데 원래 스와이프 처리가 넘기지 않았다(50px 미만·세로 우세 등) → 제자리로
+    var d=drag;drag=null;if(!d)return;
+    settle(d.on?d.x:d.base,peek);   // 보이던 자리(비스듬히 덜 따라온 경우 포함)에서 출발
+  }
+  var page=$('calPage');
+  if(page){
+    // 넘어가는·되돌아가는 중에 날짜를 누르면 «보이던 칸»과 다른 날짜 창이 열릴 수 있다 → 그 누르기는 움직임만 멈추고 창은 열지 않는다
+    document.addEventListener('pointerdown',function(e){if((turn||spring||hasGhost())&&e.target&&e.target.closest&&e.target.closest('#calGrid'))swallowAt=Date.now();},true);
+    document.addEventListener('click',function(e){if(!swallowAt)return;var fresh=Date.now()-swallowAt<1000;swallowAt=0;if(fresh&&e.target&&e.target.closest&&e.target.closest('#calGrid')){e.stopPropagation();e.preventDefault();}},true);
+    page.addEventListener('touchstart',function(e){
+      if(e.touches.length!==1){if(drag&&(drag.on||drag.base))release();else drag=null;return;}   // 두 번째 손가락: 끌던 달력은 제자리로
+      if(drag&&(drag.on||drag.base))release();               // 끝나지 않은 끌기(손길이 끊긴 경우)는 먼저 정리
+      var x=freeze();drag=null;                             // 넘어가는 중이면 그 자리에서 이어받는다
+      var g=$('calGrid');
+      if(reduced()||!g||(window.visualViewport&&visualViewport.scale>1.05)){if(x)settle(x,null);return;}   // 확대해 보는 중엔 따라오지 않는다
+      drag={x0:e.touches[0].clientX,y0:e.touches[0].clientY,base:x,x:x,dx:0,on:false,no:false,t:e.target};
+    },{passive:true});
+    page.addEventListener('touchmove',function(e){
+      var d=drag;if(!d||d.no)return;
+      if(e.touches.length!==1){release();return;}
+      var t=e.touches[0],dx=t.clientX-d.x0,dy=t.clientY-d.y0,g=$('calGrid');if(!g)return;
+      var ax=Math.abs(dx),ay=Math.abs(dy);
+      if(!d.on){
+        if(ax<10&&ay<10)return;
+        if(ax>ay*1.5&&g.animate&&g.getClientRects().length){d.on=true;stopIn();g.classList.add('mc-drag');clipOn(g);}   // 넘김 판정과 같은 기준(가로가 세로의 1.5배)
+        else{d.no=true;if(d.base)release();return;}                              // 세로 스크롤 — 건드리지 않는다
+      }else if(ay>ax){release();return;}                                         // 끌다가 세로로 바뀌면 따라오기를 멈추고 제자리로
+      d.dx=dx;var x=d.x=d.base+(ax>ay*1.5?dx:dx*.5);                            // 넘김 기준에 못 미치는 비스듬한 끌기는 덜 따라온다
+      g.style.transform='translateX('+x+'px)';
+      var dir=x<0?1:-1,p=ensurePeek(dir,g);
+      if(p)p.el.style.transform='translateX('+(x+dir*(gw(g)+GAP))+'px)';
+    },{passive:true});
+    page.addEventListener('touchend',release,{passive:true});
+    page.addEventListener('touchcancel',release,{passive:true});
+  }
+
+  /* ── 달력이 다시 그려질 때: 맞춤 다시 · 손 이벤트가 끊긴 끌기 정리 · 넘김 중 다른 이유(오늘·데이터 도착)로 그려지면 복사본 정리 ── */
+  function onGrid(){
+    if(own>0)own--;
+    else if(turn){var t=turn;turn=null;try{if(t.gridAnim)t.gridAnim.cancel();}catch(e){}try{if(t.ghostAnim)t.ghostAnim.cancel();}catch(e){}killGhost(t.ghost);var g0=$('calGrid');if(g0)g0.style.transform='';}
+    if(drag&&(drag.on||drag.base)&&drag.t&&!drag.t.isConnected)release();   // 끄던 칸이 새로 그려지면 그 손의 이벤트가 더 오지 않는다 → 제자리로
+    else if(peek&&drag&&drag.on){var g=$('calGrid'),dir=peek.dir;dropPeek();var p=ensurePeek(dir,g);if(p)p.el.style.transform='translateX('+(curX(g)+dir*(gw(g)+GAP))+'px)';}   // 데이터가 들어오면 미리보기도 새로
+    scheduleFit();
+  }
+  function scheduleFit(){if(fitQ)return;fitQ=(window.requestAnimationFrame||setTimeout)(function(){fitQ=0;try{var g=$('calGrid');if(g)lastW=g.clientWidth;fitIn(g);if(peek)fitIn(peek.el);}catch(e){}});}
+  window.mcFitLabels=scheduleFit;
+  try{
+    var cg=$('calGrid');
+    if(cg&&window.MutationObserver)new MutationObserver(onGrid).observe(cg,{childList:true});
+    window.addEventListener('resize',function(){var g=$('calGrid'),w=g?g.clientWidth:0;if(w!==lastW)scheduleFit();});   // 높이만 바뀐(주소창 접힘) resize 는 건너뜀
+    if(document.fonts){if(document.fonts.ready)document.fonts.ready.then(scheduleFit);if(document.fonts.addEventListener){document.fonts.addEventListener('loadingdone',scheduleFit);document.fonts.addEventListener('loading',function(){document.fonts.ready.then(scheduleFit);});}}   // 사파리는 loadingdone 을 안 보낼 때가 있다
+    scheduleFit();
+  }catch(e){}
+
   window.mcCalLoading=function(on){try{var g=document.getElementById('calGrid');if(!g)return;
     if(on){g.classList.remove('mc-loaded');g.classList.add('mc-loading');
       var p=document.getElementById('calPage');if(p&&!reduced()){p.classList.remove('mc-in');void p.offsetWidth;p.classList.add('mc-in');setTimeout(function(){p.classList.remove('mc-in');},900);}}

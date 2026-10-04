@@ -1018,6 +1018,9 @@ html.embed-cal .topnav{height:46px}
 /* 대시보드 숫자 상태색(원래 화면과 같은 뜻: 목표 미달·기한 지남 = 빨강, 수익 달성 = 초록) */
 .kpi .v.v-dn{color:#c0483c}
 .kpi .v.v-up{color:#2f6b3a}
+/* ── 보강 6 (261004) 달(주·일) 넘김: 넘기기 전 화면 복사본이 겹침 층에서 밀려 나간다(#calBody 밖이라 달력 안 찾기에 안 섞임) ── */
+#pg-cal{position:relative}
+.mc-turnlayer{position:absolute;overflow:hidden;pointer-events:none;z-index:2}
 </style>
 </head>
 <body>
@@ -2865,6 +2868,7 @@ function buildFilterBar(){
     <button class="flt-sync" onclick="syncAndExport(this)" title="지금 이 시점 일정으로 고객 페이지(협업·페이 캘린더)를 갱신합니다"><svg class="mi" aria-hidden="true"><use href="#i-upload"/></svg><span class="lbl">고객페이지 갱신</span></button>`;
 }
 function chM(n){
+  if(window.mcTurnStart)mcTurnStart(n);   // (261004) 넘기기 직전 화면을 붙잡아 둔다 — 새 화면과 함께 «넘어가는» 움직임용
   if(calView==='day'){curDate.setDate(curDate.getDate()+n);}
   else if(calView==='week'){curDate.setDate(curDate.getDate()+n*7);}
   else{
@@ -2878,6 +2882,7 @@ function chM(n){
 // 연 단위 이동 (260828) — 과거 일정을 볼 때 한 달씩 넘기지 않도록.
 // 월 말일에서 연을 옮기면 날짜가 다음 달로 밀릴 수 있어(2/29 등), 1일로 내렸다가 되돌린다.
 function chY(n){
+  if(window.mcTurnStart)mcTurnStart(n);   // (261004) 넘김 움직임용
   const d=curDate.getDate();
   curDate.setDate(1);
   curDate.setFullYear(curDate.getFullYear()+n);
@@ -4280,16 +4285,74 @@ function mergeIcal() {
     window.mcFitNames();   // 자동 입장(세션)으로 이 블록보다 먼저 그려진 달력
   }catch(e){}
 
-  /* ── 달 넘김: 넘긴 쪽으로 미끄러지며 ── */
-  var slideT=null;
+  /* ── 달(주·일) 넘김 (보강 6): 넘기기 전 화면은 밀려 나가고 새 화면이 반대쪽에서 들어온다 ──
+     chM·chY → mcTurnStart(n)[넘기기 전 화면 복사] → 새 화면 그리기 → mcSlide(n)[복사본은 #calBody 밖 겹침 층에서 밀려 나감]
+     · 달 보기는 요일 줄은 두고 날짜 칸(.mg)만 · 주·일 보기는 화면 통째로(머리줄에 날짜가 있다)
+     · 복사본은 #calBody 바깥(겹침 층)이라 달력 안 글자·칸 찾기에 섞이지 않는다. 누르기·id·data-* 도 뺀다
+     · 넘어가는 중에 또 넘기면 그 순간 위치에서 이어받는다 · 넘어가는 중 누른 칸은 창을 열지 않는다(보이던 칸과 다를 수 있어서)
+     · 넘길지 말지 정하는 기준(스와이프·휠)은 그대로 — 움직임만 */
+  var slideT=null, turnA=null, swallowA=0;
+  function easeOf(){ var v=''; try{ v=getComputedStyle(document.documentElement).getPropertyValue('--hz-ease').trim(); }catch(e){} return v||'cubic-bezier(.22,.8,.24,1)'; }
+  function curXA(el){ try{ var t=getComputedStyle(el).transform; if(!t||t==='none') return 0; var m=t.match(/matrix(3d)?\(([^)]+)\)/); if(!m) return 0; var a=m[2].split(',').map(parseFloat); return (m[1]?a[12]:a[4])||0; }catch(e){ return 0; } }
+  function partOf(b){ var v=b&&b.firstElementChild; if(v&&v.classList.contains('mg-wrap')&&v.querySelector('.mg')) v=v.querySelector('.mg'); return v; }
+  function killLayer(L){ if(L&&L.parentNode) L.parentNode.removeChild(L); }
+  function endTurnA(){   // 진행 중인 넘김을 바로 끝(다른 이유로 화면이 다시 그려졌을 때 등)
+    var t=turnA; turnA=null;
+    if(t){ try{ if(t.viewAnim) t.viewAnim.cancel(); }catch(e){} }
+    [].forEach.call(document.querySelectorAll('.mc-turnlayer'),killLayer);
+  }
+  window.mcTurnStart=function(n){
+    try{
+      var b=$('calBody'); if(!b||!n||reduced()){ endTurnA(); return; }
+      var pgc=$('pg-cal'); if(pgc) pgc.classList.remove('mc-enter');   // 들어올 때 떠오르기 중이면 끝내고 잰다(그 사이엔 위치 기준이 바뀌어 복사본이 어긋났다)
+      var v=partOf(b); if(!v||!v.animate||!v.getClientRects().length){ endTurnA(); return; }
+      var off=0, prev=turnA;
+      if(prev&&prev.view===v&&prev.viewAnim){ off=curXA(v); try{ prev.viewAnim.cancel(); }catch(e){} }   // 넘어가는 중에 또 넘김 → 그 순간 위치에서
+      turnA=null;                                                          // 지난 복사본 층은 하던 움직임을 끝까지 하고 스스로 사라진다
+      var vr=v.getBoundingClientRect(), br=b.getBoundingClientRect();      // 화면 좌표 차이로 잰다(위치 기준이 바뀌어도 맞게)
+      var gh=v.cloneNode(true), all=[v].concat([].slice.call(v.querySelectorAll('*'))), sc=[];
+      for(var i=0;i<all.length;i++){ if(all[i].scrollTop||all[i].scrollLeft) sc.push([i,all[i].scrollTop,all[i].scrollLeft]); }   // 주·일 시간표 스크롤 위치(바깥 틀 자신 포함)
+      gh.removeAttribute('id'); gh.setAttribute('aria-hidden','true');
+      [].forEach.call(gh.querySelectorAll('[id],[onclick],[data-ds],[data-id],[tabindex]'),function(x){ x.removeAttribute('id'); x.removeAttribute('onclick'); x.removeAttribute('data-ds'); x.removeAttribute('data-id'); x.removeAttribute('tabindex'); });
+      var tk=turnA={ghost:gh,sc:sc,x:vr.left-br.left,y:vr.top-br.top,w:v.offsetWidth,h:v.offsetHeight,off:off,top:v.scrollTop||0};
+      setTimeout(function(){ if(turnA===tk&&!tk.layer) turnA=null; },0);   // 새 화면 그리기가 중간에 멈췄으면 버린다
+    }catch(e){ turnA=null; }
+  };
   window.mcSlide=function(n){
     try{
-      var b=$('calBody'); if(!b||reduced()||!n) return;
+      var b=$('calBody'); if(!b||reduced()||!n){ endTurnA(); return; }
+      var t=turnA, v=partOf(b), pg=b.parentNode;
+      if(t&&!t.layer&&v&&v.animate&&pg){
+        var L=document.createElement('div'); L.className='mc-turnlayer'; L.setAttribute('aria-hidden','true');
+        L.style.left=b.offsetLeft+'px'; L.style.top=b.offsetTop+'px'; L.style.width=b.offsetWidth+'px'; L.style.height=b.offsetHeight+'px';
+        var g=t.ghost, s=g.style; s.position='absolute'; s.left=t.x+'px'; s.top=t.y+'px'; s.width=t.w+'px'; s.height=t.h+'px'; s.margin='0';
+        L.appendChild(g); pg.appendChild(L); t.layer=L; t.view=v;
+        if(t.sc.length){ var all=[g].concat([].slice.call(g.querySelectorAll('*'))); t.sc.forEach(function(q){ var el=all[q[0]]; if(el){ el.scrollTop=q[1]; el.scrollLeft=q[2]; } }); }
+        if(v.classList.contains('tg-wrap')&&t.top) v.scrollTop=t.top;   // 주·일 보기: 보던 시간대 그대로(넘기기 전과 같은 높이)
+        var W=Math.max(t.w,v.offsetWidth)+18, ez=easeOf(), dist=Math.abs(t.off+n*W), D=Math.round(Math.max(220,Math.min(380,170+210*dist/W)));
+        var a1=g.animate([{transform:'translateX('+t.off+'px)',opacity:1},{transform:'translateX('+(-n*W)+'px)',opacity:.3}],{duration:D,easing:ez,fill:'forwards'});
+        a1.onfinish=a1.oncancel=function(){ killLayer(L); };
+        var a2=v.animate([{transform:'translateX('+(t.off+n*W)+'px)'},{transform:'translateX(0px)'}],{duration:D,easing:ez});
+        t.viewAnim=a2;
+        a2.onfinish=function(){ if(turnA===t) turnA=null; };
+        var lb=$('calLabel'); if(lb&&lb.animate) lb.animate([{opacity:0,transform:'translateX('+(n*14)+'px)'},{opacity:1,transform:'none'}],{duration:300,easing:ez});
+        return;
+      }
+      if(t&&!t.layer) turnA=null;
+      // 복사본을 못 만든 경우(검색으로 달을 고른 경우·아주 옛 브라우저) — 예전처럼 살짝 미끄러짐
       b.classList.remove('mc-slide-l','mc-slide-r'); void b.offsetWidth;
       b.classList.add(n>0?'mc-slide-l':'mc-slide-r');
       clearTimeout(slideT); slideT=setTimeout(function(){ b.classList.remove('mc-slide-l','mc-slide-r'); },340);
-    }catch(e){}
+    }catch(e){ endTurnA(); }
   };
+  try{
+    // 넘김 중에 다른 이유(오늘·월/주/일·라벨·검색)로 화면이 다시 그려지면 지난 화면 복사본을 바로 치운다
+    var pgcT=$('pg-cal');
+    if(pgcT&&window.MutationObserver) new MutationObserver(function(){ if(turnA&&turnA.view&&!turnA.view.isConnected) endTurnA(); }).observe(pgcT,{childList:true,subtree:true});
+    // 넘어가는 중에 누른 칸은 창을 열지 않는다(움직이는 중이라 보이던 칸과 다른 칸이 눌릴 수 있다)
+    document.addEventListener('pointerdown',function(e){ if(document.querySelector('.mc-turnlayer')&&e.target&&e.target.closest&&e.target.closest('#calBody')) swallowA=Date.now(); },true);
+    document.addEventListener('click',function(e){ if(!swallowA) return; var fresh=Date.now()-swallowA<1000; swallowA=0; if(fresh&&e.target&&e.target.closest&&e.target.closest('#calBody')){ e.stopPropagation(); e.preventDefault(); } },true);
+  }catch(e){}
 
   /* ── 숫자 굴러감 (허브 lcTween 과 같은 0.34초 · ease-out) — 첫 글자 마디의 숫자만, 끝값은 원래 글자 그대로 ── */
   function rollKpis(root){
