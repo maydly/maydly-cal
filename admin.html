@@ -1341,6 +1341,19 @@ function isDelivTarget(e){
 }
 function basicDue(e){return addDue(e.date,BASIC_DUE);}
 function buyDue(e){return BUY_DUE[e.status]?addDue(e.date,BUY_DUE[e.status]):null;}
+// ── 고객 10장 셀렉 기다림 (261027 명진) ──
+// 원본 등을 구매한 고객은 받은 사진에서 10장을 골라 보내 주고, 우리는 그 10장으로 세밀 보정본(기본 보정본)을 보낸다.
+// 고른 목록이 오기 전에는 보낼 수 없으므로 '기한 지남'으로 재촉하지 않고 알림 탭 아래에 따로 모은다.
+// 셀렉 받은 뒤 보정 기한은 아직 정하지 않았다(명진 261027 「그게 정해지지 않았어」) → 받은 날부터 며칠째인지만 보여 준다.
+// 기한이 정해지면 PICK_DUE 에만 넣으면 된다(예: 2주 = {w:2}) — 그때부터 셀렉 받은 날 기준 기한으로 재촉한다.
+const PICK_DUE=null;
+function pickOn(e){return !!(e&&e.pickWait);}
+function pickDays(ds){return Math.max(0,dDiff(ds,TSTR))+1;}   // 시작한 날 = 1일째
+function basicDueOf(e){return pickOn(e)?(e.pickGot&&PICK_DUE?addDue(e.pickGot,PICK_DUE):null):basicDue(e);}   // null = 기한 없음(셀렉 기다림·기한 미정)
+function pickList(){   // 셀렉 기다리는 중 · 셀렉 받고 보정 중(기한 미정) — 재촉하지 않는 확인용
+  return maydlyEvents.filter(e=>!isExt(e)&&stActive(e.status)&&pickOn(e)&&!e.dlvBasic&&!basicDueOf(e))
+    .sort((a,b)=>String(a.pickGot||a.pickWait).localeCompare(String(b.pickGot||b.pickWait)));
+}
 
 // 지금 챙겨야 할 일 — 의상확인(촬영 D-2) / 기본 보정본 전달 / 구매분 전달
 function buildAlerts(){
@@ -1361,8 +1374,8 @@ function buildAlerts(){
     if(!isDelivTarget(e)||e.date>today)return;  // 촬영 전이면 전달 기한 없음
     // 전달 대기 건은 촬영 직후부터 기한까지 계속 목록에 남긴다(누락 방지). urgent = 기한 임박·지남.
     if(!e.dlvBasic){
-      const due=basicDue(e),left=dDiff(today,due);
-      out.push({kind:'basic',e,due,left,urgent:left<=ALERT_LEAD});
+      const due=basicDueOf(e);   // 고객 10장 셀렉 기다림이면 기한 없음 → 아래 pickList 로 따로
+      if(due){const left=dDiff(today,due);out.push({kind:'basic',e,due,left,urgent:left<=ALERT_LEAD});}
     }
     const bd=buyDue(e);
     if(bd&&!e.dlvBuy){
@@ -3112,7 +3125,7 @@ function openD(id){
   // 전달 체크 — 촬영이 끝난 대상 일정
   if(isDelivTarget(e)&&e.date<=TSTR){
     b+=`<div style="border-top:1px solid var(--bd);margin-top:12px;padding-top:10px"><div style="font-size:10px;color:var(--mu);margin-bottom:2px">전달 체크</div>`;
-    b+=dlvRow(e,'basic',DLV_TITLE.basic,basicDue(e));
+    b+=dlvRow(e,'basic',DLV_TITLE.basic,basicDueOf(e));
     const bd=buyDue(e);
     if(bd)b+=dlvRow(e,'buy',DLV_TITLE[e.status]||'구매분',bd);
     b+=`</div>`;
@@ -3159,13 +3172,38 @@ function openD(id){
 // 전달 체크 한 줄 (기본 보정본 / 구매분)
 function dlvRow(e,key,title,due){
   const done=key==='basic'?e.dlvBasic:e.dlvBuy;
+  const pk=key==='basic'&&pickOn(e);
+  const sBtn='padding:4px 9px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--mu);font-size:10px;cursor:pointer;white-space:nowrap';
+  const pBtn='padding:4px 10px;border:none;border-radius:7px;background:var(--R);color:#fff;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap';
+  // 고객 10장 셀렉 기다림 (261027)
+  if(!done&&pk&&!e.pickGot)return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
+    <span style="font-size:11px;color:var(--tx);flex:1">📮 ${title} <span style="color:var(--mu)">— 고객 10장 셀렉 기다리는 중 (${e.pickWait}부터 · ${pickDays(e.pickWait)}일째)</span></span>
+    <button onclick="setPick(${e.id},'got',1)" style="${pBtn}">셀렉 받음 ✓</button>
+    <button onclick="setPick(${e.id},'off',1)" style="${sBtn}">해제</button></div>`;
+  if(!done&&pk&&!due)return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
+    <span style="font-size:11px;color:var(--tx);flex:1">📮 ${title} <span style="color:var(--mu)">— 고객이 고른 10장 ${e.pickGot} 받음 · 받은 지 ${pickDays(e.pickGot)}일째 · 보정 기한 미정</span></span>
+    <button onclick="markDeliv(${e.id},'basic',1)" style="${pBtn}">보냈음 ✓</button>
+    <button onclick="setPick(${e.id},'ungot',1)" style="${sBtn}">받음 취소</button></div>`;
   if(done)return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
-    <span style="font-size:11px;color:var(--tx);flex:1">✅ ${title} <span style="color:var(--mu)">— ${done} 보냄</span></span>
+    <span style="font-size:11px;color:var(--tx);flex:1">✅ ${title} <span style="color:var(--mu)">— ${done} 보냄${pk&&e.pickGot?' · 고객이 고른 10장 '+e.pickGot+' 받음':''}</span></span>
     <button onclick="undoDeliv(${e.id},'${key}',1)" style="padding:4px 9px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--mu);font-size:10px;cursor:pointer">되돌리기</button></div>`;
   const left=dDiff(TSTR,due),over=left<0;
   return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
-    <span style="font-size:11px;color:var(--tx);flex:1">${title} <span style="color:${over?'#c0392b':'var(--mu)'}">— ${due}까지 (${dueText(left)})</span></span>
-    <button onclick="markDeliv(${e.id},'${key}',1)" style="padding:4px 10px;border:none;border-radius:7px;background:var(--R);color:#fff;font-size:10px;font-weight:700;cursor:pointer">보냈음 ✓</button></div>`;
+    <span style="font-size:11px;color:var(--tx);flex:1">${title} <span style="color:${over?'#c0392b':'var(--mu)'}">— ${due}까지 (${dueText(left)})${pk?' · 고객이 고른 10장 '+e.pickGot+' 받음':''}</span></span>
+    <button onclick="markDeliv(${e.id},'${key}',1)" style="padding:4px 10px;border:none;border-radius:7px;background:var(--R);color:#fff;font-size:10px;font-weight:700;cursor:pointer">보냈음 ✓</button></div>`
+    +(key==='basic'&&!pk?`<div style="margin:-3px 0 4px"><button onclick="setPick(${e.id},'wait',1)" style="padding:3px 0;border:none;background:none;color:var(--mu);font-size:10px;cursor:pointer;text-decoration:underline;text-underline-offset:2px">📮 고객이 10장 골라 보내 줘야 하는 경우 — 셀렉 기다림으로 표시</button></div>`:'');
+}
+// 고객 10장 셀렉: wait 기다림 시작 · got 셀렉 받음(오늘) · ungot 받음 취소 · off 기다림 해제
+function setPick(id,step,reopen){
+  const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
+  if(step==='wait'){e.pickWait=TSTR;e.pickGot=null;}
+  else if(step==='got'){if(!e.pickWait)e.pickWait=TSTR;e.pickGot=TSTR;}
+  else if(step==='ungot'){e.pickGot=null;}
+  else{e.pickWait=null;e.pickGot=null;}
+  saveEvents();buildNav();
+  if(curPage==='alert')renderAlerts();
+  if(reopen)openD(id);
+  toast(step==='wait'?'고객 10장 셀렉 기다림으로 표시했습니다':step==='got'?'셀렉 받은 날(오늘)을 기록했습니다':step==='ungot'?'셀렉 받음을 취소했습니다':'셀렉 기다림을 해제했습니다');
 }
 
 // ── getMaydlySlots (관리자용 — busyEvs 포함) ──
@@ -3580,7 +3618,7 @@ function delEv(id){
 
 // ── 알림 페이지 (260714 v5.0) ──
 function renderAlerts(){
-  const list=buildAlerts();
+  const list=buildAlerts(),picks=pickList();
   const urgent=list.filter(a=>a.urgent),wait=list.filter(a=>!a.urgent);
   const late=urgent.filter(a=>a.left<0).length;
   const card=a=>{
@@ -3631,10 +3669,31 @@ function renderAlerts(){
         ?`<div class="sect-label" style="margin-top:16px">📦 전달 대기 — 기한 전 (${wait.length})</div>${wait.map(card).join('')}`
         :''
       }
+      ${picks.length
+        ?`<div class="sect-label" style="margin-top:16px">📮 고객 10장 셀렉 — 기다리는 중·보정 중 (${picks.length})</div>${picks.map(e=>{
+          const L=LABELS[e.label]||{name:'기타',color:'#9a9a9a'};
+          const body=e.pickGot?`촬영 ${e.date} · 고객이 고른 10장 ${e.pickGot} 받음 — 받은 지 ${pickDays(e.pickGot)}일째 · 보정 기한 미정`
+            :`촬영 ${e.date} · ${esc(stName(e.status))} · 고객 셀렉 기다리는 중 — ${e.pickWait}부터 ${pickDays(e.pickWait)}일째`;
+          const act=e.pickGot?`<button class="btn-ok" onclick="markDeliv(${e.id},'basic')">10장 보정본 보냈음 ✓</button>`
+            :`<button class="btn-ok" onclick="setPick(${e.id},'got')">셀렉 받음 ✓</button>`;
+          return`<div class="rcard">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="background:${L.color};color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">${L.name}</span>
+              <span style="font-size:10px;font-weight:800;color:var(--mu2)">📮 고객 10장 셀렉</span>
+            </div>
+            <div class="rn">${esc(e.client||'(이름 없음)')}</div>
+            <div class="rm">${body}</div>
+            <div class="act-row" style="margin-top:10px">${act}
+              <button class="btn-ng" style="background:var(--bd);color:var(--mu);border:none" onclick="openD(${e.id})">일정 보기</button>
+            </div>
+          </div>`;}).join('')}`
+        :''
+      }
       <div style="font-size:10px;color:var(--mu);text-align:center;margin-top:16px;line-height:1.6">
         전달할 건은 촬영 직후부터 '전달 대기'에 계속 떠 있고, 기한 ${ALERT_LEAD}일 전부터 '지금 챙겨야 할 일'로 올라옵니다.<br>
         기본 보정본 1달 · 2번 색보정 2주 · 전체 원본 2주 · 전체 색보정 1달 · 🚨 긴급은 직접 기록한 날짜 기준<br>
-        '보냈음 ✓'을 눌러야 목록에서 사라집니다 · ${DELIV_SINCE} 이전 촬영은 전달 완료로 봅니다.
+        '보냈음 ✓'을 눌러야 목록에서 사라집니다 · ${DELIV_SINCE} 이전 촬영은 전달 완료로 봅니다.<br>
+        📮 고객이 10장을 골라 보내 줘야 하는 건은 재촉하지 않고 맨 아래에 따로 모읍니다(일정 상세 → 전달 체크에서 표시).
       </div>
     </div>`;
 }
@@ -3861,7 +3920,7 @@ function doJsonImport(){
       if(!e.date||!e.label)return;
       const _id=nextId++;
       // 전달 체크(dlvBasic/dlvBuy)가 들어 있으면 살려서 가져온다
-      maydlyEvents.push({id:_id,label:e.label||'studio_f',date:e.date,time:e.time||'10:00',dur:parseFloat(e.dur)||2,status:e.status||'booked',client:e.client||null,insta:e.insta||e.phone||null,note:e.note||'',priv:e.priv||['rest','personal'].includes(e.label),allDay:!!e.allDay,dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null,...(e.createdAt?{createdAt:e.createdAt}:{})});
+      maydlyEvents.push({id:_id,label:e.label||'studio_f',date:e.date,time:e.time||'10:00',dur:parseFloat(e.dur)||2,status:e.status||'booked',client:e.client||null,insta:e.insta||e.phone||null,note:e.note||'',priv:e.priv||['rest','personal'].includes(e.label),allDay:!!e.allDay,dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null,...(e.pickWait?{pickWait:e.pickWait,pickGot:e.pickGot||null}:{}),...(e.createdAt?{createdAt:e.createdAt}:{})});
       _addedIds.push(_id);
       added++;
     });
