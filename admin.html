@@ -1106,13 +1106,23 @@ html.embed-cal .topnav{height:46px}
 .qz-back{background:var(--bd)!important;color:var(--mu)!important;border:none!important}
 </style>
 <style id="sian-panel-css">
-/* ── 시안 열람 승인 칸 (261101) ── */
+/* ── 시안 열람 승인 칸 (261101, 고침 261102: 좁은 화면 머리줄 · 곧 닫힘 · 오류 다시 불러오기 · 항상 보기 기기 목록) ── */
 .tn-sian{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--hz-line,#e3e9e0);background:#fff;color:var(--hz-sub,#5d6b5f);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 .tn-sian svg.mi{width:16px;height:16px;color:var(--hz-g,#4f9a6a)}
 .tn-sian:hover{border-color:#cfdccb;box-shadow:0 4px 14px -8px rgba(61,122,82,.35)}
 .tn-sian-n{display:none;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#d9534f;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
 .tn-sian-n.on{display:inline-block}
-@media (max-width:760px){.tn-sian .lbl{display:none}.tn-sian{padding:0 10px}}
+/* 좁은 화면(≤1365px): 머리줄 단추는 «다시 보기 요청»이 있을 때만(아이콘 + 숫자). 늘 여는 길은 «예약 현황» 화면의 «시안 열람» 줄 */
+@media (max-width:1365px){.tn-sian:not(.has-req){display:none!important}.tn-sian{position:relative;width:36px;padding:0;justify-content:center}.tn-sian .lbl{display:none}.tn-sian .tn-sian-n{position:absolute;top:-6px;right:-7px;min-width:17px;height:17px;padding:0 4px;font-size:10.5px;line-height:17px}}
+@media (max-width:760px){.tn-sian{width:26px;height:38px;margin-left:-4px;border-color:transparent;background:transparent;box-shadow:none}.tn-sian svg.mi{width:20px;height:20px}.tn-sian .tn-sian-n{top:1px;right:-5px;min-width:16px;height:16px;font-size:10px;line-height:16px}html.sian-req .autosave-ind{font-size:10px!important;padding:5px 5px!important}}
+@media (max-width:430px){html.sian-req .autosave-ind{font-size:9.6px!important;letter-spacing:-.35px!important}}
+@media (max-width:385px){html.sian-req .tn-right{min-width:0}html.sian-req .autosave-ind{min-width:0;flex-shrink:1}}
+.sian-entry{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 6px;padding:12px 14px;border:1px solid var(--hz-line,#e3e9e0);border-radius:12px;background:#fff}
+.sian-entry .se-t{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:12.5px;line-height:1.5;color:var(--hz-sub,#5d6b5f)}
+.sian-entry .se-t b{font-size:14px;color:var(--hz-ink,#1c2620)}
+.sian-entry em{font-style:normal;font-weight:700}
+.sian-entry.has-req em{color:#d9534f}
+.sian-entry .se-b{flex-shrink:0;border:1px solid var(--hz-line,#e3e9e0);background:#fff;border-radius:9px;padding:0 14px;min-height:36px;font-size:13px;font-weight:700;color:var(--hz-ink,#1c2620);cursor:pointer;font-family:inherit}
 .sianp{font-size:13.5px;color:var(--hz-ink,#1c2620);text-align:left}
 .sianp .sp-note{margin:0 0 12px;color:var(--hz-sub,#5d6b5f);font-size:12.5px;line-height:1.6}
 .sianp .sp-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
@@ -1140,7 +1150,14 @@ html.embed-cal .topnav{height:46px}
 .sianp .t-inq{background:#eaf2fb;color:#2f5f8f}
 .sianp .sp-empty{padding:18px 8px;text-align:center;color:var(--hz-mute,#687568);line-height:1.7}
 .sianp .sp-foot{margin-top:12px;color:var(--hz-mute,#687568);font-size:12px}
-.sianp .sp-err{margin:0 0 10px;padding:9px 11px;border-radius:9px;background:#fdeceb;color:#9b2c2c;font-size:12.5px;line-height:1.6}
+.sianp .sp-err{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:0 0 10px;padding:9px 11px;border-radius:9px;background:#fdeceb;color:#9b2c2c;font-size:12.5px;line-height:1.6}
+.sianp .sp-reload{border:1px solid #e8c4c4;background:#fff;border-radius:8px;padding:0 10px;min-height:30px;font-size:12px;font-weight:700;color:#9b2c2c;cursor:pointer;font-family:inherit}
+.sianp .t-soon{background:#fff1e0;color:#9a5a12}
+.sianp .sp-ownt{background:none;border:0;padding:0;min-height:28px;color:var(--hz-mute,#687568);font-size:12px;cursor:pointer;text-decoration:underline;font-family:inherit}
+.sianp .sp-owns{display:flex;flex-direction:column;gap:2px;margin-top:4px}
+.sianp .sp-own{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--hz-sub,#5d6b5f)}
+.sianp .sp-own b{margin-left:auto;font-weight:700;color:var(--hz-g,#4f9a6a)}
+.sianp .sp-own .sp-del{margin-left:auto}
 </style>
 </head>
 <body>
@@ -5334,7 +5351,7 @@ function mergeIcal() {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, orderBy, limit, where, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, getDocsFromServer, query, orderBy, limit, where, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const cfg={ apiKey:"AIzaSyBfyRE7CNENjgSfe25xHAdr87gOllpYtvM", authDomain:"subin-routine.firebaseapp.com", projectId:"subin-routine" };
 // ?embed=1(홈 대시보드 앱 창)일 때만 기본 이름표로 — 홈과 같은 로그인을 함께 쓴다(홈에서 한 번 로그인하면 창도 로그인 상태).
 // 평소(파라미터 없음)에는 지금처럼 "mjcal" — 이미 해 둔 로그인이 그대로 유지된다. (운영-018, 260928)
@@ -5349,16 +5366,24 @@ window.MJCAL={
   async put(path,obj){ const [c,i]=path.split('/'); await setDoc(doc(db,c,i),{ blob:JSON.stringify(obj), savedAt:new Date().toISOString() }); }
 };
 onAuthStateChanged(auth,(u)=>{ window.MJCAL.user=u; window.MJCAL.ready=true; if(typeof window.onMjAuth==='function') window.onMjAuth(u); });
-// 시안 열람 승인 (261101) — sian_access(기기 열쇠별 열림·닫힘, 시안이 자기 것만 읽음) · sian_requests(문의함·다시 보기 요청). 쓰기·목록은 명진만(Firestore 규칙)
+// 시안 열람 승인 (261101, 고침 261102) — sian_access(기기 열쇠별 열림·닫힘, 시안이 자기 것만 읽음) · sian_requests(문의함·다시 보기 요청). 쓰기·목록은 명진만(Firestore 규칙)
+// 목록은 서버에서만 읽는다(오프라인이면 빈 목록 대신 오류). 결정할 때 이름·인스타도 sian_access 에 함께 남긴다(요청 기록을 지워도 남게).
 const _sianMs=(t)=>t&&typeof t.toMillis==='function'?t.toMillis():(+t||0);
-window.MJCAL.sianList=async()=>{ const rq=await getDocs(query(collection(db,'sian_requests'),orderBy('at','desc'),limit(500))); const ac=await getDocs(collection(db,'sian_access'));
+const _sianWait=(p,ms)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(Object.assign(new Error('timeout'),{code:'timeout'})),ms))]);
+const _sianDev=()=>{ const u=navigator.userAgent||''; const os=/iPhone/.test(u)?'아이폰':/iPad/.test(u)?'아이패드':/Android/.test(u)?'안드로이드':/Macintosh|Mac OS/.test(u)?'맥':/Windows/.test(u)?'윈도우':'기기'; const b=/KAKAOTALK/i.test(u)?'카톡':/Instagram/i.test(u)?'인스타':/Edg\//.test(u)?'엣지':/CriOS|Chrome\//.test(u)?'크롬':/Safari\//.test(u)?'사파리':'브라우저'; return os+' '+b; };
+window.MJCAL.sianList=async()=>{ const rq=await _sianWait(getDocsFromServer(query(collection(db,'sian_requests'),orderBy('at','desc'),limit(500))),15000); const ac=await _sianWait(getDocsFromServer(collection(db,'sian_access')),15000);
   const requests=[]; rq.forEach((s)=>{ const d=s.data(); requests.push({ id:s.id, key:d.key||'', kind:d.kind||'', name:d.name||'', insta:d.insta||'', first:+d.first||0, at:_sianMs(d.at), page:d.page||'sian' }); });
-  const access={}; ac.forEach((s)=>{ const d=s.data(); access[s.id]={ status:d.status||'', at:_sianMs(d.at) }; }); return { requests, access }; };
-window.MJCAL.sianSet=(key,status)=>setDoc(doc(db,'sian_access',key),{ status, at:serverTimestamp() });
-window.MJCAL.sianDeleteRequests=async(key)=>{ const qs=await getDocs(query(collection(db,'sian_requests'),where('key','==',key))); const ps=[]; qs.forEach((s)=>ps.push(deleteDoc(s.ref))); await Promise.all(ps); return ps.length; };
-window.MJCAL.sianEnsureOwner=async()=>{ let k=''; try{ k=localStorage.getItem('maydly_sian_key')||''; }catch(e){}
+  const access={}; ac.forEach((s)=>{ const d=s.data(); access[s.id]={ status:d.status||'', at:_sianMs(d.at), name:d.name||'', insta:d.insta||'', dev:d.dev||'' }; }); return { requests, access }; };
+window.MJCAL.sianSet=(key,status,info)=>{ const v={ status, at:serverTimestamp() }; if(info&&info.name) v.name=String(info.name).slice(0,40); if(info&&info.insta) v.insta=String(info.insta).slice(0,40); return setDoc(doc(db,'sian_access',key),v,{merge:true}); };
+window.MJCAL.sianDeleteAccess=(key)=>deleteDoc(doc(db,'sian_access',key));
+window.MJCAL.sianSetInfo=(key,info)=>{ const v={}; if(info&&info.name) v.name=String(info.name).slice(0,40); if(info&&info.insta) v.insta=String(info.insta).slice(0,40); return Object.keys(v).length?setDoc(doc(db,'sian_access',key),v,{merge:true}):Promise.resolve(); };
+window.MJCAL.sianDeleteRequests=async(key)=>{ const qs=await _sianWait(getDocsFromServer(query(collection(db,'sian_requests'),where('key','==',key))),15000); const ps=[]; qs.forEach((s)=>ps.push(deleteDoc(s.ref))); await Promise.all(ps); return ps.length; };
+// who: 'm' 명진 · 's' 수빈(규칙상 수빈은 자기 owner 문서만 — 이미 승인된 기기는 그대로 둔다)
+window.MJCAL.sianEnsureOwner=async(who)=>{ let k=''; try{ k=localStorage.getItem('maydly_sian_key')||''; }catch(e){}
   if(!/^[a-z0-9]{32}$/.test(k)){ const a=new Uint8Array(32), c='abcdefghijklmnopqrstuvwxyz0123456789'; crypto.getRandomValues(a); k=''; for(let i=0;i<32;i++) k+=c.charAt(a[i]%36); try{ localStorage.setItem('maydly_sian_key',k); }catch(e){} }
-  const s=await getDoc(doc(db,'sian_access',k)); if(!(s.exists()&&s.data().status==='owner')) await setDoc(doc(db,'sian_access',k),{ status:'owner', at:serverTimestamp() });
+  const s=await getDoc(doc(db,'sian_access',k)); const d=s.exists()?s.data():null; const w=who==='s'?'s':'m';
+  if(d&&((d.status==='owner'&&d.dev&&d.who)||(w==='s'&&d.status==='approved'))){ try{ localStorage.setItem('maydly_sian_status',d.status); }catch(e){} return k; }
+  await setDoc(doc(db,'sian_access',k),{ status:'owner', at:serverTimestamp(), dev:_sianDev(), who:w });
   try{ localStorage.setItem('maydly_sian_status','owner'); }catch(e){} return k; };
 </script>
 <!-- ═════════════════════════════════════════════════════════════════════
@@ -5601,14 +5626,30 @@ async function bridge(own){
 })();
 </script>
 <script id="sian-panel">
-/* ── 시안 열람 승인 칸 (261101) ──
-   시안(maydly.github.io)은 처음 연 날부터 1개월은 누구나 보고, 그 뒤엔 여기서 «승인»한 기기만 본다.
-   자료: window.MJCAL.sianList() → {requests:[{key,kind,name,insta,first,at}], access:{열쇠:{status,at}}}
-         window.MJCAL.sianSet(열쇠, 'approved'|'closed'|'black') · sianDeleteRequests(열쇠) · sianEnsureOwner()
-   명진(bucket0825) 로그인일 때만 머리줄 «시안 열람» 단추가 보이고, 그 기기는 자동으로 «항상 보기»(owner)가 된다. */
+/* ── 시안 열람 승인 칸 (261101, 고침 261102) ──
+   시안(maydly.github.io)·협업 캘린더는 처음 연 날부터 1개월은 누구나 보고, 그 뒤엔 여기서 «승인»한 기기만 본다.
+   자료: window.MJCAL.sianList() → {requests:[{key,kind,name,insta,first,at,page}], access:{열쇠:{status,at,name,insta,dev}}}
+         window.MJCAL.sianSet(열쇠, 'approved'|'closed'|'black'|'none', {name,insta}) · sianDeleteRequests(열쇠) · sianDeleteAccess(열쇠) · sianEnsureOwner()
+   명진(bucket0825) 로그인일 때만 머리줄 «시안 열람» 단추가 보이고, 그 기기는 자동으로 «항상 보기»(owner)가 된다.
+   261102 검토 고침:
+     · 서버에서만 읽고(오프라인 캐시 X), 못 읽으면 «요청 없음» 대신 «연결이 안 돼서…» + 다시 불러오기. 저장은 성공 응답을 받은 뒤에만 화면을 바꾸고, 10초 넘으면 «아직 저장 안 됐어요»(늦게라도 저장되면 그때 반영).
+     · 공용 창(#pb) 안에 칸 전용 상자를 만들어 그 상자가 붙어 있을 때만 그린다 — 늦게 온 목록이 «일정 추가» 같은 다른 창을 덮지 않게.
+     · «요청» 배지·거름은 마지막 결정(승인·닫기·블랙·풀기)보다 나중에 온 «다시 보기 요청»만 센다.
+     · 승인·닫기·블랙·풀기 때 이름·인스타를 sian_access 에도 남겨, 요청 기록을 지워도 이름과 «블랙과 같은 인스타» 경고가 남게.
+     · «풀기»는 닫힘이 아니라 처음 상태(none: 1개월까지 보임)로. «항상 보기» 기기 목록·빼기. 7일 안에 닫힐 분은 «M/D 닫힘».
+     · 배지는 5분 넘게 떠나 있다가 돌아올 때와 30분마다 다시 센다(허브 안 창·embed 에서는 처음 한 번만). «항상 보기» 등록이 실패하면 1분 뒤 다시.
+   261102 재검토 고침:
+     · 좁은 화면(≤1365px)에서는 머리줄 단추를 «다시 보기 요청»이 있을 때만 보이고, «예약 현황» 화면 위쪽에 «시안 열람» 줄을 늘 둔다(폰 머리줄 자리 보호).
+     · 예전 판에서 정한 승인·닫기·블랙 문서에 이름·인스타가 없으면 불러올 때 채워 둔다(지우기 전에도 한 번 더).
+     · 손님 쪽 «요청했어요»는 블랙이 아닌 결정(승인·닫기·풀기)이 요청보다 나중이면 지워지고, 결정이 없어도 3일이 지나면 지워진다(문지기 v5).
+   261102 명진 결정: 수빈(ara030820) 로그인도 그 기기를 자동 «항상 보기»(who 's' — 규칙상 수빈은 자기 owner 문서만 만들 수 있음, 단추·목록은 명진만) ·
+     캘린더 «처음 연 날»은 캘린더를 처음 연 날부터 따로(카드에는 시안·캘린더 처음 연 날을 따로 보여 줌). */
 (function () {
-  var ME = 'bucket0825@gmail.com';
-  var SP = { data: null, filter: 'all', box: null, owned: false, err: '' };
+  var ME = 'bucket0825@gmail.com', SUBIN = 'ara030820@gmail.com';
+  var SAVE_MS = window.__SIAN_SAVE_MS || 10000;
+  var SP = { data: null, filter: 'all', box: null, me: false, owned: false, ownRetry: 0, err: '', loading: false, lastLoad: 0, showOwners: false, pending: 0 };
+  var EMBED = (function () { try { return window.top !== window.self || /[?&]embed=1(&|$)/.test(location.search); } catch (e) { return true; } })();
+  var EVERY = window.__SIAN_EVERY || 1800000, AWAY = window.__SIAN_AWAY || 300000;   /* 시험에서만 바꿈 */
   function E(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function md(t) { if (!t) return '-'; var d = new Date(t); return (d.getMonth() + 1) + '/' + d.getDate(); }
   function endOf(t) {
@@ -5616,34 +5657,46 @@ async function bridge(own){
     return new Date(y, m, Math.min(f.getDate(), last), f.getHours(), f.getMinutes(), f.getSeconds()).getTime();
   }
   function normI(h) { return String(h || '').trim().replace(/^@+/, '').toLowerCase(); }
+  function myKey() { try { return localStorage.getItem('maydly_sian_key') || ''; } catch (e) { return ''; } }
+  function attached(el) { return !!el && document.documentElement.contains(el); }
+  function blank(k) { return { key: k, name: '', insta: '', first: 0, firstS: 0, firstC: 0, last: 0, lastReq: 0, n: 0, inq: false, req: false, cal: false }; }
   function group(d) {
-    var by = {}, acc = (d && d.access) || {}, owners = 0;
+    var by = {}, acc = (d && d.access) || {}, owners = [];
     ((d && d.requests) || []).forEach(function (r) {
       if (!r || !r.key) return;
-      var g = by[r.key] || (by[r.key] = { key: r.key, name: '', insta: '', first: 0, last: 0, n: 0, inq: false, req: false, cal: false });
+      var g = by[r.key] || (by[r.key] = blank(r.key));
       g.n++;
       var ri = normI(r.insta);
       if ((r.at || 0) >= g.last) { g.last = r.at || 0; if (r.name) g.name = r.name; if (ri) g.insta = ri; }
       if (!g.name && r.name) g.name = r.name;
       if (!g.insta && ri) g.insta = ri;
-      if (r.first && (!g.first || r.first < g.first)) g.first = r.first;
+      var pf = r.page === 'cal' ? 'firstC' : 'firstS';
+      if (r.first && (!g[pf] || r.first < g[pf])) g[pf] = r.first;
       if (r.kind === 'inquired') g.inq = true;
-      if (r.kind === 'requested') g.req = true;
+      if (r.kind === 'requested') { g.req = true; if ((r.at || 0) > g.lastReq) g.lastReq = r.at || 0; }
       if (r.page === 'cal') g.cal = true;
     });
     Object.keys(acc).forEach(function (k) {
-      if (acc[k] && acc[k].status === 'owner') { owners++; return; }
-      if (!by[k]) by[k] = { key: k, name: '', insta: '', first: 0, last: (acc[k] && acc[k].at) || 0, n: 0, inq: false, req: false };
+      var a = acc[k] || {};
+      if (a.status === 'owner') { owners.push({ key: k, at: a.at || 0, dev: a.dev || '', who: a.who || '' }); return; }
+      var g = by[k] || (by[k] = blank(k));
+      if (!g.name && a.name) g.name = a.name;
+      if (!g.insta && a.insta) g.insta = normI(a.insta);
     });
-    var list = Object.keys(by).map(function (k) { var g = by[k]; g.status = (acc[k] && acc[k].status) || ''; return g; })
-      .filter(function (g) { return g.status !== 'owner'; });
+    var list = Object.keys(by).map(function (k) {
+      var g = by[k], a = acc[k] || {};
+      g.status = a.status === 'none' ? '' : (a.status || ''); g.at = a.at || 0; g.sort = Math.max(g.last || 0, g.at || 0);
+      g.first = g.firstS || g.firstC || 0;
+      return g;
+    }).filter(function (g) { return g.status !== 'owner'; });
     var blackI = {};
     list.forEach(function (g) { if (g.status === 'black' && g.insta) blackI[normI(g.insta)] = 1; });
     list.forEach(function (g) { g.blackMatch = g.status !== 'black' && !!g.insta && !!blackI[normI(g.insta)]; });
-    list.sort(function (a, b) { return (b.last || 0) - (a.last || 0); });
+    list.sort(function (a, b) { return b.sort - a.sort; });
+    owners.sort(function (a, b) { return b.at - a.at; });
     return { list: list, owners: owners };
   }
-  function isReq(g) { return g.req && g.status !== 'approved' && g.status !== 'black'; }
+  function isReq(g) { return g.req && g.lastReq > (g.at || 0) && g.status !== 'approved' && g.status !== 'black'; }
   function match(g, f) {
     if (f === 'req') return isReq(g);
     if (f === 'inq') return g.inq;
@@ -5651,16 +5704,21 @@ async function bridge(own){
     if (f === 'black') return g.status === 'black';
     return true;
   }
+  function tag(c, t) { return '<span class="sp-tag ' + c + '">' + t + '</span>'; }
   function stTag(g) {
-    if (g.status === 'approved') return '<span class="sp-tag t-open">승인됨</span>';
-    if (g.status === 'black') return '<span class="sp-tag t-black">블랙</span>';
-    if (g.status === 'closed') return '<span class="sp-tag t-shut">닫힘</span>';
-    if (g.first && Date.now() < endOf(g.first)) return '<span class="sp-tag t-none">1개월 안 · ' + md(endOf(g.first)) + '까지</span>';
-    return '<span class="sp-tag t-shut">승인 없음 · 닫힘</span>';
+    if (g.status === 'approved') return tag('t-open', '승인됨');
+    if (g.status === 'black') return tag('t-black', '블랙');
+    if (g.status === 'closed') return tag('t-shut', '닫힘');
+    if (!g.first) return tag('t-none', '처음 상태');
+    var e = endOf(g.first), now = Date.now();
+    if (now < e) return e - now < 7 * 864e5 ? tag('t-soon', md(e) + ' 닫힘') : tag('t-none', '1개월 안 · ' + md(e) + '까지');
+    return tag('t-shut', '승인 없음 · 닫힘');
   }
+  function btn(a, t, c, k) { return '<button type="button" class="sp-b' + (c ? ' ' + c : '') + '" data-a="' + a + '" data-k="' + k + '">' + t + '</button>'; }
   function render() {
-    var box = SP.box; if (!box) return;
-    if (!SP.data) { box.innerHTML = '<div class="sianp"><div class="sp-empty">불러오는 중이에요</div></div>'; return; }
+    var box = SP.box; if (!attached(box)) return;
+    var errBox = SP.err ? '<div class="sp-err"><span>' + E(SP.err) + '</span><button type="button" class="sp-reload" data-reload>다시 불러오기</button></div>' : '';
+    if (!SP.data) { box.innerHTML = '<div class="sianp">' + (errBox || '<div class="sp-empty">불러오는 중이에요</div>') + '</div>'; return; }
     var G = group(SP.data), L = G.list, f = SP.filter;
     var cnt = { all: L.length, req: L.filter(isReq).length, inq: L.filter(function (g) { return g.inq; }).length,
       open: L.filter(function (g) { return g.status === 'approved'; }).length, black: L.filter(function (g) { return g.status === 'black'; }).length };
@@ -5668,88 +5726,189 @@ async function bridge(own){
       return '<button type="button" class="sp-chip' + (f === x[0] ? ' on' : '') + '" data-f="' + x[0] + '">' + x[1] + ' ' + cnt[x[0]] + '</button>';
     }).join('');
     var rows = L.filter(function (g) { return match(g, f); }).map(function (g) {
-      var k = E(g.key), kinds = (g.req ? '<span class="sp-tag t-req">다시 보기 요청</span> ' : '') + (g.inq ? '<span class="sp-tag t-inq">문의함</span> ' : '') + (g.cal ? '<span class="sp-tag t-none">협업 캘린더에서</span>' : '');
+      var k = E(g.key);
+      var kinds = (isReq(g) ? tag('t-req', '다시 보기 요청') + ' ' : (g.req ? tag('t-none', '요청 처리됨') + ' ' : '')) + (g.inq ? tag('t-inq', '문의함') + ' ' : '') + (g.cal ? tag('t-none', '협업 캘린더에서') : '');
       var acts;
-      if (g.status === 'black') acts = '<button type="button" class="sp-b" data-a="closed" data-k="' + k + '">풀기</button>';
-      else if (g.status === 'approved') acts = '<button type="button" class="sp-b" data-a="closed" data-k="' + k + '">닫기</button><button type="button" class="sp-b bk" data-a="black" data-k="' + k + '">블랙</button>';
-      else acts = '<button type="button" class="sp-b ok" data-a="approved" data-k="' + k + '">승인</button>'
-        + (g.status === '' ? '<button type="button" class="sp-b" data-a="closed" data-k="' + k + '">닫기</button>' : '')
-        + '<button type="button" class="sp-b bk" data-a="black" data-k="' + k + '">블랙</button>';
+      if (g.status === 'black') acts = btn('none', '블랙 풀기', '', k);
+      else if (g.status === 'approved') acts = btn('closed', '닫기', '', k) + btn('black', '블랙', 'bk', k);
+      else if (g.status === 'closed') acts = btn('approved', '승인', 'ok', k) + btn('black', '블랙', 'bk', k) + btn('none', '닫기 풀기', '', k);
+      else acts = btn('approved', '승인', 'ok', k) + btn('closed', '닫기', '', k) + btn('black', '블랙', 'bk', k);
+      var tail = g.n > 0 ? '<button type="button" class="sp-del" data-del="' + k + '">지우기</button>'
+        : (!g.status ? '<button type="button" class="sp-del" data-drop="' + k + '">목록에서 빼기</button>' : '');
+      var when = g.n > 0 ? '최근 요청 ' + md(g.last) + (g.n > 1 ? ' (' + g.n + '번)' : '') : '정한 날 ' + md(g.at);
       return '<div class="sp-card" data-key="' + k + '"><div class="sp-top"><div class="sp-who">' + E(g.name || '(이름 없음)')
         + (g.insta ? ' <small>@' + E(g.insta) + '</small>' : '') + '</div>' + stTag(g) + '</div>'
-        + '<div class="sp-meta">처음 연 날 ' + md(g.first) + ' · 최근 요청 ' + md(g.last) + (g.n > 1 ? ' (' + g.n + '번)' : '') + (kinds ? '<br>' + kinds : '') + '</div>'
+        + '<div class="sp-meta">' + (g.firstS && g.firstC ? '처음 연 날 시안 ' + md(g.firstS) + ' · 캘린더 ' + md(g.firstC) : '처음 연 날 ' + md(g.first) + (g.firstC && !g.firstS ? '(캘린더)' : '')) + ' · ' + when + (kinds ? '<br>' + kinds : '') + '</div>'
         + (g.blackMatch ? '<div class="sp-warn">블랙인 분과 같은 인스타예요</div>' : '')
-        + '<div class="sp-acts">' + acts + '<button type="button" class="sp-del" data-del="' + k + '">지우기</button></div></div>';
+        + '<div class="sp-acts">' + acts + tail + '</div></div>';
     }).join('');
-    box.innerHTML = '<div class="sianp">'
-      + (SP.err ? '<div class="sp-err">' + E(SP.err) + '</div>' : '')
-      + '<p class="sp-note">처음 연 날부터 1개월이 지난 기기는 여기서 «승인»한 분만 시안을 봐요. «블랙»은 1개월 안이라도 못 봐요.</p>'
+    var own = G.owners, mk = myKey();
+    var foot = own.length ? '<div class="sp-foot"><button type="button" class="sp-ownt" data-own>항상 보는 기기 ' + own.length + '대(명진님·수빈) · ' + (SP.showOwners ? '접기' : '보기') + '</button>'
+      + (SP.showOwners ? '<div class="sp-owns">' + own.map(function (o) {
+        return '<div class="sp-own"><span>' + (o.who === 's' ? '수빈 · ' : '명진님 · ') + E(o.dev || '기기') + ' · ' + md(o.at) + ' 등록</span>' + (o.key === mk ? '<b>이 기기</b>' : '<button type="button" class="sp-del" data-odrop="' + E(o.key) + '">빼기</button>') + '</div>';
+      }).join('') + '</div>' : '') + '</div>' : '';
+    box.innerHTML = '<div class="sianp">' + errBox
+      + '<p class="sp-note">처음 연 날부터 1개월이 지난 기기는 여기서 «승인»한 분만 봐요. «닫기»·«블랙»은 누르는 즉시 닫혀요(1개월 안이라도). «풀기»는 처음 상태로 돌려요.</p>'
       + '<div class="sp-chips">' + chips + '</div><div class="sp-list">'
       + (rows || '<div class="sp-empty">' + (L.length ? '해당하는 분이 없어요.' : '아직 요청이 없어요.<br>문의 양식을 보내거나 닫힌 화면에서 «다시 보기 요청»을 누르면 여기에 올라와요.') + '</div>')
-      + '</div>' + (G.owners ? '<div class="sp-foot">명진님 기기 ' + G.owners + '대는 항상 보여요.</div>' : '') + '</div>';
+      + '</div>' + foot + '</div>';
   }
   function badge() {
     var n = SP.data ? group(SP.data).list.filter(isReq).length : 0;
+    SP.pending = n;
     var b = document.getElementById('tnSianN');
     if (b) { b.textContent = n > 99 ? '99+' : String(n); b.classList.toggle('on', n > 0); }
+    var t = document.getElementById('tnSian'); if (t) t.classList.toggle('has-req', n > 0);
+    document.documentElement.classList.toggle('sian-req', SP.me && n > 0);
+    entryRow();
   }
-  function permMsg(e) {
-    var c = (e && (e.code || e.message)) || '';
-    return /permission|insufficient/i.test(c) ? '아직 Firebase 설정(규칙)이 없어서 저장·불러오기가 안 돼요. 안내드린 설정 글을 붙여 넣어 주세요.' : '불러오지 못했어요. 잠시 뒤 다시 열어 주세요.';
+  /* «예약 현황» 화면 위쪽 «시안 열람» 줄 — 명진 로그인일 때만, 화면을 다시 그려도 다시 붙인다 */
+  function entryRow() {
+    var pg = document.getElementById('pg-req'); if (!pg) return;
+    var row = pg.querySelector('.sian-entry');
+    if (!SP.me) { if (row) row.parentNode.removeChild(row); return; }
+    if (!row) {
+      var host = pg.querySelector('.rq-wrap'); if (!host) return;
+      row = document.createElement('div'); row.className = 'sian-entry';
+      row.innerHTML = '<div class="se-t"><b>시안 열람</b><span>다시 보기 요청 <em class="se-n">0</em>건 · 승인·닫기·블랙</span></div><button type="button" class="se-b">열기</button>';
+      row.querySelector('.se-b').addEventListener('click', function () { window.sianOpen(); });
+      var stats = host.querySelector('.stats');
+      if (stats && stats.parentNode === host) host.insertBefore(row, stats.nextSibling); else host.insertBefore(row, host.firstChild);
+    }
+    var e = row.querySelector('.se-n'); if (e) e.textContent = String(SP.pending);
+    row.classList.toggle('has-req', SP.pending > 0);
+  }
+  var obs = null;
+  function watchReqPage() {
+    if (obs || !window.MutationObserver) return;
+    var pg = document.getElementById('pg-req'); if (!pg) return;
+    obs = new MutationObserver(function () { entryRow(); });
+    obs.observe(pg, { childList: true });
+  }
+  /* 예전 판(이름 없이 저장)에서 정한 결정에 이름·인스타 채워 두기 — 한 번 불러올 때 10개까지 */
+  function heal() {
+    if (!window.MJCAL || !window.MJCAL.sianSetInfo || !SP.data) return;
+    var acc = SP.data.access || {}, n = 0;
+    group(SP.data).list.forEach(function (g) {
+      var a = acc[g.key];
+      if (n >= 10 || !a || !(a.status === 'approved' || a.status === 'closed' || a.status === 'black')) return;
+      if ((a.name || !g.name) && (a.insta || !g.insta)) return;
+      n++;
+      var info = { name: a.name || g.name || '', insta: a.insta || g.insta || '' };
+      window.MJCAL.sianSetInfo(g.key, info).then(function () { a.name = info.name; a.insta = info.insta; }).catch(function () {});
+    });
+  }
+  function errMsg(e, kind) {
+    var c = String((e && (e.code || e.message)) || '');
+    if (/permission|insufficient|unauthenticated/i.test(c)) return '권한이 없어서 ' + (kind === 'save' ? '저장이' : '불러오기가') + ' 안 돼요. 명진님 계정으로 로그인했는지 확인해 주세요.';
+    if (/unavailable|timeout|offline|network|failed-precondition|deadline/i.test(c)) return kind === 'save' ? '연결이 안 돼서 저장을 못 했어요. 다시 눌러 주세요.' : '연결이 안 돼서 최신 목록을 못 불러왔어요.';
+    return kind === 'save' ? '저장하지 못했어요. 다시 눌러 주세요.' : '목록을 불러오지 못했어요.';
   }
   function load() {
-    if (!window.MJCAL || !window.MJCAL.sianList) { SP.err = '준비 중이에요. 잠시 뒤 다시 열어 주세요.'; SP.data = { requests: [], access: {} }; render(); return Promise.resolve(); }
-    return window.MJCAL.sianList().then(function (d) { SP.err = ''; SP.data = d || { requests: [], access: {} }; render(); badge(); })
-      .catch(function (e) { SP.err = permMsg(e); SP.data = SP.data || { requests: [], access: {} }; render(); });
+    if (!window.MJCAL || !window.MJCAL.sianList) { SP.err = '준비 중이에요. 잠시 뒤 다시 열어 주세요.'; render(); return Promise.resolve(); }
+    SP.loading = true;
+    return window.MJCAL.sianList().then(function (d) {
+      SP.loading = false; SP.err = ''; SP.data = d || { requests: [], access: {} }; SP.lastLoad = Date.now(); render(); badge(); heal();
+    }).catch(function (e) { SP.loading = false; SP.lastLoad = Date.now() - EVERY + 60000; SP.err = errMsg(e, 'load'); render(); });
   }
+  function find(key) { return SP.data ? group(SP.data).list.filter(function (g) { return g.key === key; })[0] : null; }
+  /* 저장 — 성공 응답을 받은 뒤에만 화면을 바꾼다. 10초가 넘으면 안내만 하고, 늦게라도 성공하면 그때 반영. */
+  function save(card, run, after) {
+    if (card) card.classList.add('busy');
+    var done = false;
+    var t = setTimeout(function () { if (done) return; if (card) card.classList.remove('busy'); SP.err = '아직 저장 안 됐어요. 연결을 확인하고 다시 눌러 주세요.'; render(); }, SAVE_MS);
+    run().then(function (r) { done = true; clearTimeout(t); SP.err = ''; after(r); render(); badge(); })
+      .catch(function (e) { done = true; clearTimeout(t); if (card) card.classList.remove('busy'); SP.err = errMsg(e, 'save'); render(); });
+  }
+  function ensureData() { SP.data = SP.data || { requests: [], access: {} }; SP.data.access = SP.data.access || {}; SP.data.requests = SP.data.requests || []; }
   function act(key, status, card) {
     if (!window.MJCAL || !window.MJCAL.sianSet) return;
-    if (status === 'black' && !confirm('이분을 블랙으로 둘까요? 1개월 안이라도 시안을 못 보게 돼요.')) return;
-    if (card) card.classList.add('busy');
-    window.MJCAL.sianSet(key, status).then(function () {
-      SP.err = ''; SP.data.access = SP.data.access || {}; SP.data.access[key] = { status: status, at: Date.now() }; render(); badge();
-    }).catch(function (e) { if (card) card.classList.remove('busy'); SP.err = permMsg(e); render(); });
+    if (status === 'black' && !confirm('이분을 블랙으로 둘까요? 1개월 안이라도 시안·캘린더를 못 보게 돼요.')) return;
+    var g = find(key) || {};
+    save(card, function () { return window.MJCAL.sianSet(key, status, { name: g.name || '', insta: g.insta || '' }); }, function () {
+      ensureData(); var prev = SP.data.access[key] || {};
+      SP.data.access[key] = { status: status, at: Date.now(), name: g.name || prev.name || '', insta: g.insta || prev.insta || '', dev: prev.dev || '' };
+    });
   }
   function del(key, card) {
     if (!window.MJCAL || !window.MJCAL.sianDeleteRequests) return;
-    if (!confirm('이 줄의 요청 기록을 지울까요? (열림·닫힘 상태는 그대로예요)')) return;
-    if (card) card.classList.add('busy');
-    window.MJCAL.sianDeleteRequests(key).then(function () {
-      SP.data.requests = (SP.data.requests || []).filter(function (r) { return r.key !== key; }); render(); badge();
-    }).catch(function (e) { if (card) card.classList.remove('busy'); SP.err = permMsg(e); render(); });
+    var g = find(key) || {};
+    if (!confirm('이 줄의 요청 기록을 지울까요? ' + (g.status ? '(승인·닫기·블랙과 이름은 그대로 남아요)' : '(목록에서 사라져요)'))) return;
+    var a = (SP.data && SP.data.access && SP.data.access[key]) || null;
+    var need = !!(a && g.status && window.MJCAL.sianSetInfo && ((!a.name && g.name) || (!a.insta && g.insta)));
+    var info = need ? { name: a.name || g.name || '', insta: a.insta || g.insta || '' } : null;
+    save(card, function () {
+      return (need ? window.MJCAL.sianSetInfo(key, info) : Promise.resolve()).then(function () { return window.MJCAL.sianDeleteRequests(key); });
+    }, function () {
+      ensureData(); if (need) { a.name = info.name; a.insta = info.insta; }
+      SP.data.requests = SP.data.requests.filter(function (r) { return r.key !== key; });
+    });
+  }
+  function drop(key, card, owner) {
+    if (!window.MJCAL || !window.MJCAL.sianDeleteAccess) return;
+    if (!confirm(owner ? '이 기기를 «항상 보기»에서 뺄까요? 그 기기는 처음 연 날 기준으로 돌아가요.' : '목록에서 뺄까요?')) return;
+    save(card, function () { return window.MJCAL.sianDeleteAccess(key); }, function () { ensureData(); delete SP.data.access[key]; });
   }
   function onClick(ev) {
     var t = ev.target; if (!t || !t.closest) return;
     var chip = t.closest('.sp-chip'); if (chip) { SP.filter = chip.getAttribute('data-f'); render(); return; }
+    if (t.closest('[data-reload]')) { SP.err = ''; render(); load(); return; }
+    if (t.closest('[data-own]')) { SP.showOwners = !SP.showOwners; render(); return; }
     var b = t.closest('[data-a]'); if (b) { act(b.getAttribute('data-k'), b.getAttribute('data-a'), b.closest('.sp-card')); return; }
-    var d = t.closest('[data-del]'); if (d) { del(d.getAttribute('data-del'), d.closest('.sp-card')); }
+    var d = t.closest('[data-del]'); if (d) { del(d.getAttribute('data-del'), d.closest('.sp-card')); return; }
+    var x = t.closest('[data-drop]'); if (x) { drop(x.getAttribute('data-drop'), x.closest('.sp-card'), false); return; }
+    var o = t.closest('[data-odrop]'); if (o) { drop(o.getAttribute('data-odrop'), o.closest('.sp-own'), true); }
   }
   /* 칸 하나에 그리기(관리자 창 · 시험판 공용) */
   window.sianPanelMount = function (box) {
     if (SP.box && SP.box !== box) SP.box.removeEventListener('click', onClick);
     SP.box = box; box.removeEventListener('click', onClick); box.addEventListener('click', onClick);
-    SP.data = null; render(); return load();
+    SP.data = null; SP.err = ''; render(); return load();
   };
   window.sianPanelReload = load;
-  /* 관리자 머리줄 단추 → 공용 창(ov · pn)에 연다 */
+  /* 관리자 머리줄 단추 → 공용 창(ov · pn) 안에 칸 전용 상자를 만들어 연다 */
   window.sianOpen = function () {
     var h = document.getElementById('pnh'), pb = document.getElementById('pb'), ov = document.getElementById('ov');
     if (!h || !pb || !ov) return;
     h.innerHTML = '시안 열람<button class="px" onclick="closeP()">×</button>';
-    window.sianPanelMount(pb);
+    pb.innerHTML = '';
+    var host = document.createElement('div'); host.className = 'sianp-host'; pb.appendChild(host);
+    window.sianPanelMount(host);
     ov.style.display = 'flex';
   };
+  /* 배지만 다시 세기(칸이 열려 있으면 칸을 다시 불러옴) */
+  function refresh() {
+    if (attached(SP.box)) return load();
+    if (!window.MJCAL || !window.MJCAL.sianList || SP.loading) return;
+    SP.loading = true;
+    window.MJCAL.sianList().then(function (d) { SP.loading = false; SP.data = d; SP.lastLoad = Date.now(); badge(); heal(); })
+      .catch(function () { SP.loading = false; SP.lastLoad = Date.now() - EVERY + 60000; });
+  }
   /* 명진 로그인 살피기 — 기존 로그인 처리는 건드리지 않고 읽기만 */
   function watch() {
-    var u = window.MJCAL && window.MJCAL.user, me = !!(u && u.email === ME);
-    var btn = document.getElementById('tnSian'); if (btn) btn.style.display = me ? '' : 'none';
-    if (me && !SP.owned) {
+    var u = window.MJCAL && window.MJCAL.user, email = (u && u.email) || '', me = email === ME, sub = email === SUBIN;
+    SP.me = me;
+    var b = document.getElementById('tnSian'); if (b) b.style.display = me ? '' : 'none';
+    document.documentElement.classList.toggle('sian-on', me);
+    if (!me && !sub) { SP.owned = false; document.documentElement.classList.remove('sian-req'); entryRow(); return; }
+    if (!SP.owned && Date.now() >= SP.ownRetry && window.MJCAL.sianEnsureOwner) {
       SP.owned = true;
-      if (window.MJCAL.sianEnsureOwner) window.MJCAL.sianEnsureOwner().catch(function (e) { console.warn('시안 열람: 이 기기 «항상 보기» 등록 못 함', e && (e.code || e.message)); });
-      if (window.MJCAL.sianList) window.MJCAL.sianList().then(function (d) { if (!SP.box) SP.data = d; badge(); }).catch(function () {});
+      window.MJCAL.sianEnsureOwner(me ? 'm' : 's').catch(function (e) {
+        var c = String((e && (e.code || e.message)) || ''); SP.owned = false;
+        SP.ownRetry = /permission|insufficient/i.test(c) ? Infinity : Date.now() + 60000;   /* 권한 문제면 다시 안 함 */
+        console.warn('시안 열람: 이 기기 «항상 보기» 등록 못 함', c);
+      });
     }
-    if (!me) SP.owned = false;
+    if (!me) { document.documentElement.classList.remove('sian-req'); entryRow(); return; }
+    watchReqPage(); entryRow();
+    if (!document.hidden && !SP.loading && (!SP.lastLoad || (!EMBED && Date.now() - SP.lastLoad > EVERY))) refresh();
   }
+  var hiddenAt = 0;
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { hiddenAt = Date.now(); return; }
+    var away = hiddenAt ? Date.now() - hiddenAt : 0; hiddenAt = 0;
+    if (SP.me && !SP.loading && away >= AWAY && Date.now() - SP.lastLoad >= AWAY) refresh();
+  });
   if (!window.__SIAN_DEMO__) { setInterval(watch, 2000); setTimeout(watch, 300); }
 })();
 </script>
