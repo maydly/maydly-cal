@@ -1021,6 +1021,65 @@ html.embed-cal .topnav{height:46px}
 /* ── 보강 6 (261004) 달(주·일) 넘김: 넘기기 전 화면 복사본이 겹침 층에서 밀려 나간다(#calBody 밖이라 달력 안 찾기에 안 섞임) ── */
 #pg-cal{position:relative}
 .mc-turnlayer{position:absolute;overflow:hidden;pointer-events:none;z-index:2}
+/* ── 알림 카드 (261103 명진): 버튼은 오른쪽 — 폰을 한 손으로 스크롤할 때 왼쪽 버튼을 잘못 누르지 않게(PC도 오른쪽이 편함) ── */
+#pg-alert .act-row.act-r{justify-content:flex-end;align-items:center}
+/* 상담 고객 «내 계획 날짜» 칩(명진만) — 카드 오른쪽 위(왼쪽은 스크롤 자리라 비워 둠) · 가린 날짜 칸을 칩 위에 겹쳐 둔다(글자 16px 라 아이폰 확대 안 됨) */
+.plan-chip{position:relative;display:inline-flex;align-items:center;gap:4px;min-height:34px;margin:-6px -6px -6px auto;padding:0 11px;border-radius:12px;border:1px dashed #c9d8c4;background:#fbfdf9;color:var(--hz-sub);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.plan-chip.on{border-style:solid;border-color:#cfe0c8;background:#eef6ea;color:#2f6b45}
+.plan-chip input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px;border:0;padding:0;margin:0;-webkit-appearance:none;appearance:none}
+/* «보냈음 ✓» 바로 되돌리기 안내 — 이때만 누를 수 있다 */
+.toast.undo{pointer-events:auto;display:flex;align-items:center;gap:12px;padding-right:10px}
+.toast-undo{border:0;background:#eef6ea;color:#2f6b45;font-weight:800;font-size:12.5px;padding:8px 13px;border-radius:10px;cursor:pointer;white-space:nowrap}
+/* 수빈 «먼저 볼 것» (261103) — ① 확인 필요 ② 빈 자리 한 화면 · 폰은 위아래, 넓은 화면은 나란히 · 누르는 것은 오른쪽 */
+#pg-first{--dmint:#cfe9db;--dmint2:#a9dcc3;--dlime:#d8e85c;--dlime2:#eef3b8;--dgrn:#3f7a4a;--dredbg:#fdeceb;--dambbg:#fdf4e6;--dln:#eef2ed;overflow:auto}
+.fl-wrap{max-width:1120px;width:100%;margin:0 auto;padding:20px clamp(14px,2.4vw,28px) 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px}
+.fl-wrap .dhd{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.fl-grid{display:grid;gap:14px;min-width:0}
+@media(min-width:900px){.fl-grid{grid-template-columns:1fr 1fr;align-items:start}}
+.fl-card{min-width:0}
+.fl-todo{--k1:#efc2b3;--k2:#dfa28f}
+.fl-free{--k1:#f3a99f;--k2:#e0564a;border:1.5px solid #f3cdc7;background:linear-gradient(180deg,#fff 0%,#fff8f6 100%)}
+.fl-free.fl-calm{--k1:#a8d3a0;--k2:#7fb877;border-color:var(--bd);background:#fff}
+.fl-sub{font-size:12px;color:var(--hz-mute,#687568);margin:-6px 0 10px;line-height:1.5}
+.fl-sub b{color:#c0392b}
+.fl-item{display:flex;align-items:center;gap:10px;border:1px solid var(--bd);border-radius:14px;padding:10px 10px 10px 12px;margin-bottom:8px;background:#fff}
+.fl-item.over{border-color:#e0a3a3;background:#fdf4f4}
+.fl-tx{flex:1;min-width:0}
+.fl-bt{display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
+.fl-bt .btn-ok,.fl-bt .btn-ng{min-height:38px;min-width:92px;padding:0 12px;font-size:12.5px}
+.fl-bt .btn-ng{background:var(--bd);color:var(--mu);border:none}
+.fl-bt .btn-ok[disabled]{opacity:.55;cursor:default;filter:grayscale(.35)}
+.fl-it{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.fl-lb{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.fl-k{font-size:11.5px;font-weight:800;color:var(--mu2)}
+.fl-n{font-size:15px;font-weight:800;margin:4px 0 1px;color:var(--tx);overflow-wrap:anywhere}
+.fl-w{font-size:12px;color:var(--mu2);line-height:1.55;overflow-wrap:anywhere}
+.fl-w b{color:#c4763a;white-space:nowrap}
+.fl-w .nw{white-space:nowrap}
+.fl-item.over .fl-w b{color:#c0392b}
+.fl-more{display:block;margin-left:auto;width:auto;max-width:100%;min-height:40px;padding:0 14px;border:1px dashed var(--bd2);border-radius:12px;background:var(--sf2);color:var(--mu2);font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.fl-jump{align-self:center;flex:0 0 auto;min-height:38px;padding:0 14px;border:0;border-radius:999px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
+.fl-jump.fl-red{background:#fde3e0;color:#b03a2e}.fl-jump.fl-yel{background:#fbefc4;color:#6b5200}
+.fl-big{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
+.fl-big b{font-size:46px;line-height:1;font-weight:800;color:#c0392b;letter-spacing:-1px}
+.fl-big span{font-size:15px;font-weight:800;color:#9a3a30}
+.fl-big.fl-yel b{color:#9a7a10}.fl-big.fl-yel span{color:#7a6010}
+.fl-big.fl-ok b,.fl-big.fl-ok span{color:#3f7a4a}
+.fl-big em{margin-left:auto;font-style:normal;font-size:12px;color:var(--hz-mute,#687568)}
+.fl-free .mini{max-width:none}
+.fl-free .mini i{height:40px;cursor:pointer}
+.fl-free .mini i.pad{cursor:default}
+.fl-free .flist{margin-top:12px}
+.fl-free .fr{min-height:40px}
+.fl-free .ft s{background:#fde3e0;color:#b03a2e}
+.fl-free .ft s.ns{background:#fbefc4;color:#6b5200;box-shadow:inset 0 0 0 1px #f2c230}
+.fl-see{margin-left:auto;flex:0 0 auto;min-height:38px;padding:0 12px;border:1px solid var(--bd);border-radius:12px;background:#fff;color:var(--mu2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.fl-adj{font-style:normal;font-size:10.5px;font-weight:800;color:#7a6a2a;background:#f6efd6;border-radius:6px;padding:1px 6px;white-space:nowrap}
+.fl-lock{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin:-4px 0 10px;font-size:12px;color:#9a3a30;text-align:right}
+.fl-retry{min-height:38px;padding:0 14px;border:1px solid #e0a3a3;border-radius:12px;background:#fff;color:#9a3a30;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit}
+.fl-go{display:flex;justify-content:flex-end}
+.fl-go .btn-ok{flex:0 0 auto}
+.fl-gobtn{min-height:48px;padding:0 26px;font-size:14px}
 </style>
 <style id="sian-panel-css">
 /* ── 시안 열람 승인 칸 (261101) ── */
@@ -1195,6 +1254,7 @@ html.embed-cal .topnav{height:46px}
   <div class="page" id="pg-alert"></div>
   <div class="page" id="pg-req"></div>
   <div class="page" id="pg-import"></div>
+  <div class="page" id="pg-first"></div>
 </div>
 
 <div class="ov" id="ov" style="display:none" onclick="ovClick(event)">
@@ -1379,6 +1439,39 @@ function isDelivTarget(e){
 }
 function basicDue(e){return addDue(e.date,BASIC_DUE);}
 function buyDue(e){return BUY_DUE[e.status]?addDue(e.date,BUY_DUE[e.status]):null;}
+// ── 수빈 «보낼 날» = 고객 기한 7일 전 (261103 명진) ──
+// 「앞으로는 전달기한 7일전까지는 보내달라고 요청했어」 → 명진 선택 «수빈 보정본 7일 앞당김»: 수빈이 보내는 기본 보정본·구매분은
+// 고객 기한(BASIC_DUE·BUY_DUE)보다 7일 앞선 날이 «보낼 날». 알림·확인 필요·지남(빨강)은 보낼 날 기준, 고객에게 약속한 기한은 그대로 옆에.
+// 🚨 긴급 보정본(직접 적은 기한)·명진 «보낼 계획»(상담 고객)·고객 10장 셀렉 기다림은 그대로.
+// 규칙을 정한 날(11/3)부터 자연스럽게 이어지도록 보낼 날 = max(고객 기한 − 7일, min(고객 기한, 11/9))
+//   고객 기한 ~11/9 = 그대로 · 11/10~11/16 = 11/9 까지(첫 주 여유) · 11/17 부터 = 7일 전
+//   → 고객 기한이 늦은 건이 더 급하게 보이는 뒤집힘이 없다(검토 반영 — 처음 판은 «7일 앞당긴 날이 11/3 전이면 원래 기한»이라 첫 주 순서가 뒤집혔다)
+const SEND_EARLY_DAYS=7, SEND_EARLY_FROM='2026-11-03';
+function dsShift(ds,n){const d=parseDS(ds);d.setDate(d.getDate()+n);return fd(d);}
+const SEND_EARLY_CAP=dsShift(SEND_EARLY_FROM,SEND_EARLY_DAYS-1);   // 2026-11-09
+function sendDayOf(due){
+  if(!due)return due;
+  const a=dsShift(due,-SEND_EARLY_DAYS),b=due<SEND_EARLY_CAP?due:SEND_EARLY_CAP;
+  return a>b?a:b;
+}
+// 줄 세우기(검토·코덱스 반영) — ① 고객 기한(긴급은 약속 기한, 상담 고객은 원래 기한)까지 이미 지난 건: 많이 지난 순
+//   ② 보낼 날만 지난 건: 보낼 날 순 ③ 나머지: 보낼 날 순. 화면에 보이는 «N일 지남/남음»과 순서가 맞고, 고객에게 이미 늦은 건이 묻히지 않는다.
+function alertCustOf(a){return a.cust||a.orig||a.due;}
+function alertTier(a){return dDiff(TSTR,alertCustOf(a))<0?0:a.left<0?1:2;}
+function alertCmp(a,b){
+  const ta=alertTier(a),tb=alertTier(b);if(ta!==tb)return ta-tb;
+  if(ta===0){const d=dDiff(TSTR,alertCustOf(a))-dDiff(TSTR,alertCustOf(b));if(d)return d;}
+  return a.left-b.left||String(alertCustOf(a)).localeCompare(String(alertCustOf(b)))||String(a.due).localeCompare(String(b.due));
+}
+// 대시보드 «챙겨야 할 일» 6칸은 보는 사람 몫 먼저(명진 = 의상확인·내 계획, 수빈 = 보정본·구매분·긴급) — 명진 의상확인이 수빈 건에 밀려 빠지지 않게
+function dashOwnFirst(L){const r=myRole(),mine=a=>a.plan?r==='mj':(ROLE_KINDS[r]||[]).includes(a.kind);return L.filter(mine).concat(L.filter(a=>!mine(a)));}
+// 수빈 «먼저 볼 것» 상수 — 세션 자동 입장(스크립트 중간)에서 그려도 되게 여기 둔다
+const FIRST_TODO_MAX={wide:5,narrow:3};   // 넓은 화면 5 · 폰은 3건에서 시작해 ② 빈 자리 큰 숫자가 첫 화면에 들어올 때까지 줄임(최소 1)
+let _cloudReady=false;   // 첫 클라우드 기록이 왔는지 — 오기 전엔 «먼저 볼 것»의 «보냈음 ✓»을 잠깐 막는다(예전 사본으로 저장·덮어쓰기 방지)
+let _cloudSynced=false;  // 클라우드 기록을 한 번이라도 받았는지 — 받기 전엔 클라우드에 올리지 않는다(이 기기 예전 사본이 덮어쓰지 않게)
+let _cloudFailed=false;  // 첫 기록 받기에 실패했는지 — «먼저 볼 것»에 «다시 불러오기»
+let _pushHeld=false;     // 받기 전에 저장을 미룬 적이 있는지 — 기록이 오면 알려 준다
+let _firstCapKey='';     // «먼저 볼 것»을 그린 화면 기준(넓은 화면·가로 폭) — 돌리거나 폭이 바뀌면 다시 그린다(사파리 주소창 접힘처럼 높이만 바뀔 땐 그대로)
 // ── 고객 10장 셀렉 기다림 (261027 명진) ──
 // 원본 등을 구매한 고객은 받은 사진에서 10장을 골라 보내 주고, 우리는 그 10장으로 세밀 보정본(기본 보정본)을 보낸다.
 // 고른 목록이 오기 전에는 보낼 수 없으므로 '기한 지남'으로 재촉하지 않고 알림 탭 아래에 따로 모은다.
@@ -1389,8 +1482,30 @@ function pickOn(e){return !!(e&&e.pickWait);}
 function pickDays(ds){return Math.max(0,dDiff(ds,TSTR))+1;}   // 시작한 날 = 1일째
 function basicDueOf(e){return pickOn(e)?(e.pickGot&&PICK_DUE?addDue(e.pickGot,PICK_DUE):null):basicDue(e);}   // null = 기한 없음(셀렉 기다림·기한 미정)
 function pickList(){   // 셀렉 기다리는 중 · 셀렉 받고 보정 중(기한 미정) — 재촉하지 않는 확인용
-  return maydlyEvents.filter(e=>!isExt(e)&&stActive(e.status)&&pickOn(e)&&!e.dlvBasic&&!basicDueOf(e))
+  return maydlyEvents.filter(e=>!isExt(e)&&stActive(e.status)&&pickOn(e)&&!e.dlvBasic&&!e.planBasic&&!basicDueOf(e))
     .sort((a,b)=>String(a.pickGot||a.pickWait).localeCompare(String(b.pickGot||b.pickWait)));
+}
+// ── 상담 고객 «보낼 계획» (261103 명진) ──
+// 따로 상담해서 진행한 고객은 정해진 기한(기본 1달·구매분 2주…)과 다르게 보낼 수 있다. 명진이 «언제 보낼지» 날짜를 적어 두면
+// 그 건은 정해진 기한 대신 «내 계획 날짜» 기준으로 명진에게만 알린다 — 계획일 3일 전까지는 «📅 내 계획 — 상담 고객»에,
+// 3일 전부터는 «지금 챙겨야 할 일»에, 지나면 «기한 지남»으로. 수빈 목록·재촉에는 나오지 않는다.
+// 「별도로 상담해서 진행한 고객들만 하는 내용이라 나만 확인하는거야」 → 적기·보기·알림은 명진만.
+// 칸: planBasic(기본 보정본) · planBuy(구매분) — 'YYYY-MM-DD'. 보내면(보냈음 ✓) 목록에서 빠지고 날짜는 기록으로 남는다.
+function planLeftText(n){return n<0?`계획일 ${-n}일 지남`:n===0?'오늘이 계획일':`${n}일 남음`;}
+function planChip(e,key,cur){   // 명진만 — 누르면 날짜 고르기(가린 날짜 칸을 칩 위에 겹쳐 둠: 아이폰은 눌러서, PC는 showPicker)
+  if(myRole()!=='mj'||(key!=='basic'&&key!=='buy'))return'';
+  return`<label class="plan-chip${cur?' on':''}" title="따로 상담한 고객 — 내 계획으로 보낼 날짜">📅 ${cur?esc(cur.slice(5).replace('-','/'))+' 바꾸기':'내 계획 날짜'}<input type="date" value="${esc(cur||'')}" onclick="try{this.showPicker()}catch(_){}" onchange="setPlan(${e.id},'${key}',this.value)" aria-label="보낼 계획 날짜"></label>`;
+}
+function setPlan(id,key,val,reopen){   // 명진만 · val '' = 계획 빼기
+  if(myRole()!=='mj')return;
+  const e=maydlyEvents.find(x=>x.id===id);if(!e||(key!=='basic'&&key!=='buy'))return;
+  const v=/^\d{4}-\d{2}-\d{2}$/.test(String(val||''))?String(val):null;
+  if(key==='basic')e.planBasic=v;else e.planBuy=v;
+  saveEvents();buildNav();
+  if(curPage==='alert')renderAlerts();
+  if(curPage==='dash'&&typeof renderDash==='function')renderDash();
+  if(reopen)openD(id);
+  toast(v?'보낼 계획을 '+v+'로 적었습니다':'보낼 계획을 뺐습니다');
 }
 
 // 지금 챙겨야 할 일 — 의상확인(촬영 D-2) / 기본 보정본 전달 / 구매분 전달
@@ -1412,16 +1527,22 @@ function buildAlerts(){
     if(!isDelivTarget(e)||e.date>today)return;  // 촬영 전이면 전달 기한 없음
     // 전달 대기 건은 촬영 직후부터 기한까지 계속 목록에 남긴다(누락 방지). urgent = 기한 임박·지남.
     if(!e.dlvBasic){
-      const due=basicDueOf(e);   // 고객 10장 셀렉 기다림이면 기한 없음 → 아래 pickList 로 따로
-      if(due){const left=dDiff(today,due);out.push({kind:'basic',e,due,left,urgent:left<=ALERT_LEAD});}
+      if(e.planBasic){   // 상담 고객 «보낼 계획»: 명진에게만, 계획일 기준
+        if(myRole()==='mj'){const left=dDiff(today,e.planBasic);out.push({kind:'basic',e,due:e.planBasic,left,urgent:left<=ALERT_LEAD,plan:true,orig:basicDueOf(e)});}
+      }else{
+        const due=basicDueOf(e);   // 고객 10장 셀렉 기다림이면 기한 없음 → 아래 pickList 로 따로
+        if(due){const sd=pickOn(e)?due:sendDayOf(due),left=dDiff(today,sd);out.push({kind:'basic',e,due:sd,left,urgent:left<=ALERT_LEAD,cust:due,early:sd!==due});}   // (261103) due = 보낼 날, cust = 고객 기한
+      }
     }
     const bd=buyDue(e);
-    if(bd&&!e.dlvBuy){
-      const left=dDiff(today,bd);
-      out.push({kind:'buy',e,due:bd,left,urgent:left<=ALERT_LEAD});
+    if(bd&&!e.dlvBuy&&e.planBuy){   // 상담 고객 «보낼 계획»: 명진에게만, 계획일 기준
+      if(myRole()==='mj'){const left=dDiff(today,e.planBuy);out.push({kind:'buy',e,due:e.planBuy,left,urgent:left<=ALERT_LEAD,plan:true,orig:bd});}
+    }else if(bd&&!e.dlvBuy){
+      const sd=sendDayOf(bd),left=dDiff(today,sd);   // (261103) due = 보낼 날(고객 기한 7일 전), cust = 고객 기한
+      out.push({kind:'buy',e,due:sd,left,urgent:left<=ALERT_LEAD,cust:bd,early:sd!==bd});
     }
   });
-  return out.sort((a,b)=>a.left-b.left||a.due.localeCompare(b.due));
+  return out.sort(alertCmp);   // (261103) 고객 기한 지난 건 → 보낼 날 지난 건 → 보낼 날 순
 }
 function alertCount(){return buildAlerts().filter(a=>a.urgent).length;}
 
@@ -1442,7 +1563,18 @@ let _subinEntry=false;       // 로그인 직후 알림으로 보낸 적이 있�
 function isSubinUser(){
   const em=((window.MJCAL&&window.MJCAL.user&&window.MJCAL.user.email)||'').toLowerCase();
   if(em)return SUBIN_EMAILS.includes(em);   // 구글 계정이 가장 정확
-  return selAdminUser==='sb';               // 로그인 확인 전이면 PIN 화면 선택을 따른다
+  const se=storedAuthEmail();               // (261103) 로그인 확인 전 — 이 기기에 남은 구글 로그인 기록
+  if(se)return SUBIN_EMAILS.includes(se);
+  return selAdminUser==='sb';               // 로그인 확인 전이면 PIN 화면 선택을 따른다(기기에 기억)
+}
+// 이 기기에 남은 구글 로그인 기록의 이메일(확인 끝나기 전에만 쓴다 — 화면 순서만 정하고, 데이터 권한은 실제 로그인으로)
+function storedAuthEmail(){
+  if(window.MJCAL&&window.MJCAL.ready)return '';   // 확인이 끝났는데 사용자가 없으면(로그아웃) 기록을 쓰지 않는다
+  try{
+    const P='firebase:authUser:AIzaSyBfyRE7CNENjgSfe25xHAdr87gOllpYtvM:';
+    for(const n of ['mjcal','[DEFAULT]']){const r=localStorage.getItem(P+n);if(r){const u=JSON.parse(r);if(u&&u.email)return String(u.email).trim().toLowerCase();}}
+  }catch(e){}
+  return '';
 }
 // ── 노쇼 사유 (260912 명진) ──
 // 노쇼는 재예약을 재촉하기 위한 게 아니라 '다음에 거르기 위한 기록'이다.
@@ -1562,7 +1694,7 @@ function todoLine(a){
   const t=a.kind==='outfit'?'👗 의상확인':(a.kind==='rush'?'🚨 긴급 보정본':(a.kind==='basic'?'📦 기본 보정본':'🎞️ 구매분'));
   return`<div style="display:flex;gap:8px;padding:6px 0;font-size:12px;border-bottom:1px solid var(--bd)">
     <span style="flex:1;color:var(--tx)">${esc(a.e.client||'(이름 없음)')} <span style="color:var(--mu)">· ${t}</span></span>
-    <span style="color:${a.left<0?'#c0392b':'#c4763a'};font-weight:700;white-space:nowrap">${dueText(a.left)}</span></div>`;
+    <span style="color:${a.left<0?'#c0392b':'#c4763a'};font-weight:700;white-space:nowrap">${a.early?'보낼 날 ':''}${dueText(a.left)}${a.early&&dDiff(TSTR,a.cust)<0?' · 고객 기한도 '+(-dDiff(TSTR,a.cust))+'일 지남':''}</span></div>`;
 }
 function showSubinTodo(){
   const t=myTodo();
@@ -1572,18 +1704,18 @@ function showSubinTodo(){
    `<div style="text-align:center;padding:2px 0 14px">
       <div style="font-size:30px">⏰</div>
       <div style="font-size:15px;font-weight:800;color:var(--tx);margin-top:6px">아직 처리 안 된 일이 있어요</div>
-      <div style="font-size:12px;color:var(--mu);margin-top:4px">${ROLE_WHAT[t.role]} — 캘린더보다 이걸 먼저 해주세요</div>
+      <div style="font-size:12px;color:var(--mu);margin-top:4px">${ROLE_WHAT[t.role]} — 캘린더보다 이걸 먼저 해주세요${t.role==='sb'?`<br>보정본·구매분은 고객 기한 ${SEND_EARLY_DAYS}일 전이 «보낼 날»이에요`:''}</div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:12px">
       <div style="flex:1;text-align:center;background:#fdf4f4;border:1px solid #e0a3a3;border-radius:10px;padding:10px">
         <div style="font-size:21px;font-weight:800;color:#c0392b">${t.late.length}</div>
-        <div style="font-size:10.5px;color:#a05050">기한 지남</div></div>
+        <div style="font-size:10.5px;color:#a05050">${t.role==='sb'?'보낼 날 지남':'기한 지남'}</div></div>
       <div style="flex:1;text-align:center;background:#fffdf5;border:1px solid #c8a456;border-radius:10px;padding:10px">
         <div style="font-size:21px;font-weight:800;color:#8a6a20">${t.soon.length}</div>
         <div style="font-size:10.5px;color:#a08040">${soonLabel}</div></div>
     </div>
-    ${t.late.length?`<div style="font-size:10.5px;font-weight:800;color:#c0392b;margin:4px 0 2px">이미 기한이 지났어요 — 지금 바로 처리해주세요</div>${t.late.slice(0,8).map(todoLine).join('')}`:''}
-    ${t.soon.length?`<div style="font-size:10.5px;font-weight:800;color:#8a6a20;margin:${t.late.length?'12px':'4px'} 0 2px">곧 기한이에요 — 미리 처리해주세요</div>${t.soon.slice(0,8).map(todoLine).join('')}`:''}
+    ${t.late.length?`<div style="font-size:10.5px;font-weight:800;color:#c0392b;margin:4px 0 2px">${t.role==='sb'?'이미 보낼 날이 지났어요':'이미 기한이 지났어요'} — 지금 바로 처리해주세요</div>${t.late.slice(0,8).map(todoLine).join('')}`:''}
+    ${t.soon.length?`<div style="font-size:10.5px;font-weight:800;color:#8a6a20;margin:${t.late.length?'12px':'4px'} 0 2px">${t.role==='sb'?'곧 보낼 날이에요':'곧 기한이에요'} — 미리 처리해주세요</div>${t.soon.slice(0,8).map(todoLine).join('')}`:''}
     <div class="act-row" style="margin-top:14px">
       <button class="btn-ok" style="flex:2" onclick="closeP();navTab('alert')">확인 필요 보러가기</button>
       <button class="btn-ng" style="flex:1;background:var(--sf2);color:var(--mu);border:1px solid var(--bd)" onclick="closeP();subinForceCal()">캘린더 볼게요</button>
@@ -1605,7 +1737,7 @@ function navTab(pg){
 // (상세창 버튼 setStatus·편집창 updateEv 양쪽에서 같은 규칙을 쓰도록 여기 모아둔다)
 function applyStatusChange(e,next){
   if(!e||e.status===next)return;
-  if(BUY_DUE[next])e.dlvBuy=null;
+  if(BUY_DUE[next]){e.dlvBuy=null;e.planBuy=null;}
   e.status=next;
 }
 // 화면에 넣는 사용자 입력(고객명 등)은 그대로 innerHTML에 붙이지 않는다
@@ -1620,7 +1752,8 @@ function markDeliv(id,key,reopen){
   if(curPage==='alert')renderAlerts();
   if(curPage==='cal')renderBody();
   if(reopen)openD(id);
-  toast('전달 완료로 기록했습니다');
+  if(reopen)toast('전달 완료로 기록했습니다');
+  else toastUndo('전달 완료로 기록했습니다',function(){undoDeliv(id,key);});
 }
 function undoDeliv(id,key,reopen){
   const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
@@ -1816,6 +1949,7 @@ function saveEvents(){
   try{localStorage.setItem(STORAGE_KEY,JSON.stringify(toSave));lastSaved=nowStr();}
   catch(e){toast('저장 실패');}
   pushToGithub();
+  if(typeof curPage!=='undefined'&&curPage==='first'&&typeof renderFirst==='function'){clearTimeout(window._firstRT);window._firstRT=setTimeout(function(){if(curPage==='first')renderFirst(true);},0);}   // (261103) «먼저 볼 것»을 띄워 둔 채 기록이 바뀌면 다시 그린다
 }
 
 // ── 국가공휴일 목록 (다음날이 공휴일이면 그날은 19시까지만 촬영 = 20~22 타임 마감,
@@ -2009,6 +2143,8 @@ function setSaveStatus(txt, state){
 }
 function pushToGithub(){
   if(!hasToken())return;   // 토큰 없으면 로컬 단독 (저장은 localStorage에 이미 됨)
+  // (261103) 최신 클라우드 기록을 한 번이라도 받기 전엔 올리지 않는다 — 이 기기의 예전 사본이 다른 기기에서 넣은 일정·고객 공개 예약표를 덮어쓰지 않게
+  if(!_cloudSynced){_pushHeld=true;setSaveStatus('⚠ 최신 기록 받기 전 — 저장 대기','loading');return;}
   clearTimeout(_pushT);
   _pushT=setTimeout(async()=>{
     if(_pushing)return; _pushing=true; setSaveStatus('⟳ 저장 중…','loading');
@@ -2023,25 +2159,34 @@ function pushToGithub(){
   },500);
 }
 async function syncFromGithub(){
-  if(!hasToken()){promptToken();return;}
+  if(!hasToken()){_cloudReady=true;promptToken();return;}
+  if(!_cloudSynced){_cloudReady=false;if(typeof curPage!=='undefined'&&curPage==='first')renderFirst(true);}   // (261103) 첫 기록이 올 때까지 «보냈음 ✓» 잠깐 막기
   try{
     const {data}=await ghGet(GH_DATA);
     if(data&&Array.isArray(data.events)){
       _serverOn=true;
-      maydlyEvents=mergeHoliday(data.events.filter(e=>!(e.id>=90000)));
+      maydlyEvents=mergeHoliday(data.events.filter(e=>!(e.id>=90000)));_cloudReady=true;_cloudSynced=true;_cloudFailed=false;   // (261103) 최신 기록 도착
+      if(_pushHeld){_pushHeld=false;setTimeout(function(){toast('최신 기록을 받기 전에 바꾼 내용은 저장되지 않았어요 — 다시 확인해 주세요');},1600);}
       nextId=Math.max(0,...maydlyEvents.filter(e=>e.id<90000).map(e=>e.id||0),0)+1;
       try{localStorage.setItem(STORAGE_KEY,JSON.stringify(maydlyEvents));}catch(e){}
       if(typeof curPage!=='undefined'&&curPage==='cal')renderBody();
       if(typeof buildNav==='function')buildNav();
+      // (261103) 알림·«먼저 볼 것»을 보고 있을 때 최신 기록이 오면 그 화면도 다시 그린다
+      if(typeof curPage!=='undefined'&&curPage==='alert'&&typeof renderAlerts==='function')renderAlerts();
+      if(typeof curPage!=='undefined'&&curPage==='first'&&typeof renderFirst==='function')renderFirst(true);
       const _synced=data.savedAt?new Date(data.savedAt).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):nowStr(); setSaveStatus('✓ 동기화 '+_synced,'ok');
       toast('최신 불러옴 ('+maydlyEvents.length+')');
     }else{
       // 저장소가 비었으면 현재(임베드) 데이터로 시드
+      _cloudReady=true;_cloudSynced=true;_cloudFailed=false;   // (261103) 클라우드가 비어 있음 = 받은 셈 — 저장 지킴에 막히지 않게 먼저 표시
       pushToGithub();
+      if(typeof curPage!=='undefined'&&curPage==='first')renderFirst(true);
     }
   }catch(e){
     setSaveStatus('✗ 불러오기 실패','fail');
     toast('불러오기 실패: '+e.message);
+    if(!_cloudSynced)_cloudFailed=true;_cloudReady=_cloudSynced;   // (261103) 한 번도 못 받았으면 «보냈음 ✓»은 잠근 채 «다시 불러오기»
+    if(typeof curPage!=='undefined'&&curPage==='first')renderFirst(true);
   }
 }
 // 하위 호환 (기존 호출부가 있으면 GitHub 버전으로 연결)
@@ -2084,6 +2229,7 @@ function showAdminLogin(){
 
 function selAdmin(u){
   selAdminUser=u;
+  try{localStorage.setItem('maydly_admin_pick',u);}catch(_){}   // (261103) 다음에 PIN 없이 들어와도 누구인지 기억
   document.getElementById('lb-mj').className='login-btn'+(u==='mj'?' sel':'');
   document.getElementById('lb-sb').className='login-btn'+(u==='sb'?' sel':'');
 }
@@ -2135,6 +2281,7 @@ async function doLogin(){
 // (예전 '동기화+공개데이터 내보내기'를 대체. 이제 저장할 때 공개 데이터가 자동 커밋됨)
 async function syncAndExport(btn){
   if(!hasToken()){promptToken();return;}
+  if(!_cloudSynced){toast('최신 기록을 아직 못 받았어요 — 불러온 뒤에 저장할게요');syncFromGithub();return;}   // (261103) 예전 사본으로 덮어쓰기 방지
   const orig=btn?btn.innerHTML:'';
   if(btn){btn.innerHTML='⏳ 저장 중...';btn.disabled=true;}
   try{
@@ -2187,15 +2334,17 @@ var _mjEntered=false;
 window.onMjAuth=function(u){
   if(!_mjEntered) return;              // 랜딩(PIN) 단계에선 대기
   setSaveStatus(u?'✓ 구글 로그인됨':'로그인 필요', u?'ok':'off');
-  // 구글 계정으로 수빈임이 확인되면(PIN에서 명진으로 눌렀더라도) 확인 필요를 먼저 띄운다
-  if(u&&!_subinEntry&&isSubinUser()&&hasMyTodo()){_subinEntry=true;navTab('alert');}
-  if(u) syncFromGithub(); else promptToken();
+  // 구글 계정으로 수빈임이 확인되면(PIN에서 명진으로 눌렀더라도) «먼저 볼 것»을 띄운다 (261103 — 예전엔 확인 필요)
+  if(u&&!_subinEntry&&isSubinUser()){_subinEntry=true;navTab('first');}
+  else if(u&&curPage==='first'&&!isSubinUser())navTab('cal');   // PIN 은 수빈인데 명진 계정이면 캘린더로
+  if(u) syncFromGithub(); else{_cloudReady=true;if(curPage==='first')renderFirst(true);promptToken();}   // 로그인 없으면 기다릴 클라우드도 없다
 };
 function enter(){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').style.display='flex';
-  // 수빈은 '확인 필요'를 먼저 보게 한다 (밀린 일이 있을 때만)
-  if(isSubinUser()&&hasMyTodo()){curPage='alert';_subinEntry=true;}
+  // (261103) 수빈은 들어올 때마다 «먼저 볼 것»(① 확인 필요 ② 빈 자리)부터 — 예전엔 밀린 일이 있을 때만 알림 탭
+  if(isSubinUser()){curPage='first';_subinEntry=true;}
+  else if(curPage==='first')curPage='cal';   // «← 홈» 뒤 명진으로 다시 들어오면 «먼저 볼 것»에 머물지 않게
   buildNav();showPage(curPage);
   _mjEntered=true;
   if(window.MJCAL&&window.MJCAL.ready) onMjAuth(window.MJCAL.user);   // 로그인 상태 반영
@@ -2275,6 +2424,7 @@ function forgetToken(){
   },{passive:false});
 })();
 // 세션 자동 로그인
+try{const _p=localStorage.getItem('maydly_admin_pick');if(_p==='sb'||_p==='mj')selAdminUser=_p;}catch(_){}   // (261103) 지난번 PIN 에서 고른 사람
 if(localStorage.getItem('maydly_session')==='1'){enter();}
 function goLanding(){
   document.getElementById('landing').style.display='flex';
@@ -2304,7 +2454,7 @@ function buildNav(){
 function switchPage(pg,el){
   // 수빈이 캘린더로 가려 하면 밀린 일을 먼저 보여준다.
   // 기한 지난 건이 있으면 갈 때마다, 임박 건만 있으면 세션당 한 번.
-  if(pg==='cal'&&!_subinBypass){
+  if(pg==='cal'&&!_subinBypass&&curPage!=='first'){   // (261103) «먼저 볼 것»에서 막 보고 가는 길이면 다시 재촉하지 않는다
     const t=myTodo();
     if(t.late.length||(t.soon.length&&!_subinNagged)){
       if(!t.late.length)_subinNagged=true;
@@ -2317,12 +2467,15 @@ function switchPage(pg,el){
   showPage(pg);
 }
 function showPage(pg){
-  ['dash','cal','alert','req','import'].forEach(p=>{document.getElementById('pg-'+p).className='page'+(p===pg?' on':'');});
+  ['dash','cal','alert','req','import','first'].forEach(p=>{document.getElementById('pg-'+p).className='page'+(p===pg?' on':'');});
   if(pg==='dash')renderDash();
   else if(pg==='cal')renderCal();
   else if(pg==='alert')renderAlerts();
   else if(pg==='req')renderReq();
   else if(pg==='import')renderImport();
+  else if(pg==='first'){   // (261103) 수빈 «먼저 볼 것» — 그리다 오류가 나도 들어오는 길은 막지 않는다(캘린더로)
+    try{renderFirst();}catch(err){console.error('먼저 볼 것 그리기 실패 — 캘린더로',err);navTab('cal');return;}
+  }
   if(window.mcEnter)mcEnter(pg);   // (261004) 카드가 차례로 떠오르는 움직임 — 없어도 동작은 같다
 }
 
@@ -2398,7 +2551,7 @@ function dashData(){
   // 알림
   const al=buildAlerts();
   D.late=al.filter(function(a){return a.left<0;});
-  D.alerts=al.slice().sort(function(a,b){return a.left-b.left;});
+  D.alerts=al.slice().sort(alertCmp);   // (261103) 고객 기한 지난 건 → 보낼 날 지난 건 → 보낼 날 순
   // 노쇼
   const nosh=maydlyEvents.filter(function(e){return e.status==='nosh';});
   D.noshAll=nosh.sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
@@ -2597,12 +2750,12 @@ function renderDash(){
   const holRow=holLast?'<div class="task" style="background:var(--dambbg)">'
     +'<div class="d">공휴일 목록 '+holLast+'까지</div>'
     +'<div class="n">'+(Number(holLast.slice(0,4))+1)+'년 공휴일 추가 필요 — 목록 밖 공휴일은 전날 규칙이 안 걸림</div></div>':'';
-  const taskRows=holRow+(D.alerts.slice(0,6).map(function(a){
+  const taskRows=holRow+(dashOwnFirst(D.alerts).slice(0,6).map(function(a){   // (261103) 보는 사람 몫 먼저
     const bg=a.left<0?'var(--dredbg)':(a.left<=1?'var(--dambbg)':'var(--dlime2)');
-    const ow=owner(a.kind);
+    const ow=a.plan?['명진','#6a7a2a']:owner(a.kind);   // 상담 고객 내 계획 = 명진
     return '<div class="task" style="background:'+bg+'" onclick="navTab(\'alert\')">'
-      +'<div class="d">'+dueText(a.left)+' <span class="o" style="color:'+ow[1]+'">'+ow[0]+'</span></div>'
-      +'<div class="n">'+esc(a.e.client||'(이름 없음)')+' · '+kindName[a.kind]+'</div></div>';
+      +'<div class="d">'+(a.early?'보낼 날 ':'')+dueText(a.left)+(a.early&&dDiff(TSTR,a.cust)<0?' · 고객 기한도 '+(-dDiff(TSTR,a.cust))+'일 지남':'')+' <span class="o" style="color:'+ow[1]+'">'+ow[0]+'</span></div>'
+      +'<div class="n">'+esc(a.e.client||'(이름 없음)')+' · '+(a.plan?'📅 내 계획 · ':'')+kindName[a.kind]+'</div></div>';
   }).join('')||(holRow?'':'<div class="dempty">지금 챙길 일이 없습니다 🍀</div>'));
 
   const twoTitle={freeOpen:'예약을 안 받아 비어 있음',freeNosh:'노쇼로 비어 있음',full:'다 참',inq:'야외 문의만',off:'휴무·불가'};
@@ -2667,7 +2820,7 @@ function renderDash(){
           +'<span class="dtag '+(gap<0?'dn':'up')+'">'+(gap<0?manwon(-gap)+' 부족':manwon(gap)+' 초과')
           +(cur.noAmt?' · 미입력 '+cur.noAmt+'건':'')+'</span></div>';
       })()
-     +'<div class="kpi clickable'+(D.late.length?' lv-over':'')+'" onclick="navTab(\'alert\')"><div class="t"><span class="lb">기한 지난 일</span><span class="ic"><svg class="mi" aria-hidden="true"><use href="#i-clock"/></svg></span></div><div class="v'+(D.late.length?' v-dn':'')+'">'+D.late.length+'</div>'
+     +'<div class="kpi clickable'+(D.late.length?' lv-over':'')+'" onclick="navTab(\'alert\')"><div class="t"><span class="lb">보낼 날 지난 일</span><span class="ic"><svg class="mi" aria-hidden="true"><use href="#i-clock"/></svg></span></div><div class="v'+(D.late.length?' v-dn':'')+'">'+D.late.length+'</div>'
        +'<span class="dtag '+(D.late.length?'dn':'up')+'">'+(D.late.length?'눌러서 알림으로':'밀린 것 없음')+'</span></div>'
    +'</div>'
    +'<div class="dg2">'
@@ -3213,6 +3366,17 @@ function dlvRow(e,key,title,due){
   const pk=key==='basic'&&pickOn(e);
   const sBtn='padding:4px 9px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--mu);font-size:10px;cursor:pointer;white-space:nowrap';
   const pBtn='padding:4px 10px;border:none;border-radius:7px;background:var(--R);color:#fff;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap';
+  // 상담 고객 «보낼 계획» (261103)
+  const pl=key==='basic'?e.planBasic:key==='buy'?e.planBuy:null;
+  if(!done&&pl){
+    if(myRole()==='mj'){const n=dDiff(TSTR,pl);return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
+    <span style="font-size:11px;color:var(--tx);flex:1">📅 ${title} <span style="color:${n<0?'#c0392b':'var(--mu)'}">— 내 계획 ${esc(pl)} (${planLeftText(n)})${due?' · 고객 기한 '+due:''}</span></span>
+    <button onclick="setPlan(${e.id},'${key}','',1)" style="${sBtn}">계획 빼기</button>
+    <button onclick="markDeliv(${e.id},'${key}',1)" style="${pBtn}">보냈음 ✓</button></div>`;}
+    return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
+    <span style="font-size:11px;color:var(--tx);flex:1">${title} <span style="color:var(--mu)">— 명진이 따로 챙기는 상담 고객</span></span>
+    <button onclick="markDeliv(${e.id},'${key}',1)" style="${pBtn}">보냈음 ✓</button></div>`;
+  }
   // 고객 10장 셀렉 기다림 (261027)
   if(!done&&pk&&!e.pickGot)return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
     <span style="font-size:11px;color:var(--tx);flex:1">📮 ${title} <span style="color:var(--mu)">— 고객 10장 셀렉 기다리는 중 (${e.pickWait}부터 · ${pickDays(e.pickWait)}일째)</span></span>
@@ -3225,9 +3389,9 @@ function dlvRow(e,key,title,due){
   if(done)return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
     <span style="font-size:11px;color:var(--tx);flex:1">✅ ${title} <span style="color:var(--mu)">— ${done} 보냄${pk&&e.pickGot?' · 고객이 고른 10장 '+e.pickGot+' 받음':''}</span></span>
     <button onclick="undoDeliv(${e.id},'${key}',1)" style="padding:4px 9px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--mu);font-size:10px;cursor:pointer">되돌리기</button></div>`;
-  const left=dDiff(TSTR,due),over=left<0;
+  const sd=pk?due:sendDayOf(due),left=dDiff(TSTR,sd),over=left<0;   // (261103) 보낼 날 = 고객 기한 7일 전
   return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
-    <span style="font-size:11px;color:var(--tx);flex:1">${title} <span style="color:${over?'#c0392b':'var(--mu)'}">— ${due}까지 (${dueText(left)})${pk?' · 고객이 고른 10장 '+e.pickGot+' 받음':''}</span></span>
+    <span style="font-size:11px;color:var(--tx);flex:1">${title} <span style="color:${over?'#c0392b':'var(--mu)'}">— ${sd!==due?'보낼 날 '+sd+' ('+dueText(left)+') · 고객 기한 '+due+(over?' ('+dueText(dDiff(TSTR,due))+')':''):due+'까지 ('+dueText(left)+')'}${pk?' · 고객이 고른 10장 '+e.pickGot+' 받음':''}</span></span>
     <button onclick="markDeliv(${e.id},'${key}',1)" style="padding:4px 10px;border:none;border-radius:7px;background:var(--R);color:#fff;font-size:10px;font-weight:700;cursor:pointer">보냈음 ✓</button></div>`
     +(key==='basic'&&!pk?`<div style="margin:-3px 0 4px"><button onclick="setPick(${e.id},'wait',1)" style="padding:3px 0;border:none;background:none;color:var(--mu);font-size:10px;cursor:pointer;text-decoration:underline;text-underline-offset:2px">📮 고객이 10장 골라 보내 줘야 하는 경우 — 셀렉 기다림으로 표시</button></div>`:'');
 }
@@ -3655,16 +3819,126 @@ function delEv(id){
 }
 
 // ── 알림 페이지 (260714 v5.0) ──
+// ── 수빈 «먼저 볼 것» (261103 명진) ──
+// 「빈자리 수빈이한테 강조해서 캘린더 들어가면 제일 먼저 확인 필요 알림 건과 같이 두개 창을 보고 캘린더 보게 해줘」 + «한 화면에 두 칸»
+// 수빈이 들어오면 캘린더 전에 이 한 화면 — ① 확인 필요(내 일, 고객 쪽 날짜가 급한 순) ② 빈 자리(앞으로 2주, 크게) → [캘린더 보기].
+// 폰은 위아래(①은 화면 높이에 맞춰 3/2/1건 · 머리줄 «빈 자리 N ↓»), 넓은 화면은 나란히. 빈 자리 규칙·색·글은 대시보드와 같다.
+// 세션 자동 입장 땐 스크립트 중간에서 불리므로, 여기서 쓰는 상수는 위(보낼 날 묶음)에 두고 dashData 는 쓰지 않는다.
+function firstCap(){
+  const wide=!!(window.matchMedia&&matchMedia('(min-width:900px)').matches);
+  return{wide:wide,n:wide?FIRST_TODO_MAX.wide:FIRST_TODO_MAX.narrow,key:wide+':'+(window.innerWidth||0)};
+}
+// 화면에서 실제로 보이는 아래끝(폰 아래 탭바 위) — #pg-first 안쪽 기준 높이로 돌려준다
+function firstVisibleH(pg){
+  const r=pg.getBoundingClientRect();let vb=Math.min(r.bottom,window.innerHeight||r.bottom);
+  const tabs=document.getElementById('tnTabs');
+  if(tabs&&getComputedStyle(tabs).position==='fixed'){const tr=tabs.getBoundingClientRect();if(tr.top>(window.innerHeight||0)/2)vb=Math.min(vb,tr.top);}
+  return vb-r.top;
+}
+function renderFirst(fromData){
+  const pg=document.getElementById('pg-first');if(!pg)return;
+  if(fromData)pg.classList.remove('mc-enter');   // 기록 때문에 다시 그릴 땐 떠오르는 움직임을 다시 걸지 않는다(깜빡임 방지)
+  const W=['일','월','화','수','목','금','토'],md=ds=>Number(ds.slice(5,7))+'/'+Number(ds.slice(8));
+  const cap=firstCap();_firstCapKey=cap.key;
+  const t=myTodo(),items=t.late.concat(t.soon).sort(alertCmp);
+  const kindT=a=>a.kind==='rush'?'🚨 긴급 보정본':a.kind==='basic'?'📦 '+DLV_TITLE.basic:a.kind==='buy'?'🎞️ '+(DLV_TITLE[a.e.status]||'구매분'):'👗 의상확인';
+  const row=a=>{
+    const e=a.e,L=LABELS[e.label]||{name:'기타',color:'#9a9a9a'},over=a.left<0;
+    const key=a.kind==='rush'?'rush':a.kind==='basic'?'basic':'buy';
+    const adj=a.early&&dDiff(a.due,a.cust)<SEND_EARLY_DAYS;   // 규칙 첫 주라 7일보다 덜 앞당긴 건
+    const when=a.early
+      ?`보낼 날 ${md(a.due)}${adj?' <i class="fl-adj">첫 주 조정</i>':''} · <b>${dueText(a.left)}</b> · <span class="nw">고객 기한 ${md(a.cust)}${over?' ('+dueText(dDiff(TSTR,a.cust))+')':''}</span>`
+      :`${a.kind==='rush'?'약속 기한':'기한'} ${md(a.due)} · <b>${dueText(a.left)}</b>`;
+    const act=a.kind==='outfit'?`<button class="btn-ok" onclick="setStatus(${e.id},'outfit')">👗 의상확인 완료</button>`
+      :_cloudReady?`<button class="btn-ok" onclick="markDeliv(${e.id},'${key}')">보냈음 ✓</button>`
+      :`<button class="btn-ok" disabled title="최신 기록을 받은 뒤에 누를 수 있어요">${_cloudFailed?'잠김':'불러오는 중…'}</button>`;
+    return`<div class="fl-item${over?' over':''}">
+      <div class="fl-tx"><div class="fl-it"><span class="fl-lb" style="background:${L.color};color:${lblTc(e.label)}">${L.name}</span><span class="fl-k">${kindT(a)}</span></div>
+        <div class="fl-n">${esc(e.client||'(이름 없음)')}</div>
+        <div class="fl-w">촬영 ${md(e.date)} · ${when}</div></div>
+      <div class="fl-bt">${act}<button class="btn-ng" onclick="openD(${e.id})">일정 보기</button></div>
+    </div>`;
+  };
+  // 빈 자리 — 앞으로 2주(대시보드와 같은 daySlots 규칙). 시간마다 노쇼로 빈 자리인지도 · fo = 안 받아서 빈 자리
+  const days=[];let fn=0,fo=0,fslots=0;   // fslots = 받는 자리 전체(빈 자리 0 이 «다 참»인지 «받는 날 없음»인지 가르기)
+  for(let i=0;i<14;i++){
+    const ds=addDays(TSTR,i),info=daySlots(ds);
+    let cls='off',c=0,cn=0,times=[];
+    if(info.kind==='inq')cls='inq';
+    else if(info.kind==='slots'){
+      const open=info.slots.filter(x=>x.avail);
+      c=open.length;cn=open.filter(x=>x.byNosh).length;times=open.map(x=>({h:x.s,ns:!!x.byNosh}));fslots+=info.slots.length;
+      cls=c?(cn===c?'freeNosh':'freeOpen'):'full';
+    }
+    fn+=c;fo+=c-cn;days.push({ds,cls,c,cn,times});
+  }
+  let f62=0;   // 2개월 전체(대시보드 «빈 자리»와 같은 셈)
+  for(let i=0;i<62;i++){const info=daySlots(addDays(TSTR,i));if(info.kind==='slots')f62+=info.slots.filter(x=>x.avail).length;}
+  const tone=fo?'red':fn?'yel':'ok';   // 안 받아서 빈 자리가 있으면 빨강, 전부 노쇼면 노랑, 없으면 초록
+  const twoTitle={freeOpen:'예약을 안 받아 비어 있음',freeNosh:'노쇼로 비어 있음',full:'다 참',inq:'야외 문의만',off:'휴무·불가'};
+  const pad0=Array.from({length:dowOf(days[0].ds)},()=>'<i class="pad"></i>').join('');
+  const cells=days.map(d=>`<i class="${d.cls}" title="${d.ds} · ${twoTitle[d.cls]||''}${d.c?' ('+d.c+'자리'+(d.cn?', 노쇼 '+d.cn:'')+')':''}" onclick="firstGoDay('${d.ds}')">${Number(d.ds.slice(8))}${d.c?'<u>'+d.c+'</u>':''}</i>`).join('');
+  const frows=days.filter(d=>d.c).map(d=>`<div class="fr"><b>${md(d.ds)}<u>${W[dowOf(d.ds)]}</u></b><div class="ft">${d.times.map(x=>`<s${x.ns?' class="ns"':''}>${x.h}시</s>`).join('')}</div><button class="fl-see" onclick="firstGoDay('${d.ds}')" aria-label="${md(d.ds)} 캘린더에서 보기">보기 →</button></div>`).join('');
+  const head=cap.wide?'<button class="btn-ok fl-gobtn" onclick="firstGoCal()">캘린더 보기 →</button>'
+    :(fn?`<button class="fl-jump fl-${tone}" onclick="firstJumpFree()">빈 자리 ${fn} ↓</button>`:'');
+  const paint=n=>{const shown=items.slice(0,n);pg.innerHTML=`<div class="fl-wrap">
+    <div class="dhd"><div><h1>먼저 볼 것</h1><div class="ddate">${TODAY.getMonth()+1}월 ${TODAY.getDate()}일 ${W[TODAY.getDay()]}요일 · 캘린더 전에 두 가지 먼저</div></div>${head}</div>
+    <div class="fl-grid">
+      <div class="dcard fl-card fl-todo"><div class="dch"><h2>① 확인 필요</h2><span class="dpill">${items.length}건</span></div>
+        <div class="fl-sub">${t.role==='sb'?`<b>보낼 날 지남 ${t.late.length}</b> · 일주일 안 ${t.soon.length} — 보정본·구매분은 고객 기한 ${SEND_EARLY_DAYS}일 전이 «보낼 날»`:esc(ROLE_WHAT[t.role]||'')}</div>
+        ${!_cloudReady&&_cloudFailed?'<div class="fl-lock">최신 기록을 못 받아 «보냈음 ✓»을 잠갔어요 <button class="fl-retry" onclick="syncFromGithub()">다시 불러오기</button></div>':''}
+        ${items.length?shown.map(row).join('')+(items.length>shown.length?`<button class="fl-more" onclick="navTab('alert')">외 ${items.length-shown.length}건 더 — 알림에서 보기 →</button>`:'')
+          :'<div class="dempty">지금 확인할 일이 없어요 🍀</div>'}
+      </div>
+      <div class="dcard fl-card fl-free${tone==='ok'?' fl-calm':''}"><div class="dch"><h2>② 빈 자리</h2><span class="dpill">앞으로 2주</span></div>
+        <div class="fl-big fl-${tone}"><b>${fn}</b><span>${fn?'자리 비어 있어요':fslots?'자리 — 2주가 다 찼어요':'자리 — 앞으로 2주는 받는 날이 없어요(휴무·막힘)'}</span></div>
+        <div class="mini"><b>일</b><b>월</b><b>화</b><b>수</b><b>목</b><b>금</b><b>토</b>${pad0}${cells}</div>
+        <div class="mlg"><span><i style="background:#e0564a"></i><b>안 받아서 빈 자리</b></span><span><i style="background:#f2c230"></i>노쇼로 빈 자리</span><span><i style="background:#a9dcc3"></i>다 참</span><span><i style="background:#eef3e8"></i>야외 문의</span><span><i style="background:#e6e9e4"></i>휴무</span></div>
+        ${frows?`<div class="flist">${frows}</div>`:''}
+        <div class="dnote">${fn?'빈 자리는 경고입니다. <b style="color:#c0392b">빨강</b>은 열어두지 않아 비었고, <b style="color:#9a7a10">노랑</b>은 노쇼로 비었습니다. · ':''}앞으로 2개월 전체로는 ${f62}자리 비어 있어요.</div>
+      </div>
+    </div>
+    <div class="fl-go"><button class="btn-ok fl-gobtn" onclick="firstGoCal()">캘린더 보기 →</button></div>
+  </div>`;};
+  let n=cap.n;paint(n);
+  // 폰: ② 빈 자리 큰 숫자가 첫 화면 안에 들어오도록 ① 건수를 줄인다(3 → 2 → 1) — 사파리 주소창·작은 폰까지 실제 보이는 높이 기준
+  if(!cap.wide){
+    const vh=firstVisibleH(pg);
+    while(n>1){
+      const big=pg.querySelector('.fl-big');if(!big)break;
+      const off=big.getBoundingClientRect().bottom-pg.getBoundingClientRect().top+pg.scrollTop;   // 페이지 맨 위에서 큰 숫자 아래끝까지
+      if(off<=vh)break;
+      n--;paint(n);
+    }
+  }
+}
+function firstGoCal(){navTab('cal');}   // navTab 은 «잠깐만요» 재촉을 거치지 않는다 — 방금 ①②를 다 봤으므로
+function firstGoDay(ds){   // 빈 날을 누르면 그날 캘린더로(검색과 같은 이동·반짝임) — 일정 없는 날에 «일정 추가» 창이 뜨지 않게
+  if(window.mcGoDate){mcGoDate(ds,null);return;}
+  curDate=parseDS(ds);calView='month';navTab('cal');
+}
+function firstJumpFree(){const f=document.querySelector('#pg-first .fl-free');if(f)f.scrollIntoView({behavior:'smooth',block:'start'});}
+window.addEventListener('resize',function(){   // 돌리거나 창 크기를 바꿔 건수·위 버튼 기준이 바뀌면 다시 그린다
+  if(typeof curPage==='undefined'||curPage!=='first')return;
+  const c=firstCap();if(c.key!==_firstCapKey)renderFirst(true);
+});
 function renderAlerts(){
   const list=buildAlerts(),picks=pickList();
-  const urgent=list.filter(a=>a.urgent),wait=list.filter(a=>!a.urgent);
+  const urgent=list.filter(a=>a.urgent),wait=list.filter(a=>!a.urgent&&!a.plan),plans=list.filter(a=>!a.urgent&&a.plan);   // plan = 상담 고객 내 계획(명진만)
   const late=urgent.filter(a=>a.left<0).length;
   const card=a=>{
     const e=a.e,L=LABELS[e.label]||{name:'기타',color:'#9a9a9a'};
     const over=a.left<0;
     const tone=over?'#c0392b':(a.left<=1?'#c4763a':'var(--mu2)');
-    let head,body,act;
-    if(a.kind==='outfit'){
+    let head,body,act,chip='';
+    if(a.plan){   // 📅 내 계획 — 상담 고객
+      const title=a.kind==='basic'?DLV_TITLE.basic:(DLV_TITLE[e.status]||'구매분');
+      const pt=over?'#c0392b':(a.left<=1?'#c4763a':'#2f6b45');
+      head='📅 '+title+' — 내 계획';
+      body=`촬영 ${e.date} · 보낼 계획 <b style="color:${pt}">${esc(a.due)} (${planLeftText(a.left)})</b>${a.orig?` · 고객 기한 ${a.orig}`:''}`;
+      act=`<button class="btn-ok" onclick="markDeliv(${e.id},'${a.kind}')">보냈음 ✓</button>`;
+      chip=planChip(e,a.kind,a.due);
+    }else if(a.kind==='outfit'){
       head='👗 의상확인';
       body=`촬영 ${e.date}${e.time?' '+e.time.slice(0,5):''} — <b style="color:${tone}">${a.left===0?'오늘 촬영':`촬영 ${a.left}일 전`}</b> · 아직 의상확인 전`;
       act=`<button class="btn-ok" onclick="setStatus(${e.id},'outfit');renderAlerts()">👗 의상확인 완료</button>`;
@@ -3676,19 +3950,22 @@ function renderAlerts(){
       const key=a.kind==='basic'?'basic':'buy';
       const title=a.kind==='basic'?DLV_TITLE.basic:(DLV_TITLE[e.status]||'구매분');
       head=(a.kind==='basic'?'📦 ':'🎞️ ')+title+' 전달';
-      body=`촬영 ${e.date} · 기한 ${a.due} — <b style="color:${tone}">${dueText(a.left)}</b>`;
+      body=a.early   // (261103) 보낼 날(고객 기한 7일 전) 기준 · 보낼 날이 지났으면 고객 기한까지 남은 날도
+        ?`촬영 ${e.date} · 보낼 날 ${a.due} — <b style="color:${tone}">${dueText(a.left)}</b> · 고객 기한 ${a.cust}${over?` (${dueText(dDiff(TSTR,a.cust))})`:''}`
+        :`촬영 ${e.date} · 기한 ${a.due} — <b style="color:${tone}">${dueText(a.left)}</b>`;
       act=`<button class="btn-ok" onclick="markDeliv(${e.id},'${key}')">보냈음 ✓</button>`;
+      if(a.urgent)chip=planChip(e,key,null);   // 명진만 — 지금 챙겨야 할 일(지난 건·보낼 날 3일 안)에 «📅 내 계획 날짜»
     }
     return`<div class="rcard" style="${over?'border-color:#e0a3a3;background:#fdf4f4':''}">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
         <span style="background:${L.color};color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">${L.name}</span>
         <span style="font-size:10px;font-weight:800;color:var(--mu2)">${head}</span>
+        ${chip}
       </div>
       <div class="rn">${esc(e.client||'(이름 없음)')}</div>
       <div class="rm">${body}</div>
-      <div class="act-row" style="margin-top:10px">
-        ${act}
-        <button class="btn-ng" style="background:var(--bd);color:var(--mu);border:none" onclick="openD(${e.id})">일정 보기</button>
+      <div class="act-row act-r" style="margin-top:10px">
+        <button class="btn-ng" style="background:var(--bd);color:var(--mu);border:none" onclick="openD(${e.id})">일정 보기</button>${act}
       </div>
     </div>`;
   };
@@ -3696,12 +3973,16 @@ function renderAlerts(){
     <div class="rq-wrap">
       <div class="stats" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat"><div class="sn">${urgent.length}</div><div class="sl">지금 챙길 일</div></div>
-        <div class="stat"><div class="sn" style="${late?'color:#c0392b':''}">${late}</div><div class="sl">기한 지남</div></div>
+        <div class="stat"><div class="sn" style="${late?'color:#c0392b':''}">${late}</div><div class="sl">보낼 날 지남</div></div>
         <div class="stat"><div class="sn">${wait.length}</div><div class="sl">전달 대기</div></div>
       </div>
       ${urgent.length
         ?`<div class="sect-label">🔥 지금 챙겨야 할 일 (${urgent.length})</div>${urgent.map(card).join('')}`
         :'<div style="color:var(--mu);font-size:13px;text-align:center;padding:24px 0">지금 급한 일은 없습니다. 👌</div>'
+      }
+      ${plans.length
+        ?`<div class="sect-label" style="margin-top:16px">📅 내 계획 — 상담 고객 (${plans.length})</div>${plans.map(card).join('')}`
+        :''
       }
       ${wait.length
         ?`<div class="sect-label" style="margin-top:16px">📦 전달 대기 — 기한 전 (${wait.length})</div>${wait.map(card).join('')}`
@@ -3721,17 +4002,19 @@ function renderAlerts(){
             </div>
             <div class="rn">${esc(e.client||'(이름 없음)')}</div>
             <div class="rm">${body}</div>
-            <div class="act-row" style="margin-top:10px">${act}
-              <button class="btn-ng" style="background:var(--bd);color:var(--mu);border:none" onclick="openD(${e.id})">일정 보기</button>
+            <div class="act-row act-r" style="margin-top:10px">
+              <button class="btn-ng" style="background:var(--bd);color:var(--mu);border:none" onclick="openD(${e.id})">일정 보기</button>${act}
             </div>
           </div>`;}).join('')}`
         :''
       }
       <div style="font-size:10px;color:var(--mu);text-align:center;margin-top:16px;line-height:1.6">
-        전달할 건은 촬영 직후부터 '전달 대기'에 계속 떠 있고, 기한 ${ALERT_LEAD}일 전부터 '지금 챙겨야 할 일'로 올라옵니다.<br>
+        전달할 건은 촬영 직후부터 '전달 대기'에 계속 떠 있고, 보낼 날 ${ALERT_LEAD}일 전부터 '지금 챙겨야 할 일'로 올라옵니다.<br>
+        📦 기본 보정본·구매분은 고객 기한 ${SEND_EARLY_DAYS}일 전이 «보낼 날»입니다 — 규칙 첫 주만: 고객 기한 11/9까지는 그대로, 11/10~11/16은 11/9(«첫 주 조정»), 11/17부터 7일 전 · 고객 기한은 그대로.<br>
         기본 보정본 1달 · 2번 색보정 2주 · 전체 원본 2주 · 전체 색보정 1달 · 🚨 긴급은 직접 기록한 날짜 기준<br>
         '보냈음 ✓'을 눌러야 목록에서 사라집니다 · ${DELIV_SINCE} 이전 촬영은 전달 완료로 봅니다.<br>
-        📮 고객이 10장을 골라 보내 줘야 하는 건은 재촉하지 않고 맨 아래에 따로 모읍니다(일정 상세 → 전달 체크에서 표시).
+        📮 고객이 10장을 골라 보내 줘야 하는 건은 재촉하지 않고 맨 아래에 따로 모읍니다(일정 상세 → 전달 체크에서 표시).${myRole()==='mj'?`<br>
+        📅 따로 상담한 고객은 «내 계획 날짜»를 적으면 그 날짜 기준으로 알립니다(3일 전부터 «지금 챙겨야 할 일», 지나면 «보낼 날 지남») · 수빈 목록·재촉엔 안 나옵니다(명진만 보임).`:''}
       </div>
     </div>`;
 }
@@ -3958,7 +4241,7 @@ function doJsonImport(){
       if(!e.date||!e.label)return;
       const _id=nextId++;
       // 전달 체크(dlvBasic/dlvBuy)가 들어 있으면 살려서 가져온다
-      maydlyEvents.push({id:_id,label:e.label||'studio_f',date:e.date,time:e.time||'10:00',dur:parseFloat(e.dur)||2,status:e.status||'booked',client:e.client||null,insta:e.insta||e.phone||null,note:e.note||'',priv:e.priv||['rest','personal'].includes(e.label),allDay:!!e.allDay,dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null,...(e.pickWait?{pickWait:e.pickWait,pickGot:e.pickGot||null}:{}),...(e.createdAt?{createdAt:e.createdAt}:{})});
+      maydlyEvents.push({id:_id,label:e.label||'studio_f',date:e.date,time:e.time||'10:00',dur:parseFloat(e.dur)||2,status:e.status||'booked',client:e.client||null,insta:e.insta||e.phone||null,note:e.note||'',priv:e.priv||['rest','personal'].includes(e.label),allDay:!!e.allDay,dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null,...(e.pickWait?{pickWait:e.pickWait,pickGot:e.pickGot||null}:{}),...(e.planBasic?{planBasic:e.planBasic}:{}),...(e.planBuy?{planBuy:e.planBuy}:{}),...(e.createdAt?{createdAt:e.createdAt}:{})});
       _addedIds.push(_id);
       added++;
     });
@@ -4054,7 +4337,17 @@ function clearAll(){
 function openP(){document.getElementById('ov').style.display='flex';}
 function closeP(){document.getElementById('ov').style.display='none';seLabel=null;}
 function ovClick(e){if(e.target===document.getElementById('ov'))closeP();}
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+function toast(m){const t=document.getElementById('toast');t.classList.remove('undo');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+// (261103) 잘못 누른 «보냈음 ✓»을 바로 되돌리는 안내 — 6초 동안만 누를 수 있다
+let _undoT=null;
+function toastUndo(m,fn){
+  const t=document.getElementById('toast');if(!t){toast(m);return;}
+  t.textContent='';const sp=document.createElement('span');sp.textContent=m;t.appendChild(sp);
+  const b=document.createElement('button');b.type='button';b.className='toast-undo';b.textContent='되돌리기';
+  b.onclick=function(ev){ev.stopPropagation();clearTimeout(_undoT);t.classList.remove('on','undo');try{fn();}catch(_){}};
+  t.appendChild(b);t.classList.add('on','undo');
+  clearTimeout(_undoT);_undoT=setTimeout(()=>t.classList.remove('on','undo'),6000);
+}
 // ── 가져오기 되돌리기(1단계): 가져오기 실행 직전 상태를 저장해두고 복원 ──
 function pushUndoSnapshot(){
   try{
@@ -4336,7 +4629,7 @@ function mergeIcal() {
     if(pg==='cal'&&window.mcFitNames) window.mcFitNames();   // 숨겨진 채 그려진 칸은 보일 때 다시 잰다
     try{
       var p=$('pg-'+pg); if(!p) return;
-      ['dash','cal','alert','req','import'].forEach(function(k){ var x=$('pg-'+k); if(x) x.classList.remove('mc-enter'); });
+      ['dash','cal','alert','req','import','first'].forEach(function(k){ var x=$('pg-'+k); if(x) x.classList.remove('mc-enter'); });
       if(reduced()) return;
       var i=0;
       p.querySelectorAll('.dhd,.kpi,.dcard,.rcard,.stat,.sect-label,.import-box,.cal-top,.cal-filterbar,#calBody').forEach(function(el){
@@ -4729,6 +5022,7 @@ function mergeIcal() {
     if(id!=null){ var b=document.querySelector('#calBody .m-bar[data-id="'+id+'"]');
       if(b){ b.classList.remove('mc-flash'); void b.offsetWidth; b.classList.add('mc-flash'); try{ b.scrollIntoView({block:'nearest'}); }catch(e){} setTimeout(function(){ b.classList.remove('mc-flash'); },1500); } }
   }
+  window.mcGoDate=function(ds,id){return goDate(ds,id);};   // (261103) «먼저 볼 것» 빈 날 누르기
   function goDate(ds,id){
     curDate=parseDS(ds);
     calView='month';
