@@ -1080,6 +1080,30 @@ html.embed-cal .topnav{height:46px}
 .fl-go{display:flex;justify-content:flex-end}
 .fl-go .btn-ok{flex:0 0 auto}
 .fl-gobtn{min-height:48px;padding:0 26px;font-size:14px}
+/* NYC 대관 견적서 (261103 운영-003 19) — 누르는 것은 오른쪽, 입력은 16px(아이폰 확대 방지) */
+.det-qz{align-items:center}
+.qz-open{margin-left:auto;min-height:40px;padding:0 16px;border-radius:12px;border:1px solid var(--bd2);background:#fff;color:var(--tx);font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
+.qz{display:flex;flex-direction:column;gap:8px}
+.qz-who{font-size:12.5px;color:var(--mu2);margin-bottom:2px;line-height:1.5}
+.qz-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:40px}
+.qz-l{font-size:13px;font-weight:700;color:var(--tx);min-width:88px}
+.qz-v{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end;min-width:0}
+.qz-v input[type=time],.qz-v input[type=date],.qz-v input[type=text],.qz-v select{height:40px;padding:0 10px;border:1px solid var(--bd);border-radius:10px;background:var(--sf2);color:var(--tx);font-size:16px;font-family:inherit;box-sizing:border-box;min-width:0}
+.qz-v input[type=text]{width:132px;text-align:right}
+.qz-v select{max-width:min(280px,66vw);padding-right:30px;text-overflow:ellipsis}
+.qz-step{width:40px;height:40px;border-radius:12px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:18px;line-height:1;font-weight:700;cursor:pointer;font-family:inherit}
+.qz-n{min-width:40px;text-align:center;font-size:13px}
+.qz-note{font-size:11px;color:var(--mu);text-align:right;margin-top:-4px;line-height:1.5}
+.qz-prev{margin-top:6px;border:1px solid var(--bd);border-radius:12px;overflow:hidden;background:#f7f6f2;min-height:120px}
+.qz-prev img{display:block;width:100%;height:auto}
+.qz-prev img:not([src]),.qz-prev.qz-wait img{display:none}
+.qz-prev.qz-wait::after{content:'대관 공간과 시간을 정하면 견적서가 여기 보여요';display:block;padding:44px 16px;text-align:center;font-size:12.5px;color:var(--mu);line-height:1.6}
+.qz-nd{margin-left:8px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--bd2);background:#fff;color:var(--tx);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;vertical-align:middle}
+.qz-fn{font-size:11px;color:var(--mu);word-break:break-all;text-align:right}
+.qz-act{justify-content:flex-end}
+.qz-act .btn-ok,.qz-act .btn-ng{flex:0 0 auto}
+.qz-act .btn-ok[disabled]{opacity:.5;cursor:default}
+.qz-back{background:var(--bd)!important;color:var(--mu)!important;border:none!important}
 </style>
 <style id="sian-panel-css">
 /* ── 시안 열람 승인 칸 (261101) ── */
@@ -3261,6 +3285,243 @@ function fmtCreated(iso){
   const d=new Date(iso);if(isNaN(d))return esc(String(iso));
   return fd(d)+'('+['일','월','화','수','목','금','토'][d.getDay()]+') '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
 }
+// ── NYC STUDIO 대관 견적서 이미지 (운영-003 19) ──
+const QUOTE_SPACES={   // NYC 이용 안내(nyc-studio-guide) 요금 — 시간당
+  A:{name:'A 호리존',rate:50000},
+  B:{name:'B 소호',rate:30000},
+  C:{name:'C 세트룸',rate:60000},
+  D:{name:'D 파킹룸',rate:75000},
+  AB:{name:'A 호리존 + B 소호',rate:80000,tag:'연계 대관'},
+  ABC:{name:'A 호리존 + B 소호 + C 세트룸',rate:140000,tag:'연계 대관'},
+  CD:{name:'C 세트룸 + D 파킹룸',rate:150000,tag:'연계 대관'},
+  ALL:{name:'전체 대관',rate:200000,tag:'A 호리존 + B 소호 + C 세트룸 + D 파킹룸'}
+};
+const QUOTE_SPACE_BY_LABEL={studio_f:'AB',studio_m:'AB',studio_pay:'AB',brand:''};   // '' = 만들 때 고르기 · 목록에 없는 라벨(야외 등)은 견적서 없음
+const QUOTE_MIN_H=2, QUOTE_EXTRA_PER=5000;   // 최소 2시간 · 추가 인원 1인·1시간당 5,000원
+const QUOTE_PAD_H=1;      // 대관 = 촬영 앞뒤 1시간씩(준비·정리)
+const QUOTE_GUIDE='nyc-studio-guide.nyc1392.workers.dev';
+const QUOTE_ADDR='서울 강동구 양재대로 1392 진산빌딩 B102호';
+const QUOTE_FONT="'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo',sans-serif";
+
+// q = {issued:'YYYY-MM-DD', date:'YYYY-MM-DD', start:'HH:MM', hours:number, space:'AB', extra:0, total:number|null(=계산값)}
+function quoteCalc(q){
+  const sp=QUOTE_SPACES[q.space]||null, bill=Math.max(QUOTE_MIN_H,Number(q.hours)||0);
+  const base=sp?sp.rate*bill:0, ext=Math.max(0,parseInt(q.extra,10)||0)*QUOTE_EXTRA_PER*bill;
+  return{sp,bill,base,ext,total:(q.total!=null&&q.total!=='')?Number(q.total):base+ext};
+}
+function quoteFileName(q){
+  const t=q.start?q.start.replace(':','')+'-'+quoteEnd(q).replace(':',''):'';
+  return 'NYC STUDIO 대관 견적서_'+q.date+(t?'_'+t:'')+'.png';
+}
+function quoteEnd(q){
+  const p=String(q.start||'0:0').split(':').map(Number),m=p[0]*60+(p[1]||0)+Math.round((Number(q.hours)||0)*60);
+  if(m===24*60)return '24:00';   // 자정까지
+  return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+}
+function quoteCross(q){const p=String(q.start||'0:0').split(':').map(Number);return p[0]*60+(p[1]||0)+Math.round((Number(q.hours)||0)*60)>24*60;}
+function quoteEndLabel(q){return (quoteCross(q)?'다음 날 ':'')+quoteEnd(q);}   // 자정을 넘으면 «다음 날 01:00»
+// 대관 금액 줄 — 합계를 직접 고치면 그 차이를 «금액 조정» 줄로 보여 줘서 본문 계산과 합계가 어긋나지 않게 한다
+function quoteAmtLines(q,c){
+  const L=[{k:'공간 대관료',a:c.base,s1:(c.sp?c.sp.name+' · 시간당 '+quoteWon(c.sp.rate):''),s2:'× '+quoteHrs(c.bill)}];
+  if(c.ext)L.push({k:'추가 인원',a:c.ext,s1:'기본 인원 초과 '+(parseInt(q.extra,10)||0)+'인 · 1인·1시간당 '+quoteWon(QUOTE_EXTRA_PER),s2:'× '+quoteHrs(c.bill)});
+  const adj=c.total-(c.base+c.ext);
+  if(adj)L.push({k:'금액 조정',a:adj,sign:true});
+  return L;
+}
+function quoteDateKo(ds){const d=new Date(ds+'T12:00:00');return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 ('+'일월화수목금토'[d.getDay()]+')';}
+function quoteDot(ds){const a=ds.split('-').map(Number);return a[0]+'. '+a[1]+'. '+a[2]+'.';}
+function quoteWon(n){return Number(n||0).toLocaleString('ko-KR')+'원';}
+function quoteHrs(h){const n=Number(h)||0;return (Math.round(n*10)/10)+'시간';}
+
+// 그리기 — 1024 폭 기준 좌표를 scale 배로(기본 2배) 그린다. 높이는 내용에 맞춰 정한다.
+async function quoteCanvas(q,scale){
+  scale=scale||2;
+  const texts='NYC STUDIO ESTIMATE 대관 견적서 발행일 예약 정보 예약자 maydly 대관일 이용 시간 대관 공간 대관 금액 공간 대관료 추가 인원 합계 금액 예약 확정 변경 취소 이용 안내 '
+    +quoteDateKo(q.date)+' '+quoteDot(q.issued)+' 0123456789,.:~×+·원시간인당 '+Object.keys(QUOTE_SPACES).map(k=>QUOTE_SPACES[k].name+' '+(QUOTE_SPACES[k].tag||'')).join(' ')
+    +' 기본 인원 초과 촬영일 2주 전 취소 100% 환불 이내 환불 불가 그 밖의 이용 안내는 NYC STUDIO 이용 안내 페이지를 참고해 주세요 — '+QUOTE_GUIDE+' '+QUOTE_ADDR+' 본 견적서는 위 예약 건에 한해 발행되었으며, 다른 예약 정보는 포함되어 있지 않습니다. ✓ 최소 기준 1시간당 금액 조정 다음 날 −+';
+  try{ if(document.fonts&&document.fonts.load){ await Promise.all([400,500,700,800].map(w=>document.fonts.load(w+' 20px '+QUOTE_FONT,texts))); } }catch(e){}
+  const c=quoteCalc(q);
+  const W=1024, card={x:30,y:30,w:964}, L=76, R=948;
+  // 높이 먼저 셈
+  const rows=[ {k:'예약자',v:'maydly'}, {k:'대관일',v:quoteDateKo(q.date)},
+    {k:'이용 시간',v:q.start+' ~ '+quoteEndLabel(q),s:quoteHrs(q.hours)+((Number(q.hours)||0)<QUOTE_MIN_H?' · 최소 '+QUOTE_MIN_H+'시간 기준':'')},
+    {k:'대관 공간',v:c.sp?c.sp.name:'(공간을 골라 주세요)',s:c.sp&&c.sp.tag?c.sp.tag:''} ];
+  const rowH=r=>r.s?78:55;
+  const amtLines=quoteAmtLines(q,c), lineH=a=>a.s1||a.s2?110:64;
+  let y=0;
+  const H0=238, secInfo=H0+42, tableTop=secInfo+21;
+  const tableH=rows.reduce((s,r)=>s+rowH(r),0);
+  const secAmt=tableTop+tableH+46, boxTop=secAmt+22, boxH=amtLines.reduce((s,a)=>s+lineH(a),0), barTop=boxTop+boxH+2, barH=67;
+  const badgeTop=barTop+barH+17, secRule=badgeTop+29+45, ruleTop=secRule+21, ruleH=115;
+  const guideY=ruleTop+ruleH+30;
+  const footLine=guideY+23+34, cardH=footLine+170-card.y, Hc=Math.max(1536,card.y+cardH+40);   // 1024×1536, 길면 늘림
+  const cv=document.createElement('canvas');cv.width=W*scale;cv.height=Hc*scale;
+  const x=cv.getContext('2d');x.scale(scale,scale);x.textBaseline='middle';
+  const F=(w,sz)=>{x.font=w+' '+sz+'px '+QUOTE_FONT;};
+  const T=(t,px,py,col,align)=>{x.fillStyle=col;x.textAlign=align||'left';x.fillText(t,px,py);};
+  const spaced=(t,px,py,gap,col)=>{x.fillStyle=col;x.textAlign='left';let cx=px;for(const ch of t){x.fillText(ch,cx,py);cx+=x.measureText(ch).width+gap;}};
+  // 바탕 · 카드
+  x.fillStyle='#f7f6f2';x.fillRect(0,0,W,Hc);
+  x.beginPath();x.roundRect?x.roundRect(card.x,card.y,card.w,cardH,28):x.rect(card.x,card.y,card.w,cardH);x.fillStyle='#fff';x.fill();
+  x.lineWidth=1;x.strokeStyle='#e9e7e1';x.stroke();
+  // 머리
+  F(700,25);T('NYC STUDIO',L,88,'#1b1b1b');
+  const nw=x.measureText('NYC STUDIO').width;F(500,13);spaced('ESTIMATE',L+nw+20,91,2.6,'#8c8c8c');
+  F(800,38);T('대관 견적서',L,145,'#161616');
+  F(400,13.5);T('발행일 '+quoteDot(q.issued),L,194,'#8f8f8f');
+  x.fillStyle='#111';x.fillRect(card.x,H0-1.25,card.w,2.5);
+  // 예약 정보
+  F(700,14);spaced('예약 정보',L,secInfo,1.4,'#9a7425');
+  x.fillStyle='#e8e6e0';x.fillRect(L,tableTop,R-L,1);
+  let ry=tableTop+1;
+  rows.forEach(r=>{
+    const h=rowH(r);
+    x.fillStyle='#f6f5f1';x.fillRect(L,ry,256,h-1);
+    F(500,16);T(r.k,L+20,ry+27,'#1b1b1b');
+    F(400,16);T(r.v,353,ry+27,'#1b1b1b');
+    if(r.s){F(400,13.5);T(r.s,353,ry+53,'#9a9a9a');}
+    ry+=h;x.fillStyle='#e8e6e0';x.fillRect(L,ry-1,R-L,1);
+  });
+  // 대관 금액
+  F(700,14);spaced('대관 금액',L,secAmt,1.4,'#9a7425');
+  let lt=boxTop;
+  amtLines.forEach((a,i)=>{
+    const t=lt,h=lineH(a);lt+=h;
+    x.fillStyle='#f8f7f3';x.fillRect(L,t,R-L,h);
+    if(i){x.fillStyle='#ebe8e1';x.fillRect(L+20,t,R-L-40,1);}
+    F(700,16);T(a.k,L+20,t+28,'#1b1b1b');
+    F(400,16);T(a.sign?(a.a<0?'−':'+')+quoteWon(Math.abs(a.a)):quoteWon(a.a),R-20,t+28,'#1b1b1b','right');
+    F(400,13.5);if(a.s1)T(a.s1,L+20,t+56,'#9a9a9a');if(a.s2)T(a.s2,L+20,t+79,'#9a9a9a');
+  });
+  x.fillStyle='#141414';x.fillRect(L,barTop,R-L,barH);
+  F(700,16);T('합계 금액',L+23,barTop+barH/2+1,'#fff');
+  F(800,24);T(quoteWon(c.total),R-22,barTop+barH/2+1,'#fff','right');
+  // 예약 확정
+  F(700,13.5);const bt='✓ 예약 확정',bw=x.measureText(bt).width+32;
+  x.beginPath();x.roundRect?x.roundRect(L,badgeTop,bw,29,14.5):x.rect(L,badgeTop,bw,29);x.fillStyle='#e5f3ea';x.fill();
+  T(bt,L+16,badgeTop+15,'#2f7a4f');
+  // 변경 · 취소 기준
+  F(700,14);spaced('변경 · 취소 기준',L,secRule,1.4,'#9a7425');
+  const MID=512;
+  x.fillStyle='#e8e6e0';x.fillRect(L,ruleTop,R-L,1);
+  [['촬영일 2주 전 취소','100% 환불',false],['촬영일 2주 이내 취소','환불 불가',true]].forEach((r,i)=>{
+    const t=ruleTop+1+i*57.5;
+    x.fillStyle='#f6f5f1';x.fillRect(L,t,MID-L,56.5);
+    x.fillStyle=r[2]?'#fbeaea':'#fff';x.fillRect(MID,t,R-MID,56.5);
+    F(400,16);T(r[0],L+20,t+28,'#1b1b1b');
+    F(700,16);T(r[1],R-20,t+28,r[2]?'#b3261e':'#1b1b1b','right');
+    x.fillStyle='#e8e6e0';x.fillRect(L,t+56.5,R-L,1);
+  });
+  // 그 밖의 이용 안내
+  F(400,13.5);T('그 밖의 이용 안내는 NYC STUDIO 이용 안내 페이지를 참고해 주세요.',L,guideY,'#8f8f8f');
+  F(700,13.5);T(QUOTE_GUIDE,L,guideY+23,'#7a5a14');
+  // 아래
+  x.fillStyle='#efede8';x.fillRect(card.x,footLine,card.w,1);
+  F(700,15);T('NYC STUDIO',L,footLine+39,'#1b1b1b');
+  F(400,14);T(QUOTE_ADDR,L,footLine+70,'#4a4a4a');
+  F(400,13.5);T('본 견적서는 위 예약 건에 한해 발행되었으며, 다른 예약 정보는 포함되어 있지 않습니다.',L,footLine+118,'#9a9a9a');
+  return cv;
+}
+// ── 견적서 만들기 창 (일정 상세 › 📄 견적서) — 명진만 · 예약대기·개인 일정 제외 ──
+// 일정 기록은 아무것도 바꾸지 않는다(저장 없음). 고친 값은 이 창 안에서만 쓰고 이미지에만 들어간다.
+function quoteEligible(e){
+  return !!e&&myRole()==='mj'&&Object.prototype.hasOwnProperty.call(QUOTE_SPACE_BY_LABEL,e.label)
+    &&e.status!=='pending'&&e.status!=='none'&&!e.allDay&&!!e.time;
+}
+function qMin(t){const p=String(t||'0:0').split(':').map(Number);return (p[0]||0)*60+(p[1]||0);}
+function qTime(m){m=Math.max(0,Math.min(24*60-1,m));return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
+let _qz=null,_qzBlob=null,_qzUrl='',_qzT=null,_qzSeq=0;
+function openQuote(id){
+  const e=maydlyEvents.find(x=>x.id===id);if(!quoteEligible(e))return;
+  const s0=qMin(String(e.time).slice(0,5)),d=Math.round((Number(e.dur)||2)*60);
+  const endM=s0+d+QUOTE_PAD_H*60,nd=endM>24*60;   // 대관이 자정을 넘으면 «다음 날»로(정확히 자정이면 23:59 = 자정까지)
+  _qz={id:e.id,issued:TSTR,date:e.date,start:qTime(s0-QUOTE_PAD_H*60),end:nd?qTime(endM-24*60):(endM===24*60?'23:59':qTime(endM)),nextDay:nd,
+       space:QUOTE_SPACE_BY_LABEL[e.label]||'',extra:0,total:''};
+  _qzBlob=null;
+  const L=LABELS[e.label]||{name:'기타'};
+  const opts='<option value="">공간 고르기</option>'+Object.keys(QUOTE_SPACES).map(k=>`<option value="${k}"${k===_qz.space?' selected':''}>${QUOTE_SPACES[k].name}</option>`).join('');
+  document.getElementById('pnh').innerHTML=`📄 NYC 대관 견적서<button class="px" onclick="closeP()">×</button>`;
+  document.getElementById('pb').innerHTML=`<div class="qz">
+    <div class="qz-who">${esc(e.client||'(이름 없음)')} · ${esc(L.name)} · 촬영 ${e.date} ${String(e.time).slice(0,5)}~${qTime(s0+d)}${stActive(e.status)?'':' · '+esc(stName(e.status))}</div>
+    <div class="qz-row"><span class="qz-l">대관 시간</span><div class="qz-v"><input type="time" id="qzS" value="${_qz.start}" onchange="qzSet('start',this.value)" aria-label="대관 시작"><span>~</span><input type="time" id="qzE" value="${_qz.end}" onchange="qzSet('end',this.value)" aria-label="대관 끝"></div></div>
+    <div class="qz-note" id="qzH"></div>
+    <div class="qz-row"><span class="qz-l">대관 공간</span><div class="qz-v"><select id="qzSp" onchange="qzSet('space',this.value)" aria-label="대관 공간">${opts}</select></div></div>
+    <div class="qz-row"><span class="qz-l">추가 인원</span><div class="qz-v"><button class="qz-step" onclick="qzSet('extra',_qz.extra-1)" aria-label="한 명 빼기">−</button><b class="qz-n" id="qzX">0명</b><button class="qz-step" onclick="qzSet('extra',_qz.extra+1)" aria-label="한 명 더하기">+</button></div></div>
+    <div class="qz-note">기본 인원을 넘는 사람만 · 1인·1시간당 ${quoteWon(QUOTE_EXTRA_PER)}</div>
+    <div class="qz-row"><span class="qz-l">합계 금액</span><div class="qz-v"><input type="text" inputmode="numeric" id="qzT" oninput="qzSet('total',this.value)" aria-label="합계 금액(비우면 자동)"><span>원</span></div></div>
+    <div class="qz-note" id="qzTn"></div>
+    <div class="qz-row"><span class="qz-l">발행일</span><div class="qz-v"><input type="date" id="qzI" value="${_qz.issued}" onchange="qzSet('issued',this.value)" aria-label="발행일"></div></div>
+    <div class="qz-prev"><img id="qzImg" alt="견적서 미리보기"></div>
+    <div class="qz-fn" id="qzFn"></div>
+    <div class="act-row qz-act"><button class="btn-ng qz-back" onclick="openD(${e.id})">일정으로</button><button class="btn-ok" id="qzSave" onclick="quoteSave()">이미지 저장</button></div>
+  </div>`;
+  openP();qzPaint();
+}
+function qzQ(){
+  const z=_qz,em=z.nextDay?qMin(z.end)+24*60:(z.end==='23:59'?24*60:qMin(z.end)),hrs=(em-qMin(z.start))/60,t=String(z.total||'').replace(/[^\d]/g,'');   // 23:59 = 자정까지 · 다음 날이면 +24시간
+  return{issued:z.issued||TSTR,date:z.date,start:z.start,hours:hrs,nextDay:!!z.nextDay,space:z.space,extra:z.extra,total:t?Number(t):null};
+}
+function qzSet(k,v){
+  if(!_qz)return;
+  if(k==='extra')v=Math.max(0,Math.min(50,v));
+  if((k==='start'||k==='end')&&!/^\d{2}:\d{2}$/.test(String(v)))return;
+  if(k==='issued'&&!/^\d{4}-\d{2}-\d{2}$/.test(String(v)))return;
+  _qz[k]=v;_qzBlob=null;_qzSeq++;   // 그리던 옛 그림은 버린다(바꾼 직후 저장해도 옛 그림이 나가지 않게)
+  if((k==='start'||k==='end')&&qMin(_qz.end)>qMin(_qz.start))_qz.nextDay=false;   // 끝이 시작보다 늦으면 같은 날
+  clearTimeout(_qzT);_qzT=setTimeout(qzPaint,k==='total'?250:60);
+}
+async function qzPaint(){
+  if(!_qz)return;
+  const seq=++_qzSeq,q=qzQ(),c=quoteCalc(q),$=id=>document.getElementById(id);
+  if(!$('qzImg'))return;
+  $('qzX').textContent=(q.extra||0)+'명';
+  $('qzH').innerHTML=!(q.hours>0)?'끝나는 시각이 시작보다 늦어야 해요'+(q.nextDay?'':'<button class="qz-nd" onclick="qzSet(\'nextDay\',true)">다음 날까지로</button>')
+    :q.hours>24?'24시간을 넘는 대관은 만들 수 없어요'
+    :quoteHrs(q.hours)+(q.hours<QUOTE_MIN_H?' — 최소 '+QUOTE_MIN_H+'시간 요금':'')+(q.nextDay?' · 다음 날 '+_qz.end+'까지':'')+' · 기본은 촬영 앞뒤 '+QUOTE_PAD_H+'시간씩';
+  const auto=c.base+c.ext;
+  $('qzT').placeholder=c.sp?auto.toLocaleString('ko-KR'):'';
+  const adj=q.total!=null?q.total-auto:0;
+  $('qzTn').textContent=q.total!=null?'직접 적은 금액 — '+(adj?'견적서에 «금액 조정 '+(adj<0?'−':'+')+quoteWon(Math.abs(adj))+'» 줄이 같이 들어가요':'요금표와 같아요')+' · 비우면 요금표 '+quoteWon(auto)
+    :(c.sp?'요금표: '+c.sp.name+' 시간당 '+quoteWon(c.sp.rate)+' × '+quoteHrs(c.bill)+(c.ext?' + 추가 인원 '+quoteWon(c.ext):'')+' = '+quoteWon(auto):'대관 공간을 골라야 저장할 수 있어요');
+  $('qzFn').textContent='파일 이름: '+quoteFileName(q);
+  const ok=!!c.sp&&q.hours>0&&q.hours<=24;
+  $('qzSave').disabled=!ok;
+  const pv=$('qzImg').parentNode;pv.classList.toggle('qz-wait',!ok);   // 못 그리는 동안은 옛 그림 대신 안내
+  if(!ok)return;
+  const cv=await quoteCanvas(q,2);if(seq!==_qzSeq)return;
+  cv.toBlob(function(b){
+    if(seq!==_qzSeq||!b)return;
+    _qzBlob=b;if(_qzUrl)URL.revokeObjectURL(_qzUrl);_qzUrl=URL.createObjectURL(b);
+    const im=$('qzImg');if(im)im.src=_qzUrl;
+  },'image/png');
+}
+// 저장 — 폰은 공유 창(사진에 저장·카카오톡 바로 보내기), PC 는 PNG 내려받기. 누른 순간 바로 공유를 불러야 해서 이미지는 미리 그려 둔다.
+// 공유에는 파일만 넣는다 — 아이폰은 글·주소를 같이 넣으면 «이미지 저장»이 빠지거나 주소만 가는 앱이 있다(안내 주소는 이미지 안에 있음).
+let _qzSharing=false;
+function quoteSave(){
+  if(!_qz)return;
+  const q=qzQ(),c=quoteCalc(q);
+  if(!c.sp){toast('대관 공간을 골라 주세요');return;}
+  if(!(q.hours>0)){toast('대관 시간을 확인해 주세요');return;}
+  if(!_qzBlob){toast('견적서를 그리는 중이에요 — 잠시 뒤 다시 눌러 주세요');qzPaint();return;}
+  const name=quoteFileName(q),file=new File([_qzBlob],name,{type:'image/png'});
+  window.__lastQuote={name:name,size:_qzBlob.size,total:c.total};
+  const mobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent));
+  if(mobile&&navigator.canShare&&navigator.canShare({files:[file]})){
+    if(_qzSharing)return;_qzSharing=true;
+    navigator.share({files:[file]})
+      .catch(function(err){const n=err&&err.name;if(n!=='AbortError'&&n!=='InvalidStateError')qzDownload(name);})
+      .finally(function(){_qzSharing=false;});
+    return;
+  }
+  qzDownload(name);
+}
+function qzDownload(name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(_qzBlob);a.download=name;
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},2000);
+  toast('견적서 이미지를 저장했습니다');
+}
 function openD(id){
   const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
   const L=LABELS[e.label]||{name:'기타',color:'#9a9a9a'};
@@ -3295,6 +3556,7 @@ function openD(id){
       :'<span style="color:var(--mu)">미입력 — 수익에 안 잡힘</span>'}</div>`;
   }
   if(e.status==='nosh')b+=`<div class="det-r"><span class="det-l">🚫 노쇼 사유</span>${e.noshReason?esc(e.noshReason):'<span style="color:var(--mu)">기록 없음</span>'} <button onclick="askNosh(${e.id})" style="margin-left:6px;padding:2px 8px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--mu);font-size:10px;cursor:pointer">${e.noshReason?'수정':'남기기'}</button></div>`;
+  if(quoteEligible(e))b+=`<div class="det-r det-qz"><span class="det-l">📄 견적서</span><button class="qz-open" onclick="openQuote(${e.id})">NYC 대관 견적서 만들기</button></div>`;   // (261103 운영-003 19) 명진만
   b+=reLinkRows(e);   // 재예약 연결·반값 표시
   if(!e.priv&&stActive(e.status)){
     const slots=getMaydlySlots(e.date,maydlyEvents.filter(x=>x.date===e.date&&stActive(x.status)&&!isExt(x)));
