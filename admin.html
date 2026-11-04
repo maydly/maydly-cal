@@ -1104,6 +1104,86 @@ html.embed-cal .topnav{height:46px}
 .qz-act .btn-ok,.qz-act .btn-ng{flex:0 0 auto}
 .qz-act .btn-ok[disabled]{opacity:.5;cursor:default}
 .qz-back{background:var(--bd)!important;color:var(--mu)!important;border:none!important}
+/* 수익 추이 — 종류별로 쌓은 막대 (261103): 아래부터 촬영 예약비 · 사진 구매 · 추가 요청, 조각 사이 흰 틈 2px */
+.rstk{display:flex;flex-direction:column-reverse;width:100%}
+.rstk .sg{display:block;width:100%;flex:0 0 auto;box-sizing:border-box;transition:filter .14s}
+.rstk .sg+.sg{border-bottom:2px solid #fff}
+.rstk .sg:last-child{border-radius:5px 5px 0 0}
+.rstk .sg0{background:#e3ebe1}
+.rcol:hover .sg,.rcol.on .sg{filter:saturate(1.15) brightness(.96)}
+.rlab.cur{color:var(--hz-ink,#1c2620);font-weight:800}
+.mlg.rlg{margin-top:12px;gap:14px}
+.mlg.rlg i{border-radius:50%}
+.mc-tip .ts{display:flex;gap:12px;margin:0 0 1px 16px;font-size:11px;font-weight:600;color:var(--hz-mute);line-height:1.5}
+.mc-tip .ts b{margin-left:auto;padding-left:0;font-weight:700;color:var(--hz-sub)}
+.mc-tip .ts.tw{color:#b0662a}
+.mc-tip .tr.tt{margin-top:4px;padding-top:6px;border-top:1px solid #e9efe6;color:var(--hz-ink)}
+/* 일정 상세 — 금액 나눔 · 2번 금액 고르기 · 추가 요청 (261103) */
+.mny{flex:1;min-width:0}
+.mny-r{display:flex;align-items:flex-start;gap:6px;padding:2px 0}
+.mny-r i{width:8px;height:8px;border-radius:50%;flex:0 0 auto;margin-top:calc(.75em - 4px)}
+.mny-n{white-space:nowrap;flex:0 0 auto}
+.mny-v{margin-left:auto;text-align:right;min-width:0}
+.mny-d{display:block;color:var(--mu);font-size:10.5px;line-height:1.4}
+.mny-d0{color:var(--mu);font-size:10.5px;font-weight:400}
+.mny-need{font-style:normal;color:#b0662a;font-size:11.5px}
+.mny-t{display:flex;align-items:baseline;gap:6px;margin-top:5px;padding-top:5px;border-top:1px dashed var(--bd);font-weight:700}
+.mny-t b{margin-left:auto}
+.msum{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--sf2)}
+.ms-r{display:flex;align-items:center;gap:7px;padding:3px 0 1px;font-weight:700;color:var(--tx)}
+.ms-r i{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.ms-r b,.ms-d b,.ms-t b{margin-left:auto}
+.ms-d{display:flex;gap:10px;padding:0 0 1px 16px;font-size:11px;color:var(--mu2)}
+.ms-d.tw{color:#b0662a}
+.ms-t{display:flex;margin-top:5px;padding-top:6px;border-top:1px dashed var(--bd2);font-weight:800;color:var(--tx)}
+.amt-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px;margin:8px 0 2px}
+.amt-l{font-size:11px;color:var(--mu2)}
+.amt-row>.amt-l:first-child{margin-right:auto}   /* 이름은 왼쪽, 고르는 버튼은 오른쪽(왼쪽은 한 손 스크롤 자리) */
+.amt-v{font-size:13px;color:var(--tx)}
+.amt-chip{min-height:38px;padding:0 16px;border-radius:12px;border:1px solid var(--bd);background:var(--sf2);color:var(--mu2);font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
+.amt-chip.on{background:#3f86d8;border-color:#3f86d8;color:#fff}
+.amt-need{flex-basis:100%;text-align:right;font-size:11px;color:#b0662a}
+.xrow{display:flex;align-items:center;gap:6px;padding:7px 0;flex-wrap:wrap}
+.x-l{font-size:11px;color:var(--tx);flex:1;min-width:130px}
+.x-l small{color:var(--mu);font-size:10px;margin-left:2px}
+.x-step{width:38px;height:38px;border-radius:12px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:18px;line-height:1;font-weight:700;cursor:pointer;font-family:inherit}
+.x-step:disabled{opacity:.35;cursor:default}
+.x-n{min-width:34px;text-align:center;font-size:13px}
+.x-sum{font-size:11.5px;font-weight:700;color:var(--mu2)}
+#rushAmt{width:112px;min-width:0;height:38px;padding:0 10px;border:1px solid var(--bd);border-radius:10px;background:var(--sf2);color:var(--tx);font-size:16px;font-family:inherit;text-align:right}
+.x-u{font-size:11px;color:var(--mu)}
+.x-btn{height:38px;padding:0 14px;border:none;border-radius:10px;background:var(--R);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.amt-l small{color:var(--mu);font-size:10px;margin-left:4px}
+/* 금액표 · 확인 필요 (운영-003 17) */
+.mrow{display:flex;align-items:center;gap:8px;margin-top:10px}
+.mrow .mchk{flex:1;min-width:0;margin-top:0}
+.ptbtn{margin-left:auto;flex:0 0 auto;min-height:40px;padding:0 14px;border-radius:12px;border:1px solid var(--bd2);background:#fff;color:var(--tx);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
+.mwarn{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fdf6ec;color:#8a5a1c;font-size:12px;line-height:1.6}
+.mwarn-b{margin-left:8px;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid #e3c9a0;background:#fff;color:#8a5a1c;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+.mchk{display:flex;align-items:center;gap:8px;width:100%;margin-top:10px;min-height:40px;padding:0 12px;border-radius:12px;border:1px solid #ecd9bd;background:#fdf8f1;color:#8a5a1c;font-size:12px;cursor:pointer;font-family:inherit;text-align:left}
+.mchk b{font-weight:800}
+.mchk small{font-size:10.5px;color:#a37a4a}
+.mck-sub{margin-left:8px;font-size:11px;font-weight:600;color:var(--mu)}
+.mck{padding:10px 0;border-bottom:1px solid var(--bd)}
+.mck.done{opacity:.6}
+.mck-h{display:flex;align-items:center;gap:8px;cursor:pointer;min-height:32px}
+.mck-h b{font-size:13px;color:var(--tx)}
+.mck-d{margin-left:auto;font-size:11px;color:var(--mu)}
+.mck-n{margin:2px 0 0;font-size:11px;color:var(--mu2);line-height:1.5}
+.mck-c{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:6px;flex-wrap:wrap}
+.mck-c span{margin-right:auto;font-size:11.5px;color:var(--mu2)}
+.mchk span{margin-left:auto;font-weight:800}
+.mchk-r{cursor:pointer;border-bottom:1px solid var(--bd);padding:9px 0}
+.pt{display:flex;flex-direction:column;gap:6px}
+.pt-note{font-size:11.5px;color:var(--mu2);line-height:1.6}
+.pt-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--bd)}
+.pt-l{flex:1;min-width:150px;font-size:13px;font-weight:700;color:var(--tx)}
+.pt-l small{display:block;font-size:10.5px;font-weight:400;color:var(--mu)}
+.pt-v{display:flex;align-items:center;gap:4px;margin-left:auto}
+.pt-v input{width:120px;height:40px;padding:0 10px;border:1px solid var(--bd);border-radius:10px;background:var(--sf2);color:var(--tx);font-size:16px;font-family:inherit;text-align:right;box-sizing:border-box}
+.pt-v i{font-style:normal;font-size:12px;color:var(--mu)}
+.pt-act{justify-content:flex-end;margin-top:6px}
+.pt-act .btn-ok{flex:0 0 auto}
 </style>
 <style id="sian-panel-css">
 /* ── 시안 열람 승인 칸 (261101, 고침 261102: 좁은 화면 머리줄 · 곧 닫힘 · 오류 다시 불러오기 · 항상 보기 기기 목록) ── */
@@ -1621,20 +1701,31 @@ function storedAuthEmail(){
 // 노쇼는 재예약을 재촉하기 위한 게 아니라 '다음에 거르기 위한 기록'이다.
 // 사유가 남아야 같은 고객이 다시 예약할 때 받을지 판단할 수 있다.
 // ── 촬영 금액 (260912 명진) ──
-// 여·남 스튜디오만 단가 고정(8만원), 나머지는 건마다 달라 등록할 때 직접 적는다.
-// 계산 우선순위: 일정에 적은 금액 > 고정 단가(½ 반값이면 절반) > 미입력(집계에서 제외)
-// 기간별 고정 단가 — 단가는 시기에 따라 바뀐다.
-// (260912 명진) 2026년부터 여·남 스튜디오 8만원 확정. 그 이전 연도는 금액 변동이 있어
-// 값을 받기 전까지는 비워둔다. 비워두면 그 시기 촬영은 '금액 미입력'으로 집계에서 빠진다.
-// 과거 단가를 알려주시면 아래에 구간을 추가하면 그 시점부터 소급 계산된다.
+// 여·남 스튜디오만 단가가 정해져 있고, 나머지는 건마다 달라 등록할 때 직접 적는다.
+// 계산 우선순위: 일정에 적은 금액 > 정해진 단가(½ 반값이면 절반) > 미입력(집계에서 제외)
+// 기간별 단가 구간 — 이 표에는 구간과 금액표 이름만 두고, 금액은 소스에 적지 않는다(공개 저장소, 운영-003 17).
+// 금액은 로그인해야 읽히는 금액표(PRICES — Firestore mj_cal/prices, 명진·수빈만)에서 읽고, 이 기기에도 기억해 둔다.
+// 구간보다 앞선 촬영은 단가가 없어 '금액 미입력'으로 집계에서 빠진다.
 const PRICE_TABLE=[
-  // {from:'2023-01-01',p:{studio_f:00000,studio_m:00000}},   ← 과거 단가 확인되면 추가
-  {from:'2026-01-01',p:{studio_f:80000,studio_m:80000}}
+  {from:'2026-01-01',p:{studio_f:'studio',studio_m:'studio'}}   // 값 = 금액표 이름
 ];
+const PRICE_DOC='mj_cal/prices',PRICE_CACHE='maydly_prices_v1';
+const PRICE_KEYS=[['studio','여·남 스튜디오 촬영 예약비'],['buy_raw','전체 원본 구매'],['buy_color','전체 색보정 구매'],['ret','세밀보정본 추가 1장'],['wm','워터마크 제거 (받는 사진 전체)']];
+function cleanPrices(o){
+  if(!o||typeof o!=='object')return null;
+  const n=function(v){v=Number(v);return Number.isFinite(v)&&v>=1000&&v<=100000000?Math.round(v):null;};
+  const p={};PRICE_KEYS.forEach(function(k){const v=n(o[k[0]]);if(v!=null)p[k[0]]=v;});
+  const sel=(Array.isArray(o.sel)?o.sel:[]).map(n).filter(function(v){return v!=null;});
+  if(sel.length)p.sel=sel.slice(0,2);
+  return Object.keys(p).length?p:null;
+}
+let PRICES=null,_pricesState='';   // '' 아직 · ok 읽음 · none 금액표 없음 · fail 못 읽음
+try{PRICES=cleanPrices(JSON.parse(localStorage.getItem(PRICE_CACHE)||'null'));}catch(e){}
 function fixedPriceOf(label,ds){
   let hit=null;
   PRICE_TABLE.forEach(function(r){ if(String(ds)>=r.from) hit=r; });   // 날짜에 해당하는 마지막 구간
-  return hit&&hit.p[label]!=null?hit.p[label]:null;
+  const k=hit&&hit.p[label];
+  return k&&PRICES&&PRICES[k]!=null?PRICES[k]:null;
 }
 const NO_PRICE_LABELS=['rest','personal','suvin'];   // 금액 칸을 아예 안 보여줄 라벨
 function evAmount(e){
@@ -1644,12 +1735,197 @@ function evAmount(e){
   if(p==null)return null;
   return e.half?Math.round(p/2):p;
 }
+// ── 사진 구매 · 추가 요청 금액 (운영-003 17) ──
+// 촬영 예약비(evAmount)는 그대로 두고, 사진 구매·추가 요청은 따로 모아 대시보드에서 색으로 나눠 보여 준다. 촬영한 달에 넣는다.
+// 금액은 소스에 적지 않는다 — 로그인해야 읽히는 금액표(PRICES)에서 읽는다. 금액표가 있으면 지난 촬영에도 같은 금액표로 센다.
+// 2번 색보정은 촬영 상황에 따라 금액표의 두 금액 중 하나 — 일정마다 골라야(buyAmt) 잡히고, 안 고른 건은 «확인 필요».
+// 워터마크 제거는 켤 때 유료·무료를 골라야(wmPay) 잡히고, 안 고른 건은 «확인 필요».
+function buyPriceOf(k){return PRICES&&PRICES[k]!=null?PRICES[k]:null;}
+function selOpts(){return PRICES&&Array.isArray(PRICES.sel)?PRICES.sel:[];}
+function moneyOn(e){return !!e&&!!PRICES;}
+// 한 일정의 금액 나눔 — shoot 촬영 예약비(null=미입력) · buy 사진 구매 · extra 추가 요청(세밀보정 ret + 워터마크 wm + 빠른 전달 rush)
+// 2번 금액(buyAmt)·워터마크 유료/무료(wmPay)는 구매 종류나 켜기를 바꿔도 지우지 않는다 — 집계는 지금 상태로 가린다
+function evMoney(e){
+  const r={shoot:evAmount(e),buy:0,buyKey:null,buyPending:false,retN:0,ret:0,wm:0,wmPending:false,rush:0,extra:0,total:0};
+  if(!e||!moneyOn(e)){r.total=r.shoot||0;return r;}
+  if(e.status==='buy_select'){
+    r.buyKey='buy_select';
+    const v=Number(e.buyAmt)||0;
+    if(v>0)r.buy=v;else r.buyPending=true;
+  }else if(e.status==='buy_raw'||e.status==='buy_color'){
+    r.buyKey=e.status;
+    r.buy=buyPriceOf(e.status)||0;
+  }
+  r.retN=Math.max(0,parseInt(e.extraRet,10)||0);
+  r.ret=r.retN*(buyPriceOf('ret')||0);
+  if(e.wm){if(e.wmPay==='paid')r.wm=buyPriceOf('wm')||0;else if(e.wmPay!=='free')r.wmPending=true;}
+  r.rush=Math.max(0,Number(e.rushAmt)||0);
+  r.extra=r.ret+r.wm+r.rush;
+  r.total=(r.shoot||0)+r.buy+r.extra;
+  return r;
+}
+// 금액표를 읽거나 바꾸면 보고 있는 화면을 다시 그린다
+function moneyRerender(){
+  if(typeof curPage==='undefined')return;
+  if(curPage==='dash'&&typeof renderDash==='function')renderDash();
+  if(curPage==='cal'&&typeof renderBody==='function')renderBody();
+}
+// 금액표 읽기 — 구글 로그인 뒤 클라우드에서(없으면 «금액표 없음»), 이 기기에도 기억해 둔다
+async function loadPrices(){
+  if(!(window.MJCAL&&window.MJCAL.user))return;
+  try{
+    const p=cleanPrices(await window.MJCAL.get(PRICE_DOC)),before=JSON.stringify(PRICES),st0=_pricesState;
+    PRICES=p;_pricesState=p?'ok':'none';
+    try{if(p)localStorage.setItem(PRICE_CACHE,JSON.stringify(p));else localStorage.removeItem(PRICE_CACHE);}catch(e){}
+    if(JSON.stringify(PRICES)!==before||st0!==_pricesState)moneyRerender();
+  }catch(e){_pricesState='fail';}
+}
+// 💰 금액표 적기 (명진만) — 한 번 적어 두면 이 금액표로 센다. 고치면 지난 촬영도 새 금액표로 다시 센다(2번 금액은 일정마다 고른 값 그대로)
+function openPriceTable(){
+  if(myRole()!=='mj')return;
+  const P=PRICES||{},v=function(k){return P[k]!=null?P[k].toLocaleString('ko-KR'):'';},sel=P.sel||[];
+  const inp=function(id,val,lab){return '<input type="text" inputmode="numeric" id="'+id+'" value="'+val+'" aria-label="'+lab+'" placeholder="원 단위 숫자" onblur="ptFmt(this)">';};
+  document.getElementById('pnh').innerHTML='💰 금액표<button class="px" onclick="closeP()">×</button>';
+  document.getElementById('pb').innerHTML='<div class="pt">'
+    +'<div class="pt-note">금액은 캘린더 소스에 적지 않고, 명진·수빈 로그인으로만 읽히는 곳에 둡니다. 한 번 적어 두면 지난 촬영까지 이 금액표로 셉니다.</div>'
+    +PRICE_KEYS.map(function(k){return '<div class="pt-r"><span class="pt-l">'+k[1]+'</span><span class="pt-v">'+inp('pt_'+k[0],v(k[0]),k[1])+'<i>원</i></span></div>';}).join('')
+    +'<div class="pt-r"><span class="pt-l">2번 색보정 구매<small>촬영 상황에 따라 둘 중 하나 — 일정마다 고릅니다</small></span>'
+      +'<span class="pt-v">'+inp('pt_sel0',sel[0]!=null?sel[0].toLocaleString('ko-KR'):'','2번 색보정 구매 첫째 금액')+'<i>원</i></span>'
+      +'<span class="pt-v">'+inp('pt_sel1',sel[1]!=null?sel[1].toLocaleString('ko-KR'):'','2번 색보정 구매 둘째 금액')+'<i>원</i></span></div>'
+    +'<div class="pt-note">빠른 일정 보정본 전달은 상담 후 정해 일정마다 직접 적습니다.</div>'
+    +'<div class="act-row pt-act"><button class="btn-ok" id="ptSave" onclick="savePriceTable()">금액표 저장</button></div></div>';
+  openP();
+}
+function ptFmt(el){const v=ptNum(el.id);if(v>=1000)el.value=v.toLocaleString('ko-KR');}
+function ptNum(id){
+  const el=document.getElementById(id),t=String((el&&el.value)||'').replace(/[,\s원]/g,'');
+  const m=t.match(/^(\d+(?:\.\d+)?)만$/);
+  if(m)return Math.round(Number(m[1])*10000);
+  return /^\d+$/.test(t)?Number(t):NaN;
+}
+async function savePriceTable(){
+  if(myRole()!=='mj')return;
+  if(!(window.MJCAL&&window.MJCAL.user)){toast('구글 로그인 뒤에 저장할 수 있어요');return;}
+  const o={};let bad='';
+  PRICE_KEYS.forEach(function(k){const v=ptNum('pt_'+k[0]);if(!(v>=1000))bad=bad||k[1];else o[k[0]]=v;});
+  const s0=ptNum('pt_sel0'),s1=ptNum('pt_sel1');
+  if(!(s0>=1000&&s1>=1000))bad=bad||'2번 색보정 구매';
+  if(bad){toast(bad+' — 금액을 숫자로 적어 주세요 (예: 25000 또는 2.5만)');return;}
+  if(s0===s1){toast('2번 색보정 구매 두 금액이 같아요 — 촬영 상황별 두 금액을 적어 주세요');return;}
+  o.sel=[s0,s1].sort(function(x,y){return x-y;});
+  const btn=document.getElementById('ptSave');if(btn)btn.disabled=true;
+  try{
+    await window.MJCAL.put(PRICE_DOC,o);
+    PRICES=cleanPrices(o);_pricesState='ok';
+    try{localStorage.setItem(PRICE_CACHE,JSON.stringify(PRICES));}catch(e){}
+    closeP();moneyRerender();toast('금액표를 저장했어요');
+  }catch(e){if(btn)btn.disabled=false;toast('저장하지 못했어요 — '+((e&&e.message)||'다시 해 주세요'));}
+}
+// 확인 필요 — 2번 색보정 금액·워터마크 유료/무료를 아직 안 고른 촬영(모든 달, 최근 것부터)
+function moneyChecks(){
+  if(!PRICES)return[];
+  return maydlyEvents.filter(function(e){return isShootEv(e);}).map(function(e){return{e:e,m:evMoney(e)};})
+    .filter(function(x){return x.m.buyPending||x.m.wmPending;})
+    .sort(function(a,b){return String(b.e.date).localeCompare(String(a.e.date));});
+}
+// 목록 안에서 바로 고른다 — 열 때 모은 일정은 닫을 때까지 그대로 두어(고른 것엔 ✓) 잘못 눌러도 바로 고칠 수 있게
+let _mchkIds=[];
+function openMoneyCheck(){_mchkIds=moneyChecks().map(function(x){return x.e.id;});renderMoneyCheck();openP();}
+function renderMoneyCheck(){
+  const evs=_mchkIds.map(function(id){return maydlyEvents.find(function(e){return e.id===id;});}).filter(Boolean);
+  const left=evs.filter(function(e){const m=evMoney(e);return m.buyPending||m.wmPending;}).length;
+  const chip=function(on,txt,js){return '<button class="amt-chip'+(on?' on':'')+'" aria-pressed="'+on+'" onclick="event.stopPropagation();'+js+'">'+(on?'✓ ':'')+txt+'</button>';};
+  document.getElementById('pnh').innerHTML='금액 확인 필요 '+left+'건<small class="mck-sub">전체 기간</small><button class="px" onclick="closeP()">×</button>';
+  document.getElementById('pb').innerHTML=evs.length
+    ?'<div class="pt-note" style="margin-bottom:6px">여기서 바로 고르면 저장됩니다. 2번 색보정은 촬영 상황에 맞는 금액을, 워터마크 제거는 유료·무료를 골라 주세요. 이름을 누르면 일정 상세 창이 열립니다.</div>'
+      +evs.map(function(e){const L=LABELS[e.label]||{name:'기타',color:'#9a9a9a'},m=evMoney(e),cur=Number(e.buyAmt)||0,wp=e.wmPay||'';
+        const done=!m.buyPending&&!m.wmPending;
+        return '<div class="mck'+(done?' done':'')+'">'
+          +'<div class="mck-h" onclick="closeP();openD('+e.id+')"><span style="background:'+L.color+';color:'+lblTc(e.label)+';font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">'+L.name+'</span>'
+          +'<b>'+esc(e.client||'(이름 없음)')+'</b><span class="mck-d">'+e.date+(e.time?' '+e.time:'')+(done?' · ✓ 골랐어요':'')+' ›</span></div>'
+          +(e.note?'<div class="mck-n">'+esc(String(e.note).slice(0,80))+'</div>':'')
+          +(e.status==='buy_select'?'<div class="mck-c"><span>2번 구매</span>'+selOpts().map(function(v){return chip(cur===v,manwon(v)+'원','mchkSet('+e.id+',\'buy\','+v+')');}).join('')+'</div>':'')
+          +(e.wm?'<div class="mck-c"><span>워터마크 제거</span>'+chip(wp==='paid','유료'+(buyPriceOf('wm')?' '+manwon(buyPriceOf('wm'))+'원':''),'mchkSet('+e.id+',\'wm\',\'paid\')')+chip(wp==='free','무료','mchkSet('+e.id+',\'wm\',\'free\')')+'</div>':'')
+          +'</div>';}).join('')
+    :'<div style="text-align:center;padding:24px 0;color:var(--mu)">확인할 것이 없어요 🍀</div>';
+}
+function mchkSet(id,k,v){
+  const e=maydlyEvents.find(function(x){return x.id===id;});if(!e)return;
+  if(k==='buy'){if(e.status!=='buy_select'||selOpts().indexOf(v)<0||Number(e.buyAmt)===v)return;e.buyAmt=v;}
+  else if(k==='wm'){if(!e.wm||(v!=='paid'&&v!=='free')||e.wmPay===v)return;e.wmPay=v;}
+  else return;
+  saveEvents();renderMoneyCheck();
+}
+// 대시보드 수익 추이 아래 한 줄 — 금액표가 없으면 안내, 있으면 «확인 필요» 모음
+function moneyDashLine(){
+  if(!PRICES){
+    const why=(window.MJCAL&&window.MJCAL.user)?(_pricesState==='fail'?'금액표를 읽지 못했어요':'금액표가 아직 없어요'):'금액표를 아직 못 읽었어요(구글 로그인하면 읽어요)';
+    return '<div class="mwarn">💰 '+why+' — 적기 전엔 스튜디오 예약비·사진 구매·추가 요청이 수익에 안 잡혀요'+(myRole()==='mj'?'<button class="mwarn-b" onclick="openPriceTable()">금액표 적기</button>':' (명진이 적으면 보여요)')+'</div>';
+  }
+  const L0=moneyChecks(),mj=myRole()==='mj';if(!L0.length&&!mj)return'';
+  const nb=L0.filter(function(x){return x.m.buyPending;}).length,nw=L0.filter(function(x){return x.m.wmPending;}).length;
+  return '<div class="mrow">'+(L0.length?'<button class="mchk" onclick="openMoneyCheck()"><b>금액 확인 필요</b><small>전체 기간</small>'+[nb?'2번 구매 금액 '+nb+'건':'',nw?'워터마크 유료·무료 '+nw+'건':''].filter(Boolean).join(' · ')+'<span>›</span></button>':'')
+    +(mj?'<button class="ptbtn" onclick="openPriceTable()">💰 금액표</button>':'')+'</div>';
+}
+function revColor(k){const p=REV_PARTS.find(function(x){return x.k===k;});return p?p.color:'#9a9a9a';}
+// 한 달 집계(b)의 종류별 세부 — [이름, 금액(없으면 null), 경고면 1] · 말풍선과 그 달 목록이 같이 쓴다
+function revDetail(b){
+  b=b||{};const bk=b.bk||{},xk=b.xk||{},n=function(o){return (o&&o.n)||0;},m=function(o){return (o&&o.s)||0;};
+  const d={shoot:[['촬영 '+(b.n||0)+'건',null]],buy:[],extra:[]};
+  if(b.noAmt)d.shoot.push(['금액 미입력 '+b.noAmt+'건',null,1]);
+  if(n(bk.buy_raw))d.buy.push(['전체 원본 '+n(bk.buy_raw)+'건',m(bk.buy_raw)]);
+  if(n(bk.buy_color))d.buy.push(['전체 색보정 '+n(bk.buy_color)+'건',m(bk.buy_color)]);
+  if(n(bk.buy_select))d.buy.push(['2번 색보정 '+n(bk.buy_select)+'건',m(bk.buy_select)]);
+  if(b.noBuyAmt)d.buy.push(['2번 구매 금액 확인 필요 '+b.noBuyAmt+'건',null,1]);
+  if(n(xk.ret))d.extra.push(['세밀보정 '+n(xk.ret)+'장',m(xk.ret)]);
+  if(n(xk.wm))d.extra.push(['워터마크 제거 '+n(xk.wm)+'건',m(xk.wm)]);
+  if(b.noWm)d.extra.push(['워터마크 유료·무료 확인 필요 '+b.noWm+'건',null,1]);
+  if(n(xk.rush))d.extra.push(['빠른 전달 '+n(xk.rush)+'건',m(xk.rush)]);
+  return d;
+}
+function moneyTail(e){   // 목록 한 줄 뒤에 붙이는 구매·추가 금액
+  const m=evMoney(e);
+  return (m.buy?' · 구매 '+manwon(m.buy)+'원':'')+(m.buyPending?' · 2번 금액 확인 필요':'')+(m.wmPending?' · 워터마크 확인 필요':'')+(m.extra?' · 추가 '+manwon(m.extra)+'원':'');
+}
+// 상세 창 — 구매 버튼 아래 금액 줄 (2번은 촬영 상황에 따라 금액표의 두 금액 중 고르기)
+function buyAmtRow(e){
+  if(!moneyOn(e))return'';
+  if(e.status==='buy_select'){
+    const cur=Number(e.buyAmt)||0,opts=selOpts();
+    return`<div class="amt-row"><span class="amt-l">2번 색보정 금액<small>촬영 상황에 따라</small></span>${opts.map(v=>`<button class="amt-chip${cur===v?' on':''}" aria-pressed="${cur===v}" onclick="setBuyAmt(${e.id},${v})">${cur===v?'✓ ':''}${manwon(v)}원</button>`).join('')}${cur&&opts.indexOf(cur)<0?`<b class="amt-v">${manwon(cur)}원</b>`:''}${cur?'':'<span class="amt-need">확인해서 골라야 수익에 잡힙니다</span>'}</div>`;
+  }
+  if(e.status==='buy_raw'||e.status==='buy_color'){
+    const p=buyPriceOf(e.status);
+    return p?`<div class="amt-row"><span class="amt-l">${e.status==='buy_raw'?'전체 원본':'전체 색보정'} 금액</span><b class="amt-v">${manwon(p)}원</b><span class="amt-l">— 자동으로 잡힙니다</span></div>`:'';
+  }
+  return'';
+}
+// 상세 창 — 워터마크 제거를 켰을 때 유료·무료 고르기
+function wmPayRow(e){
+  if(!moneyOn(e)||!e.wm)return'';
+  const p=buyPriceOf('wm'),v=e.wmPay||'';
+  return`<div class="amt-row"><span class="amt-l">워터마크 제거 금액</span><button class="amt-chip${v==='paid'?' on':''}" aria-pressed="${v==='paid'}" onclick="setWmPay(${e.id},'paid')">${v==='paid'?'✓ ':''}유료${p?' '+manwon(p)+'원':''}</button><button class="amt-chip${v==='free'?' on':''}" aria-pressed="${v==='free'}" onclick="setWmPay(${e.id},'free')">${v==='free'?'✓ ':''}무료</button>${v?'':'<span class="amt-need">유료·무료를 골라야 수익에 잡힙니다</span>'}</div>`;
+}
+// 상세 창 — 추가 요청: 빠른 전달 금액(상담 후 직접) · 세밀보정본 추가 장수
+function rushAmtRow(e){
+  if(!moneyOn(e))return'';
+  const v=Number(e.rushAmt)||0;
+  return`<div class="xrow"><span class="x-l">🚨 빠른 전달 금액 <small>상담 후 정한 금액</small></span>
+    <input type="text" inputmode="numeric" id="rushAmt" value="${v?v.toLocaleString('ko-KR'):''}" placeholder="0" aria-label="빠른 일정 보정본 전달 금액(원)" onkeydown="if(event.key==='Enter'){event.preventDefault();setRushAmt(${e.id});}"><span class="x-u">원</span>
+    <button class="x-btn" onclick="setRushAmt(${e.id})">${v?'고치기':'적기'}</button></div>`;
+}
+function retRow(e){
+  if(!moneyOn(e))return'';
+  const n=Math.max(0,parseInt(e.extraRet,10)||0),p=buyPriceOf('ret')||0;
+  return`<div class="xrow"><span class="x-l">✨ 세밀보정본 추가 <small>1장 ${manwon(p)}원</small></span>
+    <button class="x-step" onclick="setExtraRet(${e.id},-1)"${n?'':' disabled'} aria-label="세밀보정본 한 장 빼기">−</button><b class="x-n">${n}장</b><button class="x-step" onclick="setExtraRet(${e.id},1)" aria-label="세밀보정본 한 장 더하기">+</button>${n?`<span class="x-sum">${(n*p).toLocaleString('ko-KR')}원</span>`:''}</div>`;
+}
 function amountFormBlock(e){
   const v=(e&&e.amount!=null)?e.amount:'';
   const hide=e&&NO_PRICE_LABELS.includes(e.label);
   return`<div class="fg" id="amtBox"${hide?' style="display:none"':''}>
     <label>금액 <span style="color:var(--mu);font-weight:400;font-size:10px">— 수익 집계용</span></label>
-    <input type="number" id="f_amt" step="10000" value="${v}" placeholder="예: 80000">
+    <input type="number" id="f_amt" step="10000" value="${v}" placeholder="원 단위 숫자">
     <div id="priceHint" style="font-size:10.5px;color:var(--mu);margin-top:4px"></div>
   </div>`;
 }
@@ -1661,9 +1937,10 @@ function refreshPriceHint(){
   const sd=document.getElementById('f_sd');
   const ds=(sd&&sd.value)||TSTR;
   const p=fixedPriceOf(seLabel,ds);
+  if(p==null&&!PRICES&&['studio_f','studio_m'].includes(seLabel)&&String(ds)>=PRICE_TABLE[0].from){h.innerHTML='금액표를 아직 못 읽어서 기본 단가를 모릅니다 — 대시보드 «💰 금액표»에서 한 번 적어 주세요. 직접 적으면 그 금액으로 잡힙니다.';return;}
   h.innerHTML=p
     ?'비워두면 기본 <b>'+p.toLocaleString('ko-KR')+'원</b>으로 잡힙니다. (½ 반값이면 절반) 다르면 직접 적어주세요.'
-    :'이 날짜·라벨은 고정 단가가 없어서, <b>적어두지 않으면 수익에 안 잡힙니다.</b>';
+    :(['studio_pay','outdoor_pay'].includes(seLabel)?'페이 촬영은 금액을 직접 적어 주세요 — ':'이 날짜·라벨은 고정 단가가 없어서, ')+'<b>적어두지 않으면 수익에 안 잡힙니다.</b>';
 }
 function amtFromForm(){
   const box=document.getElementById('amtBox'),a=document.getElementById('f_amt');
@@ -1816,6 +2093,34 @@ function clearRush(id){
   const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
   e.dlvRush=null;e.dlvRushDone=null;
   saveEvents();buildNav();openD(id);toast('긴급 기한을 해제했습니다');
+}
+// 사진 구매·추가 요청 금액 적기 (261103) — 저장하고 상세 창을 다시 그린다(대시보드를 띄워 뒀으면 saveEvents 가 다시 그림)
+function setBuyAmt(id,v){
+  const e=maydlyEvents.find(x=>x.id===id);if(!e||e.status!=='buy_select'||selOpts().indexOf(v)<0)return;
+  if(Number(e.buyAmt)===v)return;
+  e.buyAmt=v;saveEvents();openD(id);toast('2번 색보정 '+manwon(v)+'원으로 잡았습니다');
+}
+function setExtraRet(id,d){
+  const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
+  const n=Math.max(0,Math.min(99,(parseInt(e.extraRet,10)||0)+d));
+  e.extraRet=n||null;saveEvents();openD(id);
+}
+function setRushAmt(id){
+  const e=maydlyEvents.find(x=>x.id===id);if(!e)return;
+  const el=document.getElementById('rushAmt');if(!el)return;
+  const t=String(el.value||'').replace(/[,\s원]/g,'');
+  let v=null;const m=t.match(/^(\d+(?:\.\d+)?)만$/);
+  if(m)v=Math.round(Number(m[1])*10000);
+  else if(/^\d+$/.test(t))v=Number(t);
+  else if(t){toast('금액은 숫자로 적어 주세요 (예: 30000 또는 3만)');return;}
+  if(v&&v<1000){toast('원 단위로 적어 주세요 (예: 30000 또는 3만)');return;}
+  e.rushAmt=v||null;saveEvents();openD(id);
+  toast(v?'빠른 전달 금액 '+v.toLocaleString('ko-KR')+'원을 적었습니다':'빠른 전달 금액을 비웠습니다');
+}
+function setWmPay(id,v){
+  const e=maydlyEvents.find(x=>x.id===id);if(!e||!e.wm||(v!=='paid'&&v!=='free'))return;
+  if(e.wmPay===v)return;
+  e.wmPay=v;saveEvents();openD(id);toast(v==='paid'?'워터마크 제거를 유료로 잡았습니다':'워터마크 제거를 무료로 표시했습니다');
 }
 // 💧 워터마크 제거 표시 + 캘린더 이모지 선택
 function toggleWm(id){
@@ -1990,6 +2295,8 @@ function saveEvents(){
   try{localStorage.setItem(STORAGE_KEY,JSON.stringify(toSave));lastSaved=nowStr();}
   catch(e){toast('저장 실패');}
   pushToGithub();
+  // (261103) 대시보드를 띄워 둔 채 기록이 바뀌면(상세 창에서 구매·금액 등) 대시보드 숫자도 바로 맞춘다
+  if(typeof curPage!=='undefined'&&curPage==='dash'&&typeof renderDash==='function'){clearTimeout(window._dashRT);window._dashRT=setTimeout(function(){if(curPage==='dash')renderDash();},0);}
   if(typeof curPage!=='undefined'&&curPage==='first'&&typeof renderFirst==='function'){clearTimeout(window._firstRT);window._firstRT=setTimeout(function(){if(curPage==='first')renderFirst(true);},0);}   // (261103) «먼저 볼 것»을 띄워 둔 채 기록이 바뀌면 다시 그린다
 }
 
@@ -2201,6 +2508,7 @@ function pushToGithub(){
 }
 async function syncFromGithub(){
   if(!hasToken()){_cloudReady=true;promptToken();return;}
+  loadPrices();   // 금액표 (운영-003 17)
   if(!_cloudSynced){_cloudReady=false;if(typeof curPage!=='undefined'&&curPage==='first')renderFirst(true);}   // (261103) 첫 기록이 올 때까지 «보냈음 ✓» 잠깐 막기
   try{
     const {data}=await ghGet(GH_DATA);
@@ -2212,6 +2520,9 @@ async function syncFromGithub(){
       try{localStorage.setItem(STORAGE_KEY,JSON.stringify(maydlyEvents));}catch(e){}
       if(typeof curPage!=='undefined'&&curPage==='cal')renderBody();
       if(typeof buildNav==='function')buildNav();
+      // (261103) 대시보드·알림을 보고 있을 때 최신 기록이 오면 그 화면도 다시 그린다 — 전엔 막대가 예전 기록 그대로 남아 말풍선 숫자와 달랐다
+      if(typeof curPage!=='undefined'&&curPage==='dash'&&typeof renderDash==='function')renderDash();
+      if(typeof curPage!=='undefined'&&curPage==='alert'&&typeof renderAlerts==='function')renderAlerts();
       // (261103) 알림·«먼저 볼 것»을 보고 있을 때 최신 기록이 오면 그 화면도 다시 그린다
       if(typeof curPage!=='undefined'&&curPage==='alert'&&typeof renderAlerts==='function')renderAlerts();
       if(typeof curPage!=='undefined'&&curPage==='first'&&typeof renderFirst==='function')renderFirst(true);
@@ -2526,6 +2837,12 @@ function showPage(pg){
 const DASH_SHOOT=['studio_m','studio_f','outdoor','studio_pay','outdoor_pay','brand'];
 // 목표 기준 (260913 명진) — 차이가 나면 사유를 확인해야 하는 기준선
 const WEEK_TARGET=10;        // 이번 주 촬영 10명 고정
+// 수익 종류 (261103) — 아래부터 쌓는 순서. 색은 색약 구분·흰 바탕 대비 검사 통과한 3색
+const REV_PARTS=[
+  {k:'shoot',name:'촬영 예약비',color:'#3d9461'},
+  {k:'buy',name:'사진 구매',color:'#3f86d8'},
+  {k:'extra',name:'추가 요청',color:'#da6b9a'}
+];
 const MONTH_TARGET=3200000;  // 이번 달 수익 320만원 고정
 function isShootEv(e){return !!e&&DASH_SHOOT.includes(e.label)&&stActive(e.status);}
 function mkOf(ds){return String(ds).slice(0,7);}
@@ -2581,12 +2898,23 @@ function dashData(){
   maydlyEvents.forEach(function(e){
     if(!isShootEv(e))return;
     const mk=mkOf(e.date);if(!mk)return;
-    const b=D.byMonth[mk]||(D.byMonth[mk]={n:0,sum:0,noAmt:0,noAmtEvs:[],upto:{},uptoSum:{}});
-    b.n++;const a=evAmount(e);
-    if(a==null){b.noAmt++;if(b.noAmtEvs.length<6)b.noAmtEvs.push(e);}else b.sum+=a;
+    const b=D.byMonth[mk]||(D.byMonth[mk]={n:0,sum:0,noAmt:0,noAmtEvs:[],upto:{},uptoSum:{},
+      shoot:0,buy:0,extra:0,noBuyAmt:0,noWm:0,
+      bk:{buy_raw:{n:0,s:0},buy_color:{n:0,s:0},buy_select:{n:0,s:0}},xk:{ret:{n:0,s:0},wm:{n:0,s:0},rush:{n:0,s:0}}});
+    b.n++;const a=evAmount(e),mo=evMoney(e);
+    if(a==null){b.noAmt++;if(b.noAmtEvs.length<6)b.noAmtEvs.push(e);}else b.shoot+=a;
+    // 사진 구매 · 추가 요청 (261103) — 촬영한 달에 넣는다
+    if(mo.buyKey){if(mo.buyPending)b.noBuyAmt++;else if(mo.buy){b.bk[mo.buyKey].n++;b.bk[mo.buyKey].s+=mo.buy;}}
+    b.buy+=mo.buy;
+    if(mo.retN){b.xk.ret.n+=mo.retN;b.xk.ret.s+=mo.ret;}
+    if(mo.wm){b.xk.wm.n++;b.xk.wm.s+=mo.wm;}
+    if(mo.wmPending)b.noWm++;
+    if(mo.rush){b.xk.rush.n++;b.xk.rush.s+=mo.rush;}
+    b.extra+=mo.extra;
+    const tt=(a||0)+mo.buy+mo.extra;b.sum+=tt;
     const dd=Number(e.date.slice(8));
     b.upto[dd]=(b.upto[dd]||0)+1;
-    if(a!=null)b.uptoSum[dd]=(b.uptoSum[dd]||0)+a;
+    if(a!=null||tt)b.uptoSum[dd]=(b.uptoSum[dd]||0)+tt;
   });
   D.mk=thisMk; D.day=day;
   // 알림
@@ -2707,7 +3035,7 @@ function dashList(title,evs,note){
     return '<div class="act" style="cursor:pointer;border-bottom:1px solid var(--bd);padding:9px 0" onclick="closeP();openD('+e.id+')">'
       +'<span style="background:'+L.color+';color:'+lblTc(e.label)+';font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0">'+L.name+'</span>'
       +'<div class="n" style="margin-left:8px">'+esc(e.client||'(이름 없음)')
-      +'<div class="s">'+e.date+(e.time?' '+e.time:'')+(amt!=null?' · '+amt.toLocaleString('ko-KR')+'원':'')
+      +'<div class="s">'+e.date+(e.time?' '+e.time:'')+(amt!=null?' · '+amt.toLocaleString('ko-KR')+'원':'')+moneyTail(e)
       +(e.status==='nosh'?' · 🚫 '+esc((e.noshReason||'사유 없음').split(' — ')[0]):'')+'</div></div></div>';
   }).join('');
   document.getElementById('pb').innerHTML=
@@ -2720,7 +3048,12 @@ function dashMonth(mk){
   const evs=maydlyEvents.filter(function(e){return isShootEv(e)&&mkOf(e.date)===mk;})
     .sort(function(a,b){return String(a.date+(a.time||'')).localeCompare(String(b.date+(b.time||'')));});
   const b=(dashData().byMonth||{})[mk]||{sum:0,n:0};
-  dashList(mkLabel(mk)+' 촬영 '+evs.length+'건', evs, '수익 <b>'+manwon(b.sum)+'</b>'+(b.noAmt?' · 금액 미입력 '+b.noAmt+'건':''));
+  dashList(mkLabel(mk)+' 촬영 '+evs.length+'건', evs, '수익 <b>'+manwon(b.sum)+'</b>'+(b.noAmt?' · 금액 미입력 '+b.noAmt+'건':'')+((b.noBuyAmt||0)+(b.noWm||0)?' · 확인 필요 '+((b.noBuyAmt||0)+(b.noWm||0))+'건':'')
+    +(function(){const det=revDetail(b);
+      return '<div class="msum">'+REV_PARTS.map(function(p){
+        return '<div class="ms-r"><i style="background:'+p.color+'"></i><span>'+p.name+'</span><b>'+manwon(b[p.k]||0)+'원</b></div>'
+          +det[p.k].map(function(x){return '<div class="ms-d'+(x[2]?' tw':'')+'"><span>'+x[0]+'</span>'+(x[1]!=null?'<b>'+manwon(x[1])+'원</b>':'')+'</div>';}).join('');
+      }).join('')+'<div class="ms-t"><span>합계</span><b>'+manwon(b.sum||0)+'원</b></div></div>';})());
 }
 function dashStatus(kind){
   const yr=String(TODAY.getFullYear()),today=TSTR;
@@ -2743,18 +3076,27 @@ function dashNoAmt(){
   const mk=mkOf(TSTR);
   const list=maydlyEvents.filter(function(e){return isShootEv(e)&&mkOf(e.date)===mk&&evAmount(e)==null;})
     .sort(function(a,b){return String(a.date).localeCompare(String(b.date));});
+  const pend=maydlyEvents.filter(function(e){return isShootEv(e)&&mkOf(e.date)===mk&&(function(m){return m.buyPending||m.wmPending;})(evMoney(e));})   // 2번 금액·워터마크 유료/무료 확인 필요
+    .sort(function(a,b){return String(a.date).localeCompare(String(b.date));});
+  const pendHtml=pend.length?'<div style="font-size:12px;color:var(--mu2);margin:'+(list.length?'16px':'0')+' 0 10px">2번 색보정 금액이나 워터마크 유료·무료를 아직 안 고른 '+pend.length+'건 — 눌러서 골라 주세요.</div>'
+    +pend.map(function(e){const L=LABELS[e.label]||{name:'기타',color:'#9a9a9a'};
+      return '<div class="act" style="cursor:pointer;border-bottom:1px solid var(--bd);padding:9px 0" onclick="closeP();openD('+e.id+')">'
+        +'<span style="background:'+L.color+';color:'+lblTc(e.label)+';font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">'+L.name+'</span>'
+        +'<div class="n" style="margin-left:8px">'+esc(e.client||'(이름 없음)')+'<div class="s">'+e.date+(e.time?' '+e.time:'')+'</div></div></div>';}).join(''):'';
   document.getElementById('pnh').innerHTML='이번 달 금액 미입력<button class="px" onclick="closeP()">×</button>';
-  document.getElementById('pb').innerHTML=list.length
+  document.getElementById('pb').innerHTML=(list.length||pend.length)?(list.length
     ? '<div style="font-size:12px;color:var(--mu2);margin-bottom:10px">아래 '+list.length+'건은 금액이 없어 <b>수익에 안 잡힙니다.</b> 눌러서 채워주세요.</div>'
       +list.map(function(e){const L=LABELS[e.label]||{name:'기타',color:'#9a9a9a'};
         return '<div class="act" style="cursor:pointer;border-bottom:1px solid var(--bd);padding:9px 0" onclick="closeP();openEdit('+e.id+')">'
           +'<span style="background:'+L.color+';color:'+lblTc(e.label)+';font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">'+L.name+'</span>'
           +'<div class="n" style="margin-left:8px">'+esc(e.client||'(이름 없음)')+'<div class="s">'+e.date+(e.time?' '+e.time:'')+'</div></div></div>';}).join('')
+    : '')+pendHtml
     : '<div style="text-align:center;padding:24px 0;color:var(--mu)">이번 달은 금액이 모두 입력돼 있습니다 🍀</div>';
   openP();
 }
 function renderDash(){
   const D=dashData(),W=['일','월','화','수','목','금','토'];
+  window.__dashSnap=D;   // (261103) 말풍선은 막대를 그린 이 집계를 그대로 쓴다 — 둘의 숫자가 어긋나지 않게
   const cur=D.byMonth[D.mk]||{n:0,sum:0,noAmt:0,noAmtEvs:[]};
   const prevMk=addMk(D.mk,-1),nextMk=addMk(D.mk,1);
   const ly=function(mk){return addMk(mk,-12);};
@@ -2817,16 +3159,31 @@ function renderDash(){
   const sums=mks.map(function(m){return (D.byMonth[m]||{sum:0}).sum;});
   const smx=Math.max.apply(null,sums.concat([1]));
   const H=118, base=Math.max(smx,MONTH_TARGET);   // 막대 영역 높이
+  // (261103 명진 «촬영 예약비와 전부 별도로, 색을 다르게») 아래부터 촬영 예약비 · 사진 구매 · 추가 요청을 쌓는다.
+  // 막대 전체 높이는 합계에 비례(누적값으로 반올림해 조각 합 = 전체). 아주 작은 조각도 보이게 최소 높이(맨 아래 3px,
+  // 위 조각은 흰 틈 2px 포함 5px)를 주되, 늘어난 만큼은 가장 큰 조각에서 덜어 전체 높이는 그대로 둔다.
   const barCols=mks.map(function(m,i){
-    const v=sums[i], hit=v>=MONTH_TARGET;
-    return '<div class="rcol" tabindex="0" data-mk="'+m+'" aria-label="'+mkLabel(m)+' '+manwon(v)+'" onclick="dashMonth(\''+m+'\')">'
+    const v=sums[i], hit=v>=MONTH_TARGET, bm=D.byMonth[m]||{};
+    const tot=Math.max(3,Math.round(H*v/base));
+    const xs=REV_PARTS.map(function(p){return Math.max(0,bm[p.k]||0);});
+    const hs=[];let acc=0,prevY=0;
+    xs.forEach(function(x){acc+=x;const y=v>0?Math.round(tot*acc/v):0;hs.push(y-prevY);prevY=y;});
+    let need=0;
+    const big=xs.indexOf(Math.max.apply(null,xs)), firstNz=xs.findIndex(function(x){return x>0;});
+    xs.forEach(function(x,j){if(x<=0)return;const mn=j===firstNz?3:5;if(hs[j]<mn){need+=mn-hs[j];hs[j]=mn;}});
+    if(need&&xs[big]>0)hs[big]=Math.max(big===firstNz?3:5,hs[big]-need);
+    const segs=[];
+    REV_PARTS.forEach(function(p,j){if(xs[j]>0)segs.push('<span class="sg" style="height:'+hs[j]+'px;background:'+p.color+'"></span>');});
+    if(!segs.length)segs.push('<span class="sg sg0" style="height:3px"></span>');
+    const aria=mkLabel(m)+' 합계 '+manwon(v)+'원 — '+REV_PARTS.map(function(p){return p.name+' '+manwon(bm[p.k]||0)+'원';}).join(' · ');
+    return '<div class="rcol'+(i===5?' cur':'')+'" tabindex="0" data-mk="'+m+'" aria-label="'+aria+'" onclick="dashMonth(\''+m+'\')">'
       +'<b class="rbv'+(hit?' hit':'')+'">'+manwon(v)+'</b>'
-      +'<i style="height:'+Math.max(3,Math.round(H*v/base))+'px;background:'+(i===5?'#3f7a4a':(hit?'#7ab87a':'#c3ddc9'))+'"></i>'
+      +'<span class="rstk">'+segs.join('')+'</span>'
       +'</div>';
   }).join('');
   const labCols=mks.map(function(m,i){
     const v=sums[i], prev=i?sums[i-1]:null, d=prev==null?null:v-prev;
-    return '<div class="rlab">'+mkLabel(m)
+    return '<div class="rlab'+(i===5?' cur':'')+'">'+mkLabel(m)
       +(d!=null&&Math.abs(d)>=10000?'<u class="'+(d>0?'up':'dn')+'">'+(d>0?'▲':'▼')+manwon(Math.abs(d))+'</u>':'')
       +'</div>';
   }).join('');
@@ -2856,10 +3213,12 @@ function renderDash(){
       })()
      +(function(){
         const gap=cur.sum-MONTH_TARGET;
+        if(!PRICES)return '<div class="kpi clickable" onclick="'+(myRole()==='mj'?'openPriceTable()':'dashNoAmt()')+'"><div class="t"><span class="lb">이번 달 수익</span><span class="ic"><svg class="mi" aria-hidden="true"><use href="#i-wallet"/></svg></span></div>'
+          +'<div class="v">—<u class="goal">/'+manwon(MONTH_TARGET)+'</u></div><span class="dtag">💰 금액표 필요</span></div>';   // 금액표를 읽기 전엔 수익을 셀 수 없다
         return '<div class="kpi clickable'+(gap<0?' lv-d3':'')+'" onclick="dashNoAmt()"><div class="t"><span class="lb">이번 달 수익</span><span class="ic"><svg class="mi" aria-hidden="true"><use href="#i-wallet"/></svg></span></div>'
           +'<div class="v '+(gap<0?'v-dn':'v-up')+'">'+manwon(cur.sum)+'<u class="goal">/'+manwon(MONTH_TARGET)+'</u></div>'
           +'<span class="dtag '+(gap<0?'dn':'up')+'">'+(gap<0?manwon(-gap)+' 부족':manwon(gap)+' 초과')
-          +(cur.noAmt?' · 미입력 '+cur.noAmt+'건':'')+'</span></div>';
+          +((cur.noAmt||0)+(cur.noBuyAmt||0)+(cur.noWm||0)?' · 미입력 '+((cur.noAmt||0)+(cur.noBuyAmt||0)+(cur.noWm||0))+'건':'')+'</span></div>';
       })()
      +'<div class="kpi clickable'+(D.late.length?' lv-over':'')+'" onclick="navTab(\'alert\')"><div class="t"><span class="lb">보낼 날 지난 일</span><span class="ic"><svg class="mi" aria-hidden="true"><use href="#i-clock"/></svg></span></div><div class="v'+(D.late.length?' v-dn':'')+'">'+D.late.length+'</div>'
        +'<span class="dtag '+(D.late.length?'dn':'up')+'">'+(D.late.length?'눌러서 알림으로':'밀린 것 없음')+'</span></div>'
@@ -2875,7 +3234,8 @@ function renderDash(){
      +'<div class="dcard c-rev"><div class="dch"><h2>수익 추이</h2><span class="dpill goalpill">┄ 목표 '+manwon(MONTH_TARGET)+'</span><span class="dpill">최근 6개월</span></div>'
        +'<div class="rbs"><div class="rbarea"><div class="goalline" style="bottom:'+goalBottom+'px"></div>'+barCols+'</div>'
        +'<div class="rlabs">'+labCols+'</div></div>'
-       +'<div class="dnote">점선이 목표 '+manwon(MONTH_TARGET)+'입니다 · 막대 아래 숫자는 전월 대비 증감 · 금액 미입력 건은 빠져 있습니다</div></div>'
+       +'<div class="mlg rlg">'+REV_PARTS.map(function(p){return '<span><i style="background:'+p.color+'"></i>'+p.name+'</span>';}).join('')+'</div>'
+       +'<div class="dnote">점선이 목표 '+manwon(MONTH_TARGET)+'입니다 · 막대 위 숫자는 세 가지를 더한 합계 · 막대 아래 숫자는 전월 대비 증감 · 금액 미입력·확인 필요 건은 빠져 있습니다</div>'+moneyDashLine()+'</div>'
    +'</div>'
    +'<div class="dcard full c-m3"><div class="dch"><h2>전월 · 당월 · 익월</h2>'
      +'<div class="mgl"><span><i style="background:#3f7a4a"></i>올해</span><span><i style="background:#cfe0d2"></i>작년 같은 달</span></div></div>'
@@ -3567,10 +3927,21 @@ function openD(id){
   if(e.note)b+=`<div class="det-r"><span class="det-l">📝 메모</span>${esc(e.note)}</div>`;
   b+=`<div class="det-r"><span class="det-l">🕓 등록</span>${e.createdAt?fmtCreated(e.createdAt):'<span style="color:var(--mu)">기록 없음 (9/29 이전에 등록한 일정)</span>'}</div>`;
   if(!NO_PRICE_LABELS.includes(e.label)){
-    const amt=evAmount(e);
-    b+=`<div class="det-r"><span class="det-l">💰 금액</span>${amt!=null
+    const amt=evAmount(e),mo=evMoney(e);
+    const shootTxt=amt!=null
       ?amt.toLocaleString('ko-KR')+'원'+(e.amount==null?' <span style="color:var(--mu);font-size:10.5px">(기본 단가'+(e.half?' · ½ 반값':'')+')</span>':'')
-      :'<span style="color:var(--mu)">미입력 — 수익에 안 잡힘</span>'}</div>`;
+      :(!PRICES&&e.amount==null&&['studio_f','studio_m'].includes(e.label)?'<span style="color:var(--mu)">금액표 필요 — 대시보드 «💰 금액표»</span>':'<span style="color:var(--mu)">미입력 — 수익에 안 잡힘</span>');
+    if(!(mo.buy||mo.buyPending||mo.extra||mo.wmPending))b+=`<div class="det-r"><span class="det-l">💰 금액</span>${shootTxt}</div>`;
+    else{   // (261103) 촬영 예약비 · 사진 구매 · 추가 요청 — 대시보드 막대와 같은 색
+      const W=v=>v.toLocaleString('ko-KR')+'원';
+      const bn={buy_raw:'전체 원본 구매',buy_color:'전체 색보정 구매',buy_select:'2번 색보정 구매'}[mo.buyKey]||'';
+      const xs=[mo.retN?'세밀보정 '+mo.retN+'장 '+W(mo.ret):'',mo.wm?'워터마크 제거 '+W(mo.wm):'',mo.rush?'빠른 전달 '+W(mo.rush):''].filter(Boolean).join('<br>');
+      b+=`<div class="det-r"><span class="det-l">💰 금액</span><div class="mny">
+        <div class="mny-r"><i style="background:${revColor('shoot')}"></i><span class="mny-n">촬영 예약비</span><span class="mny-v">${shootTxt}</span></div>
+        ${mo.buyKey?`<div class="mny-r"><i style="background:${revColor('buy')}"></i><span class="mny-n">사진 구매</span><span class="mny-v">${mo.buyPending?'<em class="mny-need">2번 색보정 금액 확인 필요 — 아래에서 골라 주세요</em>':W(mo.buy)+'<small class="mny-d">'+bn+'</small>'}</span></div>`:''}
+        ${mo.extra||mo.wmPending?`<div class="mny-r"><i style="background:${revColor('extra')}"></i><span class="mny-n">추가 요청</span><span class="mny-v">${mo.extra||!mo.wmPending?W(mo.extra):'—'}<small class="mny-d">${xs}${mo.wmPending?(xs?'<br>':'')+'<em class="mny-need">워터마크 유료·무료 확인 필요</em>':''}</small></span></div>`:''}
+        <div class="mny-t"><span class="mny-n">${mo.buyPending||mo.wmPending?'지금 잡힌 합계':'합계'}</span>${amt==null?'<small class="mny-d0">촬영 예약비 미입력은 빠짐</small>':''}${mo.buyPending||mo.wmPending?'<small class="mny-d0">확인 필요는 빠짐</small>':''}<b>${W(mo.total)}</b></div></div></div>`;
+    }
   }
   if(e.status==='nosh')b+=`<div class="det-r"><span class="det-l">🚫 노쇼 사유</span>${e.noshReason?esc(e.noshReason):'<span style="color:var(--mu)">기록 없음</span>'} <button onclick="askNosh(${e.id})" style="margin-left:6px;padding:2px 8px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--mu);font-size:10px;cursor:pointer">${e.noshReason?'수정':'남기기'}</button></div>`;
   if(quoteEligible(e))b+=`<div class="det-r det-qz"><span class="det-l">📄 견적서</span><button class="qz-open" onclick="openQuote(${e.id})">NYC 대관 견적서 만들기</button></div>`;   // (261103 운영-003 19) 명진만
@@ -3590,7 +3961,7 @@ function openD(id){
       return`<button class="btn-ok" style="flex:1;font-size:11px${on?'':';background:var(--sf2);color:var(--mu2);border:1px solid var(--bd)'}" onclick="setStatus(${e.id},'${k}');openD(${e.id})">${stEmoji(k)} ${txt}</button>`;
     };
     b+=`<div style="font-size:10px;color:var(--mu);margin:10px 0 5px">촬영 후 구매 선택${e.status.startsWith('buy_')?' <span style="color:var(--ok);font-weight:700">— 지금: '+stName(e.status)+'</span>':''}</div>
-      <div class="act-row">${buyBtn('buy_select','2번구매')}${buyBtn('buy_raw','원본구매')}${buyBtn('buy_color','원본색보정')}</div>`;
+      <div class="act-row">${buyBtn('buy_select','2번구매')}${buyBtn('buy_raw','원본구매')}${buyBtn('buy_color','원본색보정')}</div>`+buyAmtRow(e);
   }
   // 전달 체크 — 촬영이 끝난 대상 일정
   if(isDelivTarget(e)&&e.date<=TSTR){
@@ -3602,7 +3973,7 @@ function openD(id){
   }
   // 🚨 긴급 전달 기한 · 💧 워터마크 제거 — 촬영 라벨 일정이면 언제든 기록 가능
   if(DELIV_LABELS.includes(e.label)&&stActive(e.status)){
-    b+=`<div style="border-top:1px solid var(--bd);margin-top:12px;padding-top:10px"><div style="font-size:10px;color:var(--mu);margin-bottom:2px">긴급 전달 · 워터마크</div>`;
+    b+=`<div style="border-top:1px solid var(--bd);margin-top:12px;padding-top:10px"><div style="font-size:10px;color:var(--mu);margin-bottom:2px">${moneyOn(e)?'추가 요청 — ':''}긴급 전달 · 워터마크${moneyOn(e)?' · 세밀보정':''}</div>`;
     if(e.dlvRushDone){
       b+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
         <span style="font-size:11px;color:var(--tx);flex:1">✅ 🚨 긴급 보정본 <span style="color:var(--mu)">— ${e.dlvRushDone} 보냄</span></span>
@@ -3619,14 +3990,17 @@ function openD(id){
         <input type="date" id="rushDate" style="flex:1;min-width:0;padding:5px 8px;border:1px solid var(--bd);border-radius:7px;background:var(--sf2);color:var(--tx);font-size:11px;font-family:inherit">
         <button onclick="setRush(${e.id})" style="padding:5px 11px;border:none;border-radius:7px;background:var(--R);color:#fff;font-size:10px;font-weight:700;cursor:pointer">등록</button></div>`;
     }
+    b+=rushAmtRow(e);   // 빠른 일정 보정본 전달 금액 — 상담 후 직접 (261103)
     const wmOn=!!e.wm;
     b+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
-      <span style="font-size:11px;color:var(--tx);flex:1">${wmOn?(e.wmEmoji||'💧')+' ':''}워터마크 제거</span>
+      <span style="font-size:11px;color:var(--tx);flex:1">${wmOn?(e.wmEmoji||'💧')+' ':''}워터마크 제거${moneyOn(e)?' <span style="color:var(--mu);font-size:10px">받는 사진 전체</span>':''}</span>
       <button onclick="toggleWm(${e.id})" style="padding:4px 12px;border:none;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;${wmOn?'background:var(--R);color:#fff':'background:var(--sf2);color:var(--mu);border:1px solid var(--bd)'}">${wmOn?'표시 중':'꺼짐'}</button></div>`;
     if(wmOn){
+      b+=wmPayRow(e);   // 유료·무료 (운영-003 17)
       b+=`<div style="display:flex;gap:6px;padding:0 0 4px">${['💧','🚫','✨','⭐','📌'].map(x=>`<button onclick="setWmEmoji(${e.id},'${x}')" style="flex:1;padding:5px 0;border-radius:7px;border:1.5px solid ${x===(e.wmEmoji||'💧')?'var(--R)':'var(--bd)'};background:var(--sf2);font-size:13px;cursor:pointer">${x}</button>`).join('')}</div>
       <div style="font-size:9.5px;color:var(--mu);padding-bottom:4px">선택한 이모지가 캘린더 일정 이름 앞에 표시됩니다</div>`;
     }
+    b+=retRow(e);   // 세밀보정본 추가 장수 (261103)
     b+=`</div>`;
   }
   if(!e.priv)b+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--bd);margin-top:8px">
@@ -4520,7 +4894,7 @@ function doJsonImport(){
       if(!e.date||!e.label)return;
       const _id=nextId++;
       // 전달 체크(dlvBasic/dlvBuy)가 들어 있으면 살려서 가져온다
-      maydlyEvents.push({id:_id,label:e.label||'studio_f',date:e.date,time:e.time||'10:00',dur:parseFloat(e.dur)||2,status:e.status||'booked',client:e.client||null,insta:e.insta||e.phone||null,note:e.note||'',priv:e.priv||['rest','personal'].includes(e.label),allDay:!!e.allDay,dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null,...(e.pickWait?{pickWait:e.pickWait,pickGot:e.pickGot||null}:{}),...(e.planBasic?{planBasic:e.planBasic}:{}),...(e.planBuy?{planBuy:e.planBuy}:{}),...(e.createdAt?{createdAt:e.createdAt}:{})});
+      maydlyEvents.push({id:_id,label:e.label||'studio_f',date:e.date,time:e.time||'10:00',dur:parseFloat(e.dur)||2,status:e.status||'booked',client:e.client||null,insta:e.insta||e.phone||null,note:e.note||'',priv:e.priv||['rest','personal'].includes(e.label),allDay:!!e.allDay,dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null,...(e.pickWait?{pickWait:e.pickWait,pickGot:e.pickGot||null}:{}),...(e.planBasic?{planBasic:e.planBasic}:{}),...(e.planBuy?{planBuy:e.planBuy}:{}),...(e.amount!=null&&e.amount!==''?{amount:Number(e.amount)}:{}),...(e.half?{half:true}:{}),...(e.wm?{wm:true,wmEmoji:e.wmEmoji||'💧'}:{}),...(e.wmPay==='paid'||e.wmPay==='free'?{wmPay:e.wmPay}:{}),...(e.buyAmt!=null?{buyAmt:e.buyAmt}:{}),...(e.extraRet?{extraRet:e.extraRet}:{}),...(e.rushAmt?{rushAmt:e.rushAmt}:{}),...(e.createdAt?{createdAt:e.createdAt}:{})});
       _addedIds.push(_id);
       added++;
     });
@@ -5047,7 +5421,8 @@ function mergeIcal() {
 
   /* ── 그래프 금액 말풍선 (수익 추이 막대 · 마우스/키보드) — 허브 lcShow 처럼 미끄러지고 숫자가 굴러간다 ── */
   var tip=null, tipIdx=null, tipRaf=0, tipShown=0, tipCol=null, tipD=null, tipDT=0, lastPd=0;
-  function dashD(){ var n=Date.now(); if(!tipD||n-tipDT>3000){ tipD=dashData(); tipDT=n; } return tipD; }   // 막대를 지날 때마다 전체 집계를 다시 하지 않게
+  function dashD(){ if(window.__dashSnap) return window.__dashSnap;   // (261103) 막대를 그린 그 집계 그대로 — 막대와 말풍선 숫자가 어긋나지 않게
+    var n=Date.now(); if(!tipD||n-tipDT>3000){ tipD=dashData(); tipDT=n; } return tipD; }   // 막대를 지날 때마다 전체 집계를 다시 하지 않게
   function ensureTip(){
     if(tip) return tip;
     tip=document.createElement('div'); tip.className='mc-tip'; tip.setAttribute('aria-hidden','true');
@@ -5069,10 +5444,14 @@ function mergeIcal() {
         delta='<div class="tf">작년 같은 달 '+won(lb.sum)+pctTag(b.sum,lb.sum)+'</div>'; }
       var goal=(typeof MONTH_TARGET==='number')?('<div class="tf">목표 '+won(MONTH_TARGET)+' 대비 '+(b.sum>=MONTH_TARGET?'달성':won(MONTH_TARGET-b.sum)+' 부족')+'</div>'):'';
       var t=ensureTip(), first=!t.classList.contains('on');
+      // (261103) 촬영 예약비 · 사진 구매 · 추가 요청 — 막대와 같은 색, 줄마다 아래에 항목
+      var det=(typeof revDetail==='function')?revDetail(b):{};
+      var rows=((typeof REV_PARTS!=='undefined')?REV_PARTS:[]).map(function(p){
+        return '<div class="tr"><i style="background:'+p.color+'"></i>'+p.name+'<b>'+won(b[p.k]||0)+'</b></div>'
+          +(det[p.k]||[]).map(function(x){ return '<div class="ts'+(x[2]?' tw':'')+'"><span>'+x[0]+'</span>'+(x[1]!=null?'<b>'+won(x[1])+'</b>':'')+'</div>'; }).join(''); }).join('');
       t.innerHTML='<div class="th">'+mon+'월<small>'+yr+'년'+(mk===D.mk?' · 진행 중':'')+'</small></div>'
-        +'<div class="tr"><i style="background:#4f9a6a"></i>수익<b data-v="'+b.sum+'">'+won(b.sum)+'</b></div>'
-        +'<div class="tr"><i style="background:#a6c8e2"></i>촬영<b>'+(b.n||0)+'건</b></div>'
-        +(b.noAmt?'<div class="tr"><i style="background:#e3cf9d"></i>금액 미입력<b>'+b.noAmt+'건</b></div>':'')
+        +rows
+        +'<div class="tr tt">합계<b data-v="'+(b.sum||0)+'">'+won(b.sum||0)+'</b></div>'
         +delta+goal;
       var r=col.getBoundingClientRect(), tw=t.offsetWidth, th=t.offsetHeight;
       var x=Math.round(Math.max(8,Math.min(window.innerWidth-tw-8,r.left+r.width/2-tw/2)));
