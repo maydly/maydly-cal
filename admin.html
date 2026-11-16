@@ -1525,6 +1525,10 @@ const LABELS={
 //          저장하면 실제로 rest로 바뀜. 선택지·필터엔 '휴무'만 남음. (국가공휴일 KR_HOLIDAYS와는 무관)
 function mergeHoliday(evs){ if(Array.isArray(evs)) evs.forEach(function(e){ if(e&&e.label==='holiday') e.label='rest'; if(e&&e.label==='nopay'){ e.label='studio_f'; var _t='[과거이력1: 원 무페이]'; if((e.note||'').indexOf(_t)<0) e.note=(e.note?e.note+' ':'')+_t; } }); return evs; }
 const EXT_LABELS=['suvin'];
+// (261116 운영-003 21) 예약이 아닌 라벨 — 상태(예약완료·의상확인·구매)를 쓰지 않는다. 휴무 = 쉬는 날 · PA촬영 = 회사 출근·지원일(명진 261116).
+// 고르면 상태 칸이 사라지고 «상태 없음(none)»으로 저장된다. 고객 캘린더에서 그 시간이 막히는 건 그대로.
+const NOSTAT_LABELS=['rest','pa_shoot'];
+function noStat(k){return NOSTAT_LABELS.indexOf(k)>=0;}
 function isExt(e){return e&&(e.ext||EXT_LABELS.includes(e.label));}
 // 라벨색을 배경으로 쓸 때의 글자색. 밝은 라벨(노랑 등) 위에 흰 글씨를 쓰면 안 보인다.
 function lblTc(k){return (LABELS[k]&&LABELS[k].tc)||'#fff';}
@@ -1569,7 +1573,7 @@ function stEmoji(s){return stInfo(s).emoji||'';}
 function stActive(s){return stInfo(s).active!==false;}
 function stOptions(sel){return STATUS_ORDER.map(k=>`<option value="${k}"${k===sel?' selected':''}>${STATUS[k].emoji?STATUS[k].emoji+' ':''}${STATUS[k].name}</option>`).join('');}
 // 고객명 앞 상태 이모지 표시 (+워터마크 제거 표시 이모지)
-function nameTag(e,fallback,wrapIc){const c=e.client||fallback;const em=e.label==='pa_shoot'?'':stEmoji(e.status);const wm=e.wm?(e.wmEmoji||'💧'):'';const hf=e.half?' ½':'';const ic=wm+(em?em:'');return (wrapIc&&ic?'<span class="m-em">'+ic+'</span>':ic)+c+hf;}   // ½는 이름 뒤 — 앞에 두면 좁은 칸에서 이름이 밀린다 · wrapIc=월 칸(폰에서 이모지만 작게, 261004)
+function nameTag(e,fallback,wrapIc){const c=e.client||fallback;const em=noStat(e.label)?'':stEmoji(e.status);const wm=e.wm?(e.wmEmoji||'💧'):'';const hf=e.half?' ½':'';const ic=wm+(em?em:'');return (wrapIc&&ic?'<span class="m-em">'+ic+'</span>':ic)+c+hf;}   // ½는 이름 뒤 — 앞에 두면 좁은 칸에서 이름이 밀린다 · wrapIc=월 칸(폰에서 이모지만 작게, 261004)
 // 시간(duration) 옵션 — 종일·다일 포함
 const DUR_OPTS=[1,2,3,4,5,6,7,8,10,12,24,48,72];
 function durLabel(v){return v>=24?(v/24)+'일'+(v===24?' (종일)':''):v+'시간';}
@@ -6752,8 +6756,8 @@ function openD(id){
   const e=evById(id);if(!e)return;
   const L=LABELS[e.label]||{name:'기타',color:'#9a9a9a'};
   document.getElementById('pnh').innerHTML=`${esc(e.client||L.name)}<button class="px" onclick="closeP()">×</button>`;
-  const emj=e.label==='pa_shoot'?'':stEmoji(e.status);
-  const stb=stActive(e.status)
+  const emj=noStat(e.label)?'':stEmoji(e.status);   // (261116 운영-003 21) 휴무·PA촬영엔 상태 이모지 없음
+  const stb=noStat(e.label)&&stActive(e.status)?'':stActive(e.status)   // (261116 운영-003 21) 휴무·PA촬영은 상태 표시 없이 라벨만
     ?`<span class="badge bOK">${emj?emj+' ':''}${stName(e.status)}</span>`
     :`<span class="badge" style="background:${e.status==='nosh'?NOSH_COLOR:'#c86060'};color:${e.status==='nosh'?NOSH_TEXT:'#fff'}">${emj?emj+' ':''}${stName(e.status)}</span>`;
   let b=`<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center">${stb}<span style="background:${L.color};color:${lblTc(e.label)};font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px">${L.name}</span></div>`;
@@ -6803,9 +6807,9 @@ function openD(id){
     b+=`<div class="client-view-box"><div class="cv-label">고객에게 표시</div><div class="cv-val">${cv}</div></div>`;
   }
   if(e.status==='pending')b+=`<div class="act-row"><button class="btn-ok" onclick="confEv(${e.id});closeP()">✓ 확정</button><button class="btn-ng" onclick="rejEv(${e.id});closeP()">✕ 거절</button></div>`;
-  if(e.status==='booked')b+=`<div class="act-row"><button class="btn-ok" onclick="setStatus(${e.id},'outfit');closeP()">👗 의상확인 완료</button></div>`;
+  if(e.status==='booked'&&!noStat(e.label))b+=`<div class="act-row"><button class="btn-ok" onclick="setStatus(${e.id},'outfit');closeP()">👗 의상확인 완료</button></div>`;   // (261116 운영-003 21) 휴무·PA촬영은 의상확인 없음
   // 촬영 후 구매 선택 — 촬영이 끝난 일정. 이미 고른 뒤에도 다시 눌러 바꿀 수 있다.
-  if(e.date<=TSTR&&['booked','outfit','buy_select','buy_raw','buy_color'].includes(e.status)){
+  if(e.date<=TSTR&&!noStat(e.label)&&['booked','outfit','buy_select','buy_raw','buy_color'].includes(e.status)){   // (261116 운영-003 21) 휴무·PA촬영은 구매 선택 없음
     const buyBtn=(k,txt)=>{
       const on=e.status===k;
       return`<button class="btn-ok" style="flex:1;font-size:11px${on?'':';background:var(--sf2);color:var(--mu2);border:1px solid var(--bd)'}" onclick="setStatus(${e.id},'${k}');openD(${e.id})">${stEmoji(k)} ${txt}</button>`;
@@ -7143,6 +7147,7 @@ function openAdd(ds){
     ${noshFormBlock(null)}
     <div class="form-foot"><button class="sub-btn" onclick="saveEv()">저장</button></div>`;
   _editingId=null;_reFrom=null;
+  {const c=document.getElementById('f_c');if(c)c.dataset.ph=c.placeholder;}restUi();   // (261116 운영-003 21) 지난번 라벨이 휴무·PA촬영이어도 상태가 «예약완료»로 남지 않게
   openP();applyAllDay();bindAllDayNote();refreshPriceHint();v2Opened('a');   // (261106 운영-003 20 저장엔진 v2)
 }
 // 시작 날짜가 바뀌면 종일 촬영 안내를 다시 계산한다
@@ -7202,10 +7207,25 @@ function selLbl(k,el){
   // 촬영 라벨로 되돌리면 기본 상태(예약완료)로 돌려놓는다.
   const ss=document.getElementById('f_s');
   if(ss){
-    if(k==='rest')ss.value='none';
+    if(noStat(k))ss.value='none';
     else if(ss.value==='none')ss.value='booked';
   }
+  restUi();   // (261116 운영-003 21)
   refreshPriceHint();
+}
+// (261116 운영-003 21) 휴무·PA촬영은 예약이 아니다 — 이 라벨이면 상태를 «없음»으로 두고 상태 칸을 감춘다(아래에서 다시 고를 일 없게).
+// 지난번 라벨이 휴무·PA촬영이라 창이 열릴 때부터 골라져 있어도 똑같이 맞춘다. 다른 라벨을 고르면 상태 칸이 다시 보인다.
+const NOSTAT_NOTE={rest:'휴무는 예약이 아니라서',pa_shoot:'PA촬영은 회사 출근·지원일이라'},NOSTAT_RO={rest:'로',pa_shoot:'으로'};
+function restUi(){
+  const ss=document.getElementById('f_s');if(!ss)return;
+  const row=ss.closest('.fg'),rest=noStat(seLabel),nm=rest?LABELS[seLabel].name:'';
+  if(rest)ss.value='none';
+  if(row)row.style.display=rest?'none':'';
+  const nb=document.getElementById('noshBox');if(nb&&rest)nb.style.display='none';
+  let n=document.getElementById('restNote');
+  if(n)n.remove();   // 라벨이 바뀌면 문구도 다시
+  if(rest&&row)row.insertAdjacentHTML('afterend','<div id="restNote" class="fg" style="font-size:11px;color:var(--mu);line-height:1.6">'+NOSTAT_NOTE[seLabel]+' 의상확인·구매 같은 예약 상태 없이 저장돼요. 이름을 비워 두면 «'+nm+'»'+NOSTAT_RO[seLabel]+' 들어가요.</div>');
+  const c=document.getElementById('f_c');if(c)c.placeholder=rest?'비워 두면 «'+nm+'»':(c.dataset.ph!=null?c.dataset.ph:c.placeholder);
 }
 
 function readTimeForm(){
@@ -7224,12 +7244,12 @@ function saveEv(force){
   if(!seLabel){toast('라벨을 선택해주세요.');return;}
   const t=readTimeForm();
   if(!t){toast('시작 날짜를 입력해주세요.');return;}
-  const cli=document.getElementById('f_c').value.trim();
+  const cli=document.getElementById('f_c').value.trim()||(noStat(seLabel)?LABELS[seLabel].name:'');   // (261116 운영-003 21) 휴무·PA촬영은 이름을 비워도 라벨 이름으로
   if(!cli){toast('고객명을 입력해주세요. (필수)');return;}
   if(!force&&!v2TimeCheck(t,seLabel,null))return;   // (261106 운영-003 20 저장엔진 v2) 지난 날·스튜디오 시간 밖이면 저장 전에 확인
   const e={
     id:v2NewId(),uid:v2Uid(),label:seLabel,date:t.date,time:t.time,dur:t.dur,allDay:t.allDay,repeat:t.repeat,   // (261106 운영-003 20 저장엔진 v2)
-    status:document.getElementById('f_s').value||'booked',
+    status:noStat(seLabel)?'none':(document.getElementById('f_s').value||'booked'),   // (261116 운영-003 21) 휴무·PA촬영은 늘 상태 없음
     client:cli,
     insta:document.getElementById('f_p').value.trim()||null,
     note:document.getElementById('f_n').value.trim()||'',
@@ -7279,14 +7299,15 @@ function openEdit(id){
     <div class="form-foot"><button class="sub-btn" onclick="updateEv(${id})">저장</button></div>`;
   const rep=document.getElementById('f_rep');if(rep)rep.innerHTML=repeatOptions(e.date,e.repeat||'none');
   _editingId=id;
-  openP();applyAllDay();bindAllDayNote();refreshPriceHint();v2Opened('e',e);   // (261106 운영-003 20 저장엔진 v2) 창을 연 때 칸 값
+  openP();applyAllDay();bindAllDayNote();refreshPriceHint();v2Opened('e',e);
+  {const c=document.getElementById('f_c');if(c)c.dataset.ph=c.placeholder||'';}restUi();   // (261116 운영-003 21) 연 때 값을 적어 둔 뒤 맞춘다 → 예전 휴무·PA촬영의 상태도 저장 때 바로잡힘   // (261106 운영-003 20 저장엔진 v2) 창을 연 때 칸 값
 }
 
 function updateEv(id,force){   // (261106 운영-003 20 저장엔진 v2) 바꾼 칸만 · 창을 연 때 값을 기준으로
   if(!v2AfGuard())return;   // (261106 운영-003 20 저장엔진 v2)
   const S=V2.edit&&(V2.edit.id===id||V2.idMap[id]===V2.edit.key)?V2.edit:null;
   const cur=S?v2FindKey(S.key):evById(id);   // (261107 운영-003 20 저장엔진 v2) 창을 연 일정의 열쇠로 찾는다(같은 번호를 받은 다른 일정을 고치지 않게)
-  const cli=document.getElementById('f_c').value.trim();
+  const cli=document.getElementById('f_c').value.trim()||(noStat(seLabel)?LABELS[seLabel].name:'');   // (261116 운영-003 21)
   if(!cli){toast('고객명을 입력해주세요. (필수)');return;}
   const t=readTimeForm();
   if(!t){toast('시작 날짜를 입력해주세요.');return;}
