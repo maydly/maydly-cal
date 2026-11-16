@@ -198,6 +198,11 @@ a:focus-visible,button:focus-visible,.mc:focus-visible{outline:2px solid var(--h
   .hdr-nav{order:2;width:100%;justify-content:flex-start}
   .ml{margin-left:auto;margin-right:2px;font-size:19px}
 }
+/* (261116 운영-003 21) 몇 월인지 뚜렷하게 — 처음 열 때 가장 빠른 가능 달로 넘어가므로, 지금 몇 월을 보는지 한눈에 */
+.ml{display:inline-flex;align-items:baseline;gap:5px;background:var(--hz-gl);border:1px solid #cfe3cf;border-radius:14px;padding:3px 13px 5px}
+.ml .ml-y{font-size:12.5px;font-weight:600;color:var(--hz-sub);letter-spacing:0}
+.ml .ml-m{font-size:27px;font-weight:800;color:var(--hz-pri);letter-spacing:-1px;line-height:1.1}
+@media(max-width:360px){.ml{padding:2px 10px 4px}.ml .ml-m{font-size:24px}}
 
 /* ── 본문 ── */
 .cal-wrap{padding:14px 16px 30px;max-width:980px}
@@ -563,6 +568,7 @@ async function loadPublicData(){
     banner.style.display=dataLoaded?'none':'block';
     legend.style.display=dataLoaded?'flex':'none';
   }
+  if(dataLoaded)jumpToFirstOpen();   // (261116 운영-003 21)
   renderCal();
 }
 
@@ -623,6 +629,26 @@ function getMaydlySlots(ds){
 
 // ── 캘린더 상태 ──
 let curDate=new Date(TODAY);
+// (261116 운영-003 21) 처음 열면 «예약 가능한 가장 빠른 날»이 있는 달부터 보여 준다.
+// 이번 달에 가능한 날이 없으면 굳이 이번 달을 보여 줄 필요가 없다(명진 261116).
+// 손님이 데이터가 오기 전에 이미 달을 넘겼으면 건드리지 않는다. 가능한 날이 하나도 없으면 이번 달 그대로.
+// «오늘» 버튼과 ‹ 버튼으로 이번 달은 그대로 볼 수 있다.
+let _calMoved=false,_calJumped=false;
+function firstOpenDay(){
+  if(!dataLoaded||!publicSchedule)return null;
+  const ks=Object.keys(publicSchedule).filter(k=>k>=TSTR).sort();
+  for(const k of ks){if(getMaydlySlots(k).some(x=>x.avail))return k;}   // 달력에 «N타임 가능»으로 뜨는 날과 같은 기준
+  return null;
+}
+function jumpToFirstOpen(){
+  if(_calJumped||_calMoved)return;
+  _calJumped=true;
+  const k=firstOpenDay();if(!k)return;
+  const d=parseDS(k);
+  if(d.getFullYear()===curDate.getFullYear()&&d.getMonth()===curDate.getMonth())return;
+  curDate=new Date(d.getFullYear(),d.getMonth(),1);
+  updLabel();
+}
 
 function goCalendar(){
   document.getElementById('landing').style.display='none';
@@ -639,17 +665,18 @@ function goLanding(){
   document.getElementById('calPage').style.display='none';
 }
 function chM(n){
+  _calMoved=true;   // (261116 운영-003 21)
   if(window.mcTurnStart)mcTurnStart(n);   // (261004) 넘기기 직전 달력을 붙잡아 둔다 — 새 달과 함께 «넘어가는» 움직임용
   // (261004) 말일(29~31일)에 넘기면 한 달을 건너뛰던 고장 수리 — 1일로 내렸다가 그 달 말일 안으로 되돌린다
   const d=curDate.getDate();curDate.setDate(1);curDate.setMonth(curDate.getMonth()+n);
   curDate.setDate(Math.min(d,new Date(curDate.getFullYear(),curDate.getMonth()+1,0).getDate()));
   updLabel();renderCal();if(window.mcSlide)mcSlide(n);
 }
-function goToday(){curDate=new Date(TODAY);updLabel();renderCal();}
+function goToday(){_calMoved=true;curDate=new Date(TODAY);updLabel();renderCal();}   // (261116 운영-003 21)
 function updLabel(){
   const ms=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   const el=document.getElementById('calLabel');
-  if(el)el.textContent=`${curDate.getFullYear()}년 ${ms[curDate.getMonth()]}`;
+  if(el)el.innerHTML=`<span class="ml-y">${curDate.getFullYear()}년</span><span class="ml-m">${ms[curDate.getMonth()]}</span>`;   // (261116 운영-003 21) 연도 작게 · 월 크게
 }
 
 function renderCal(){
