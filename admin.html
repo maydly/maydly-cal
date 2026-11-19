@@ -1318,6 +1318,17 @@ html.embed-cal .topnav{height:46px}
 .xt-op{border:1.5px solid var(--bd2);background:#fff;border-radius:20px;padding:6px 11px;font-size:12px;font-weight:700;color:#4a5a4a;cursor:pointer;font-family:inherit}
 .xt-op.on{background:#2f6f4a;border-color:#2f6f4a;color:#fff}
 </style>
+<style id="req23-css">
+/* (261119 운영-003 23) 달력 칸 오른쪽 위 «알아야 하는 날» — 수능·공휴일 이름. 보기만 한다 */
+.mc{position:relative}
+.kd{position:absolute;top:6px;right:6px;max-width:calc(100% - 34px);z-index:2;pointer-events:none;font-size:10px;font-weight:800;line-height:16px;padding:0 5px;border-radius:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#8a6410;background:#fff2cf}
+.kd.kd-h{color:#c2453a;background:#fdeceb}
+.kd .kd-s{display:none}
+.kd b{font-weight:800}
+.kd-p{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:6px;font-size:12px;font-weight:800;color:#8a6410;background:#fff2cf;vertical-align:2px}
+.kd-p.kd-h{color:#c2453a;background:#fdeceb}
+@media(max-width:560px){.kd{top:3px;right:2px;max-width:calc(100% - 21px);font-size:9px;line-height:14px;padding:0 3px;border-radius:4px}.kd .kd-l{display:none}.kd .kd-s{display:inline}}
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false"><defs>
@@ -6448,6 +6459,37 @@ function sumCard(e){
   return h;
 }
 
+// ── (261119 운영-003 23) 알아야 하는 날 — 달력 칸 오른쪽 위에 이름만(보기 전용 · 예약 막기·고객 공개표와 무관) ──
+// 공휴일은 KR_HOLIDAYS 날짜에 이름을 붙인 것(이름 없는 날은 «공휴일»). 그 밖의 날은 KNOW_DAYS 에 넣는다.
+// var·function: 첫 화면 그리기가 이 줄보다 먼저 돌 수 있다
+var KNOW_DAYS={
+  '2026-02-14':['밸런타인데이','밸런'],'2026-11-11':['빼빼로데이','빼빼로'],'2026-12-24':['크리스마스이브','이브'],
+  '2026-11-19':['수능','수능'],   // 2027학년도 대학수학능력시험
+  '2027-02-14':['밸런타인데이','밸런'],'2027-11-11':['빼빼로데이','빼빼로'],'2027-12-24':['크리스마스이브','이브'],
+  '2027-11-18':['수능','수능']    // 2028학년도 대학수학능력시험(교육부 발표)
+};
+var HOL_NAME={
+  '2026-01-01':['신정','신정'],'2026-02-16':['설 연휴','설'],'2026-02-17':['설날','설날'],'2026-02-18':['설 연휴','설'],
+  '2026-03-01':['삼일절','삼일절'],'2026-03-02':['대체공휴일','대체'],'2026-05-05':['어린이날','어린이'],
+  '2026-05-24':['부처님오신날','석탄일'],'2026-05-25':['대체공휴일','대체'],'2026-06-03':['지방선거','선거'],'2026-06-06':['현충일','현충일'],
+  '2026-07-17':['제헌절','제헌절'],'2026-08-15':['광복절','광복절'],'2026-08-17':['대체공휴일','대체'],
+  '2026-09-24':['추석 연휴','추석'],'2026-09-25':['추석','추석'],'2026-09-26':['추석 연휴','추석'],
+  '2026-10-03':['개천절','개천절'],'2026-10-05':['대체공휴일','대체'],'2026-10-09':['한글날','한글날'],'2026-12-25':['성탄절','성탄절'],
+  '2027-01-01':['신정','신정'],'2027-02-06':['설 연휴','설'],'2027-02-07':['설날','설날'],'2027-02-08':['설 연휴','설'],'2027-02-09':['대체공휴일','대체'],
+  '2027-03-01':['삼일절','삼일절'],'2027-05-01':['노동절','노동절'],'2027-05-03':['대체공휴일','대체'],'2027-05-05':['어린이날','어린이'],
+  '2027-05-13':['부처님오신날','석탄일'],'2027-06-06':['현충일','현충일'],'2027-07-17':['제헌절','제헌절'],'2027-07-19':['대체공휴일','대체'],
+  '2027-08-15':['광복절','광복절'],'2027-08-16':['대체공휴일','대체'],'2027-09-14':['추석 연휴','추석'],'2027-09-15':['추석','추석'],'2027-09-16':['추석 연휴','추석'],
+  '2027-10-03':['개천절','개천절'],'2027-10-04':['대체공휴일','대체'],'2027-10-09':['한글날','한글날'],'2027-10-11':['대체공휴일','대체'],
+  '2027-12-25':['성탄절','성탄절'],'2027-12-27':['대체공휴일','대체']
+};
+function knowDay(ds){   // {n:긴 이름, s:짧은 이름(폰), h:공휴일?} 또는 null
+  try{
+    if(KNOW_DAYS[ds])return{n:KNOW_DAYS[ds][0],s:KNOW_DAYS[ds][1],h:false};
+    if(KR_HOLIDAYS.indexOf(ds)>=0){const x=HOL_NAME[ds]||['공휴일','휴일'];return{n:x[0],s:x[1],h:true};}
+  }catch(e){}
+  return null;
+}
+function dayTag(ds){const k=knowDay(ds);return k?`<span class="kd${k.h?' kd-h':''}" title="${k.n}"><b class="kd-l">${k.n}</b><b class="kd-s">${k.s}</b></span>`:'';}
 function renderMonth(){
   const y=curDate.getFullYear(),m=curDate.getMonth();
   const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate();
@@ -6519,7 +6561,7 @@ function mCell(ds,dn,dim){
       inner+=`<div class="m-bar${mStripe?' m-tm':''}${hs?' m-hs':''}${so?' m-sopen':''}" data-id="${e.id}" style="background:${isNosh?NOSH_COLOR:L.color+mAlpha};color:${isNosh?NOSH_TEXT:mTxc};${mStripe}${op}" onclick="event.stopPropagation();openD(${e.id})">${hs?`<span class="m-nm">${nameTag(e,L.name,1)}</span><span class="m-tg" role="button" aria-label="예약 요약" onclick="event.stopPropagation();toggleSum(${e.id},'${ds}')">${so?'▴':'▾'}</span>`:nameTag(e,L.name,1)}</div>`;
     }
   });
-  return`<div class="mc${dim?' dim':''}${isT?' tdc':''}" data-ds="${ds}" onclick="openDay('${ds}')"><div class="dn sticky">${dn}</div>${spanHtml}${inner}${paHtml}</div>`;
+  return`<div class="mc${dim?' dim':''}${isT?' tdc':''}" data-ds="${ds}" onclick="openDay('${ds}')"><div class="dn sticky">${dn}</div>${dayTag(ds)}${spanHtml}${inner}${paHtml}</div>`;   // (261119 운영-003 23) 알아야 하는 날
 }
 
 function renderTimeGrid(){
@@ -6570,7 +6612,8 @@ function openDay(ds){
     .sort(noshLast);   // 노쇼는 맨 아래로
   if(evs.length===0){openAdd(ds);return;}
   const [y,m,d]=ds.split('-');
-  document.getElementById('pnh').innerHTML=`${y}년 ${parseInt(m)}월 ${parseInt(d)}일<button class="px" onclick="closeP()">×</button>`;
+  const _kd=knowDay(ds);   // (261119 운영-003 23) 하루 창 제목에도 알아야 하는 날
+  document.getElementById('pnh').innerHTML=`${y}년 ${parseInt(m)}월 ${parseInt(d)}일${_kd?`<span class="kd-p${_kd.h?' kd-h':''}">${_kd.n}</span>`:''}<button class="px" onclick="closeP()">×</button>`;
   let b='';
   evs.forEach(e=>{
     const L=LABELS[e.label]||{name:'기타',color:'#9a9a9a'};
