@@ -1367,6 +1367,7 @@ html.embed-cal .topnav{height:46px}
   .m-bar.m-hs.m-tm,.m-bar.m-hs.m-tm:hover{box-shadow:inset 3px 0 0 var(--lc),inset -3px 0 0 #b9832a}
   .m-bar.m-hs>.m-nm{display:inline}
   .m-bar.m-hs>.m-tg{position:absolute;top:0;right:0;bottom:0;width:16px;padding:0;margin:0;background:transparent;box-shadow:none;color:transparent;font-size:0}
+  .m-bar.m-hs>.m-tg::after{top:0;bottom:0;left:0;right:0}
   .m-bar.m-hs.m-sopen{box-shadow:inset -3px 0 0 #2f6f4a}
   .m-bar.m-hs.m-tm.m-sopen,.m-bar.m-hs.m-tm.m-sopen:hover{box-shadow:inset 3px 0 0 var(--lc),inset -3px 0 0 #2f6f4a}
 }
@@ -6523,7 +6524,8 @@ function toggleSum(id,ds){const t=evById(id);if(t)id=t.id;SUM=(SUM&&SUM.id===id&
 function sumEnd(e){if(e.allDay||!e.time)return '';const p=e.time.split(':').map(Number),m=p[0]*60+(p[1]||0)+Math.round((e.dur||0)*60);return pad(Math.floor(m/60)%24)+':'+pad(m%60);}
 function sumCard(e,noX){   // noX: 하루 창 안에서 펼칠 땐 ✕ 없이
   const L=LABELS[e.label]||{name:'기타'};const d=new Date(e.date+'T00:00');const dw='일월화수목금토'[d.getDay()];
-  const nd=e.dur>=24?Math.ceil(e.dur/24):1,ed=new Date(d);ed.setDate(d.getDate()+nd-1);   // (261120) 여러 날이면 끝 날·며칠
+  let nd=e.dur>=24?Math.ceil(e.dur/24):1,ed=new Date(d);ed.setDate(d.getDate()+nd-1);   // (261120) 여러 날이면 끝 날·며칠
+  if(!e.allDay&&e.time){const p=e.time.split(':').map(Number),x=new Date(d);x.setHours(p[0]||0,p[1]||0,0,0);x.setTime(x.getTime()+Math.round((e.dur||0)*60)*60000-60000);ed=new Date(x.getFullYear(),x.getMonth(),x.getDate());if(ed<d)ed=new Date(d);nd=Math.round((ed-d)/86400000)+1;}   // 시간 예약은 실제 끝 시각 기준(상세 창 «종료»와 같게)
   const when=(d.getMonth()+1)+'/'+d.getDate()+'('+dw+')'+(nd>1?'~'+(ed.getMonth()+1)+'/'+ed.getDate()+'('+'일월화수목금토'[ed.getDay()]+')':'')+' '+(e.allDay||!e.time?'종일'+(nd>1?' · '+nd+'일':''):e.time+'~'+sumEnd(e)+' · '+(e.dur||0)+'시간');
   const st=noStat(e.label)?'':(stEmoji(e.status)+' '+stName(e.status));
   const ins=e.insta||e.phone;
