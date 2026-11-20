@@ -594,10 +594,10 @@ svg.mi{width:20px;height:20px;flex:0 0 auto;display:block;fill:none;stroke:curre
 .mc.dim{opacity:1;background:rgba(255,255,255,.42);box-shadow:inset 0 0 0 1px rgba(227,233,224,.5)}
 .mc.dim>*{opacity:.42}
 .mc.tdc{background:linear-gradient(165deg,#e6f3e2 0%,#fff 62%);box-shadow:0 8px 18px -12px rgba(61,122,82,.5),inset 0 0 0 1.5px #b6d8b1}
-.mc>.dn{font-size:12.5px;font-weight:700;color:var(--hz-sub);margin:1px 0 2px 2px;line-height:22px;height:22px}
+.mc-hd>.dn{font-size:12.5px;font-weight:700;color:var(--hz-sub);margin:1px 0 2px 2px;line-height:22px;height:22px}
 .dn.sticky{background:inherit;border-radius:8px}
-.mg .mc:nth-child(7n+1) .dn{color:#c0392b}
-.mg .mc:nth-child(7n) .dn{color:#3b6ea5}
+.mg .mc.mc-sun .dn{color:#c0392b}
+.mg .mc.mc-sat .dn{color:#3b6ea5}
 .mc.tdc .dn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;margin:0 0 2px;border-radius:50%;
   background:linear-gradient(160deg,#3b8053,#2c6843);color:#fff!important;font-size:12px;font-weight:800;box-shadow:0 4px 10px -4px rgba(61,122,82,.65)}
 .m-bar{font-size:11.5px;font-weight:600;padding:2px 6px;border-radius:7px;line-height:1.38;margin-bottom:0;
@@ -610,7 +610,7 @@ svg.mi{width:20px;height:20px;flex:0 0 auto;display:block;fill:none;stroke:curre
   .mg-wrap{padding:0 8px 8px;gap:4px}
   .mg{gap:3px;padding:1px}
   .mc{border-radius:9px;padding:3px 2px 2px;gap:2px}
-  .mc>.dn{font-size:11.5px;margin:0 0 1px 2px;line-height:19px;height:19px}
+  .mc-hd>.dn{font-size:11.5px;margin:0 0 1px 2px;line-height:19px;height:19px}
   .mc.tdc .dn{width:20px;height:20px;font-size:11px}
   .m-bar{font-size:10.5px;padding:1px 3px;border-radius:5px;line-height:1.32}
   .m-span{margin-left:-2px;margin-right:-2px}
@@ -984,7 +984,7 @@ html.embed-cal .tn-tabs{left:0}
   .mg-wrap{padding:0 3px 6px}
   .mg{gap:2px}
   .mc{padding:2px 1px;gap:2px}
-  .mc>.dn{margin-left:3px}
+  .mc-hd>.dn{margin-left:3px}
   .m-bar{display:block;white-space:nowrap;text-overflow:ellipsis;word-break:normal;overflow-wrap:normal;
     font-size:10.5px;letter-spacing:-.4px;line-height:1.32;padding:1px 1px 1px 3px;border-radius:4px}
   .m-bar.m-tm{box-shadow:inset 2px 0 0 var(--lc);padding-left:4px}
@@ -1328,6 +1328,48 @@ html.embed-cal .topnav{height:46px}
 .kd-p{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:6px;font-size:12px;font-weight:800;color:#8a6410;background:#fff2cf;vertical-align:2px}
 .kd-p.kd-h{color:#c2453a;background:#fdeceb}
 @media(max-width:560px){.kd{top:3px;right:2px;max-width:calc(100% - 21px);font-size:9px;line-height:14px;padding:0 3px;border-radius:4px}.kd .kd-l{display:none}.kd .kd-s{display:inline}}
+</style>
+<style id="req24-css">
+/* (261120 운영-003 22·23 보강) 날짜 머리줄 · 좁은 칸 짧은 이름 · 주·일 보기 이름 · 하루 창 ▾ · 폰 ▾ 폭 */
+.mc-hd{display:flex;position:sticky;top:-4px;z-index:1;background:inherit;border-radius:8px;flex-shrink:0}
+.mc-hd>.kd{top:1px;right:1px;max-width:calc(100% - 24px);pointer-events:auto}
+.kd.kd-sm{font-size:9px;line-height:14px;padding:0 3px;border-radius:4px}
+.kd.kd-sm .kd-l{display:none}.kd.kd-sm .kd-s{display:inline}
+.tg-dh .kd{position:static;display:block;width:max-content;max-width:100%;margin:3px auto 0;pointer-events:auto}
+.od-tg{font-size:12px;padding:2px 8px;margin-left:4px}
+.od-tg.od-open{background:#2f6f4a;color:#fff}
+.od-sum{margin:-1px 0 6px}
+@media(max-width:560px){
+  .mc-hd>.kd{max-width:calc(100% - 19px)}
+  .m-bar>.m-tg{font-size:8px;padding:0 1px;margin-left:0;letter-spacing:0}
+  .m-bar>.m-tg::after{left:-14px}
+  .tg-dh.tg-d1 .kd .kd-l{display:inline}.tg-dh.tg-d1 .kd .kd-s{display:none}
+}
+</style>
+<style id="req25-css">
+/* (261120 보강 2) 오늘 칸 머리줄은 투명(초록 그라데이션 이음매 없게) · 오늘 칸 이름표 폭 · 폰 이름표 여백 · 하루 창 ▾ 누르는 자리 */
+.mc.tdc>.mc-hd{background:none}
+.mc.tdc>.mc-hd>.kd{max-width:calc(100% - 28px)}
+.od-tg{display:inline-flex;align-items:center;justify-content:center;position:relative}
+.od-tg::after{top:-14px;bottom:-14px;left:-12px;right:-10px}
+@media(max-width:560px){.kd,.kd.kd-sm{padding:0 2px}.mc.tdc>.mc-hd>.kd{max-width:calc(100% - 24px)}}
+</style>
+<style id="req26-css">
+/* (261120 보강 3) 오늘 칸 머리줄은 칸 안을 굴렸을 때만 색(막대가 비치지 않게) · 폰 오늘 칸 이름표 폭 */
+.mc.tdc.mc-scrolled>.mc-hd{background:#e8f4e5}
+@media(max-width:560px){.mc.tdc>.mc-hd>.kd{max-width:calc(100% - 21px)}}
+@media(max-width:370px){.mc.tdc>.mc-hd>.kd{padding:0 1px}}
+</style>
+<style id="req27-css">
+/* (261120) 폰: 특이사항 표시 = 막대 오른쪽 끝 갈색 띠(이름 폭을 먹지 않음) · 누르는 자리는 오른쪽 끝 투명 칸 · 열린 요약은 초록 띠 */
+@media(max-width:560px){
+  .m-bar.m-hs{display:block;position:relative;box-shadow:inset -3px 0 0 #b9832a}
+  .m-bar.m-hs.m-tm,.m-bar.m-hs.m-tm:hover{box-shadow:inset 3px 0 0 var(--lc),inset -3px 0 0 #b9832a}
+  .m-bar.m-hs>.m-nm{display:inline}
+  .m-bar.m-hs>.m-tg{position:absolute;top:0;right:0;bottom:0;width:16px;padding:0;margin:0;background:transparent;box-shadow:none;color:transparent;font-size:0}
+  .m-bar.m-hs.m-sopen{box-shadow:inset -3px 0 0 #2f6f4a}
+  .m-bar.m-hs.m-tm.m-sopen,.m-bar.m-hs.m-tm.m-sopen:hover{box-shadow:inset 3px 0 0 var(--lc),inset -3px 0 0 #2f6f4a}
+}
 </style>
 </head>
 <body>
@@ -3473,6 +3515,7 @@ function v2Remap(a,b,key){
   try{if(Array.isArray(_mchkIds))_mchkIds=_mchkIds.map(function(x){return x===a?b:x;});}catch(e){}
   if(V2.open&&V2.open.id===a)V2.open.id=b;
   if(V2.edit&&V2.edit.id===a)V2.edit.id=b;
+  try{if(SUM&&SUM.id===a)SUM.id=b;}catch(e){}   // (261120) 열린 달력 요약도 새 번호로
 }
 // 화면 손잡이(숫자 id)로 찾기 — 올린 뒤 번호가 바뀐 새 일정도 찾는다
 function evById(id){
@@ -5258,6 +5301,7 @@ const KR_HOLIDAYS=[
   '2026-01-01',                            // 신정
   '2026-02-16','2026-02-17','2026-02-18',  // 설 연휴
   '2026-03-01','2026-03-02',               // 삼일절(일) + 대체공휴일
+  '2026-05-01',                            // 노동절 (2026-04-09 공휴일법 개정 — 2026-05-01부터 공휴일)
   '2026-05-05',                            // 어린이날
   '2026-05-24','2026-05-25',               // 부처님오신날(일) + 대체공휴일
   '2026-06-03',                            // 전국동시지방선거
@@ -5285,6 +5329,31 @@ const KR_HOLIDAYS=[
   '2027-12-25','2027-12-27',               // 성탄절(토) + 대체공휴일
   // 2028년은 아직 넣지 않음 — 설 날짜가 자료마다 다르고 4월 국회의원 선거일이 미반영(260926)
 ];
+// ── (261119 운영-003 23 · 261120 이곳으로 옮김) 알아야 하는 날 이름 — 보기 전용(예약 막기·고객 공개표와 무관) ──
+// 아래 «세션 자동 로그인»의 enter() 가 첫 화면을 그리기 전에 값이 있어야 첫 화면부터 이름이 나온다(var 는 멈춤만 막고 값은 비어 있음).
+// 수능은 해마다 날짜가 달라 연도별(교육부 발표) — knowListShort() 가 다음 수능 날짜가 떨어져 가면 대시보드에 알린다.
+var KNOW_DAYS={
+  '2026-11-19':['수능','수능'],   // 2027학년도
+  '2027-11-18':['수능','수능'],   // 2028학년도(교육부 발표)
+  '2028-11-16':['수능','수능']    // 2029학년도(교육부 2026-08-18 발표)
+};
+var KNOW_MD={'02-14':['밸런타인데이','밸런'],'11-11':['빼빼로데이','빼빼로'],'12-24':['크리스마스이브','이브']};   // 해마다 같은 날(공휴일과 겹치면 공휴일 이름)
+// 새 공휴일을 KR_HOLIDAYS 에 넣을 땐 여기에도 이름을 함께 — 빠뜨리면 «공휴일»로만 뜬다
+var HOL_NAME={
+  '2026-01-01':['신정','신정'],'2026-02-16':['설 연휴','설'],'2026-02-17':['설날','설날'],'2026-02-18':['설 연휴','설'],
+  '2026-03-01':['삼일절','삼일절'],'2026-03-02':['대체공휴일','대체'],'2026-05-01':['노동절','노동절'],'2026-05-05':['어린이날','어린이'],
+  '2026-05-24':['부처님오신날','석탄일'],'2026-05-25':['대체공휴일','대체'],'2026-06-03':['지방선거','선거'],'2026-06-06':['현충일','현충일'],
+  '2026-07-17':['제헌절','제헌절'],'2026-08-15':['광복절','광복절'],'2026-08-17':['대체공휴일','대체'],
+  '2026-09-24':['추석 연휴','추석'],'2026-09-25':['추석','추석'],'2026-09-26':['추석 연휴','추석'],
+  '2026-10-03':['개천절','개천절'],'2026-10-05':['대체공휴일','대체'],'2026-10-09':['한글날','한글날'],'2026-12-25':['성탄절','성탄절'],
+  '2027-01-01':['신정','신정'],'2027-02-06':['설 연휴','설'],'2027-02-07':['설날','설날'],'2027-02-08':['설 연휴','설'],'2027-02-09':['대체공휴일','대체'],
+  '2027-03-01':['삼일절','삼일절'],'2027-05-01':['노동절','노동절'],'2027-05-03':['대체공휴일','대체'],'2027-05-05':['어린이날','어린이'],
+  '2027-05-13':['부처님오신날','석탄일'],'2027-06-06':['현충일','현충일'],'2027-07-17':['제헌절','제헌절'],'2027-07-19':['대체공휴일','대체'],
+  '2027-08-15':['광복절','광복절'],'2027-08-16':['대체공휴일','대체'],'2027-09-14':['추석 연휴','추석'],'2027-09-15':['추석','추석'],'2027-09-16':['추석 연휴','추석'],
+  '2027-10-03':['개천절','개천절'],'2027-10-04':['대체공휴일','대체'],'2027-10-09':['한글날','한글날'],'2027-10-11':['대체공휴일','대체'],
+  '2027-12-25':['성탄절','성탄절'],'2027-12-27':['대체공휴일','대체']
+};
+
 // 다음날이 공휴일인 날인가?
 // ※ 260929부터 빨간날 판정은 아래 holRule() 한 곳에서 한다. 이 함수는 '다음날이 목록에 있나'만 보는 옛 판정(참고용)
 function isPreHoliday(ds){return KR_HOLIDAYS.includes(addDays(ds,1));}
@@ -6027,13 +6096,15 @@ function renderDash(){
   const holRow=holLast?'<div class="task" style="background:var(--dambbg)">'
     +'<div class="d">공휴일 목록 '+holLast+'까지</div>'
     +'<div class="n">'+(Number(holLast.slice(0,4))+1)+'년 공휴일 추가 필요 — 목록 밖 공휴일은 전날 규칙이 안 걸림</div></div>':'';
-  const taskRows=holRow+(dashOwnFirst(D.alerts).slice(0,6).map(function(a){   // (261103) 보는 사람 몫 먼저
+  const knowLast=knowListShort();   // (261120) 수능 날짜도 떨어져 가면 알림
+  const knowRow=knowLast?'<div class="task" style="background:var(--dambbg)"><div class="d">수능 날짜 '+knowLast+'까지</div><div class="n">'+(Number(knowLast.slice(0,4))+1)+'년 수능 날짜 추가 필요 — 교육부 발표 확인</div></div>':'';
+  const taskRows=holRow+knowRow+(dashOwnFirst(D.alerts).slice(0,6).map(function(a){   // (261103) 보는 사람 몫 먼저
     const bg=a.left<0?'var(--dredbg)':(a.left<=1?'var(--dambbg)':'var(--dlime2)');
     const ow=a.plan?['명진','#6a7a2a']:owner(a.kind);   // 상담 고객 내 계획 = 명진
     return '<div class="task" style="background:'+bg+'" onclick="navTab(\'alert\')">'
       +'<div class="d">'+(a.early?'보낼 날 ':'')+dueText(a.left)+(a.early&&dDiff(TSTR,a.cust)<0?' · 고객 기한도 '+(-dDiff(TSTR,a.cust))+'일 지남':'')+' <span class="o" style="color:'+ow[1]+'">'+ow[0]+'</span></div>'
       +'<div class="n">'+esc(a.e.client||'(이름 없음)')+' · '+(a.plan?'📅 내 계획 · ':'')+kindName[a.kind]+'</div></div>';
-  }).join('')||(holRow?'':'<div class="dempty">지금 챙길 일이 없습니다 🍀</div>'));
+  }).join('')||(holRow||knowRow?'':'<div class="dempty">지금 챙길 일이 없습니다 🍀</div>'));
 
   const twoTitle={freeOpen:'예약을 안 받아 비어 있음',freeNosh:'노쇼로 비어 있음',full:'다 참',inq:'야외 문의만',off:'휴무·불가',unk:'아직 모름 — 연결되면 보여요'};
   const two=D.two.map(function(t){
@@ -6427,13 +6498,19 @@ function xtraFormBlock(e,halfOn){
     +'<button type="button" class="xt-fold" id="xtFold" onclick="xtraFold(1)" style="'+(open?'display:none':'')+'"><span>＋ <b>별도</b> · 반값 · BTS · 디카 …</span><span>있을 때만 ▸</span></button>'
     +'<div class="xt-box" id="xtBox" style="'+(open?'':'display:none')+'"><div class="xt-hd"><span>별도 — 있는 것만 눌러요(여러 개)</span><span onclick="xtraFold(0)">접기 ▴</span></div><div class="xt-ops">'+ops+'</div></div></div>';
 }
-function xtraFold(o){const f=document.getElementById('xtFold'),b=document.getElementById('xtBox');if(f)f.style.display=o?'none':'';if(b)b.style.display=o?'':'none';}
+function xtraFold(o){const f=document.getElementById('xtFold'),b=document.getElementById('xtBox');if(f)f.style.display=o?'none':'';if(b)b.style.display=o?'':'none';xtraFoldLbl();}
+function xtraFoldLbl(){   // (261120) 접힌 줄에 고른 것 — 재예약처럼 반값이 켜진 채 접어도 보이게
+  const f=document.getElementById('xtFold'),inp=document.getElementById('f_xtra');if(!f||!inp)return;const sp=f.querySelector('span');if(!sp)return;
+  const a=inp.value?inp.value.split(','):[];
+  sp.innerHTML=a.length?'＋ <b>별도</b> — '+a.map(function(k){const x=XTRA.find(function(y){return y.k===k;});return x?'<span style="white-space:nowrap">'+x.ic+' '+x.nm+' ✓</span>':'';}).filter(Boolean).join(' · '):'＋ <b>별도</b> · 반값 · BTS · 디카 …';
+  const hs2=[].slice.call(f.children).filter(function(c){return c.tagName==='SPAN';});if(hs2[1])hs2[1].style.display=a.length?'none':'';sp.style.textAlign='left';
+}
 function xtraPick(el){
   const inp=document.getElementById('f_xtra');if(!inp||!el)return;
   const a=inp.value?inp.value.split(','):[],k=el.getAttribute('data-k'),i=a.indexOf(k);
   if(i>=0)a.splice(i,1);else a.push(k);
   inp.value=XTRA.map(function(x){return x.k;}).filter(function(z){return a.indexOf(z)>=0;}).join(',');
-  const on=i<0;el.classList.toggle('on',on);const x=XTRA.find(function(y){return y.k===k;});if(x)el.textContent=x.ic+' '+x.nm+(on?' ✓':'');
+  const on=i<0;el.classList.toggle('on',on);const x=XTRA.find(function(y){return y.k===k;});if(x)el.textContent=x.ic+' '+x.nm+(on?' ✓':'');xtraFoldLbl();
 }
 function xtraSetHalf(on){const inp=document.getElementById('f_xtra');if(!inp)return;const a=inp.value?inp.value.split(','):[];if(on&&a.indexOf('half')<0){const b=document.querySelector('.xt-op[data-k="half"]');if(b)xtraPick(b);xtraFold(1);}}
 function readXtra(){const inp=document.getElementById('f_xtra');const a=inp&&inp.value?inp.value.split(','):[];return{half:a.indexOf('half')>=0,extra:a.filter(function(k){return k!=='half';})};}
@@ -6442,15 +6519,16 @@ var SUM={};   // var: 첫 화면 그리기가 이 줄보다 먼저 돌 수 있�
 function sumable(e){return !!e&&!e.priv&&!isExt(e)&&!noStat(e.label)&&e.label!=='pa_shoot';}
 // 특이사항(메모·별도)이 있는 예약만 ▾ 로 알아보게 한다 (XTRA 를 안 씀: 첫 화면 그리기가 먼저 돌 수 있음)
 function hasSpecial(e){return !!e&&(!!(e.note&&String(e.note).trim())||!!e.half||(Array.isArray(e.extra)&&e.extra.length>0));}
-function toggleSum(id,ds){SUM=(SUM&&SUM.id===id&&SUM.ds===ds)?{}:{id:id,ds:ds};renderBody();}
+function toggleSum(id,ds){const t=evById(id);if(t)id=t.id;SUM=(SUM&&SUM.id===id&&SUM.ds===ds)?{}:{id:id,ds:ds,fresh:1};renderBody();}   // (261120) 임시 번호로 눌려도 지금 번호로
 function sumEnd(e){if(e.allDay||!e.time)return '';const p=e.time.split(':').map(Number),m=p[0]*60+(p[1]||0)+Math.round((e.dur||0)*60);return pad(Math.floor(m/60)%24)+':'+pad(m%60);}
-function sumCard(e){
+function sumCard(e,noX){   // noX: 하루 창 안에서 펼칠 땐 ✕ 없이
   const L=LABELS[e.label]||{name:'기타'};const d=new Date(e.date+'T00:00');const dw='일월화수목금토'[d.getDay()];
-  const when=(d.getMonth()+1)+'/'+d.getDate()+'('+dw+') '+(e.allDay||!e.time?'종일':e.time+'~'+sumEnd(e)+' · '+(e.dur||0)+'시간');
+  const nd=e.dur>=24?Math.ceil(e.dur/24):1,ed=new Date(d);ed.setDate(d.getDate()+nd-1);   // (261120) 여러 날이면 끝 날·며칠
+  const when=(d.getMonth()+1)+'/'+d.getDate()+'('+dw+')'+(nd>1?'~'+(ed.getMonth()+1)+'/'+ed.getDate()+'('+'일월화수목금토'[ed.getDay()]+')':'')+' '+(e.allDay||!e.time?'종일'+(nd>1?' · '+nd+'일':''):e.time+'~'+sumEnd(e)+' · '+(e.dur||0)+'시간');
   const st=noStat(e.label)?'':(stEmoji(e.status)+' '+stName(e.status));
   const ins=e.insta||e.phone;
   const xs=xtraOf(e);
-  let h='<div class="sm22-card"><button class="sm22-x" onclick="event.stopPropagation();toggleSum('+e.id+',SUM.ds)" aria-label="요약 닫기">✕</button>'
+  let h='<div class="sm22-card">'+(noX?'':'<button class="sm22-x" onclick="event.stopPropagation();toggleSum('+e.id+',SUM.ds)" aria-label="요약 닫기">✕</button>')
     +'<div class="sm22-t"><b>'+esc(e.client||L.name)+'</b><span>'+when+'</span></div>'
     +'<div class="sm22-l">'+esc(L.name)+(st?' · '+st:'')+(ins?' · '+esc(ins):'')+(e.status==='nosh'&&e.noshReason?' · 사유 '+esc(e.noshReason):'')+'</div>';
   if(xs.length)h+='<div class="sm22-ch">'+xs.map(function(k){return '<span class="sm22-cp">'+xtraName(k)+'</span>';}).join('')+'</div>';
@@ -6460,34 +6538,72 @@ function sumCard(e){
 }
 
 // ── (261119 운영-003 23) 알아야 하는 날 — 달력 칸 오른쪽 위에 이름만(보기 전용 · 예약 막기·고객 공개표와 무관) ──
-// 공휴일은 KR_HOLIDAYS 날짜에 이름을 붙인 것(이름 없는 날은 «공휴일»). 그 밖의 날은 KNOW_DAYS 에 넣는다.
-// var·function: 첫 화면 그리기가 이 줄보다 먼저 돌 수 있다
-var KNOW_DAYS={
-  '2026-02-14':['밸런타인데이','밸런'],'2026-11-11':['빼빼로데이','빼빼로'],'2026-12-24':['크리스마스이브','이브'],
-  '2026-11-19':['수능','수능'],   // 2027학년도 대학수학능력시험
-  '2027-02-14':['밸런타인데이','밸런'],'2027-11-11':['빼빼로데이','빼빼로'],'2027-12-24':['크리스마스이브','이브'],
-  '2027-11-18':['수능','수능']    // 2028학년도 대학수학능력시험(교육부 발표)
-};
-var HOL_NAME={
-  '2026-01-01':['신정','신정'],'2026-02-16':['설 연휴','설'],'2026-02-17':['설날','설날'],'2026-02-18':['설 연휴','설'],
-  '2026-03-01':['삼일절','삼일절'],'2026-03-02':['대체공휴일','대체'],'2026-05-05':['어린이날','어린이'],
-  '2026-05-24':['부처님오신날','석탄일'],'2026-05-25':['대체공휴일','대체'],'2026-06-03':['지방선거','선거'],'2026-06-06':['현충일','현충일'],
-  '2026-07-17':['제헌절','제헌절'],'2026-08-15':['광복절','광복절'],'2026-08-17':['대체공휴일','대체'],
-  '2026-09-24':['추석 연휴','추석'],'2026-09-25':['추석','추석'],'2026-09-26':['추석 연휴','추석'],
-  '2026-10-03':['개천절','개천절'],'2026-10-05':['대체공휴일','대체'],'2026-10-09':['한글날','한글날'],'2026-12-25':['성탄절','성탄절'],
-  '2027-01-01':['신정','신정'],'2027-02-06':['설 연휴','설'],'2027-02-07':['설날','설날'],'2027-02-08':['설 연휴','설'],'2027-02-09':['대체공휴일','대체'],
-  '2027-03-01':['삼일절','삼일절'],'2027-05-01':['노동절','노동절'],'2027-05-03':['대체공휴일','대체'],'2027-05-05':['어린이날','어린이'],
-  '2027-05-13':['부처님오신날','석탄일'],'2027-06-06':['현충일','현충일'],'2027-07-17':['제헌절','제헌절'],'2027-07-19':['대체공휴일','대체'],
-  '2027-08-15':['광복절','광복절'],'2027-08-16':['대체공휴일','대체'],'2027-09-14':['추석 연휴','추석'],'2027-09-15':['추석','추석'],'2027-09-16':['추석 연휴','추석'],
-  '2027-10-03':['개천절','개천절'],'2027-10-04':['대체공휴일','대체'],'2027-10-09':['한글날','한글날'],'2027-10-11':['대체공휴일','대체'],
-  '2027-12-25':['성탄절','성탄절'],'2027-12-27':['대체공휴일','대체']
-};
-function knowDay(ds){   // {n:긴 이름, s:짧은 이름(폰), h:공휴일?} 또는 null
+// 이름 자료(KNOW_DAYS·KNOW_MD·HOL_NAME)는 261120에 KR_HOLIDAYS 바로 아래로 옮김 — 세션 자동 입장이 첫 화면을 그리기 전에 값이 있어야 한다.
+function knowDay(ds){   // {n:긴 이름, s:짧은 이름(폰), h:공휴일?} 또는 null — 수능(연도별) → 공휴일 → 해마다 같은 날 순서
   try{
     if(KNOW_DAYS[ds])return{n:KNOW_DAYS[ds][0],s:KNOW_DAYS[ds][1],h:false};
     if(KR_HOLIDAYS.indexOf(ds)>=0){const x=HOL_NAME[ds]||['공휴일','휴일'];return{n:x[0],s:x[1],h:true};}
+    const md=KNOW_MD[String(ds).slice(5)];if(md)return{n:md[0],s:md[1],h:false};
   }catch(e){}
   return null;
+}
+// ── (261120 운영-003 22·23 보강) ──
+function sumCovers(e,ds){   // 그 일정 막대가 ds 칸에 그려지나(여러 날·자정 넘김 포함)
+  if(!e||!ds)return false;if(e.date===ds)return true;
+  const st=new Date(e.date+'T00:00');let n=0;
+  if(e.dur>=24)n=Math.ceil(e.dur/24)-1;
+  else if(e.time){const t=e.time.split(':').map(Number);if(t[0]+(t[1]||0)/60+(e.dur||0)>24)n=1;}
+  for(let i=1;i<=n;i++){const d=new Date(st);d.setDate(st.getDate()+i);if(fd(d)===ds)return true;}
+  return false;
+}
+function sumPlace(cb,at,W,sumH,keepTop,vis){   // 요약을 그 주 바로 아래에 — 다른 주 칸 높이는 그대로, 달력이 아래로 늘어나 달력 안에서만 스크롤
+  sumWatch();
+  const g=cb.querySelector('.mg');if(!g)return;
+  const c0=g.querySelector('.mc'),rh=c0?c0.getBoundingClientRect().height:0;
+  const r=rh>0?Math.max(rh,28).toFixed(2)+'px':'minmax(0,1fr)';   // 화면에 안 그려졌을 때(허브 다른 탭)만 잠시 원래대로 — 보이게 되면 sumWatch 가 다시 잰다 · 낮은 창(폰 가로)도 칸을 누르지 않고 굴림
+  g.style.gridTemplateRows=`repeat(${at+1},${r}) auto${W-at-1>0?` repeat(${W-at-1},${r})`:''}`;
+  const wr=g.parentNode;
+  if(rh>0&&wr){g.style.flex='none';wr.style.overflowY='auto';const hd=wr.querySelector('.mg-hdr');if(hd)hd.classList.add('sticky-hdr');}
+  const ref=g.children[at*7+6];if(ref)ref.insertAdjacentHTML('afterend',sumH);else g.insertAdjacentHTML('beforeend',sumH);
+  if(!wr||rh<=0)return;
+  const sm=g.querySelector('.m-sum');if(!sm)return;
+  const show=function(){   // 요약이 보이게 달력만 굴린다(scrollIntoView 는 허브 화면까지 굴려서 안 씀)
+    const a=sm.getBoundingClientRect(),b=wr.getBoundingClientRect(),hd=wr.querySelector('.mg-hdr'),hh=hd?hd.offsetHeight:0;
+    if(a.bottom>b.bottom)wr.scrollTop+=Math.max(0,Math.min(a.bottom-b.bottom+8,a.top-b.top-hh-4));
+    else if(a.top<b.top+hh)wr.scrollTop-=b.top+hh-a.top+4;
+  };
+  if(SUM&&SUM.fresh){show();return;}   // ▾로 새로 열었을 때
+  if(keepTop)wr.scrollTop=keepTop;     // 다른 기기 변경·내 저장으로 다시 그릴 땐 보던 자리 그대로
+  if(vis){const a=sm.getBoundingClientRect(),b=wr.getBoundingClientRect();if(Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)<Math.min(60,a.height))show();}   // 다른 달로 넘김·다른 주로 따라감·다시 잼 → 거의 안 보이면 보이게
+}
+var SUM_RO=null,SUM_RO_EL=null;
+function sumWatch(){   // 요약이 열린 채 달력 크기가 바뀌면(허브 탭 전환·창 크기·폰 돌림) 다시 재서 그린다 — #calBody 가 새로 생기면 새것을 지켜봄
+  if(typeof ResizeObserver==='undefined')return;
+  const cb=document.getElementById('calBody');if(!cb||SUM_RO_EL===cb)return;
+  if(SUM_RO)SUM_RO.disconnect();
+  SUM_RO_EL=cb;let lw=-1,lh=-1,t=0;
+  SUM_RO=new ResizeObserver(function(){
+    const r=cb.getBoundingClientRect();if(Math.abs(r.width-lw)<1&&Math.abs(r.height-lh)<1)return;
+    const first=lw<0;lw=r.width;lh=r.height;if(first)return;
+    clearTimeout(t);t=setTimeout(function(){try{if(r.width>0&&r.height>0&&SUM&&SUM.id!=null&&curPage==='cal'&&calView==='month'){SUM.keepVis=1;renderBody();}}catch(e){}},120);
+  });
+  SUM_RO.observe(cb);
+}
+function sumNamed(e,ds){   // 그 일정 막대에 이름(과 ▾)이 그려지는 칸인가 — 시작일, 또는 이어지는 일요일
+  if(!e||!ds)return false;if(e.date===ds)return true;
+  return sumCovers(e,ds)&&new Date(ds+'T00:00').getDay()===0;
+}
+function odSum(el){   // 하루 창: 그 줄 아래 요약 펼치기/접기
+  const row=el.closest('div[onclick]'),box=row&&row.nextElementSibling;if(!box||!box.classList.contains('od-sum'))return;
+  box.hidden=!box.hidden;el.textContent=box.hidden?'▾':'▴';el.classList.toggle('od-open',!box.hidden);
+}
+function kdFit(root){   // 알아야 하는 날 이름이 칸을 넘치면 그 칸만 짧은 이름
+  if(!root||!root.getClientRects().length)return;
+  root.querySelectorAll('.kd').forEach(function(k){k.classList.remove('kd-sm');if(k.scrollWidth>k.clientWidth+0.5)k.classList.add('kd-sm');});
+}
+function knowListShort(){   // 다음 수능 날짜가 185일 안으로 떨어져 가면 그 날짜, 아니면 null
+  try{const last=Object.keys(KNOW_DAYS).filter(function(k){return KNOW_DAYS[k][0]==='수능';}).sort().pop();
+    const need=fd(new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()+185));return last&&last<need?last:null;}catch(e){return null;}
 }
 function dayTag(ds){const k=knowDay(ds);return k?`<span class="kd${k.h?' kd-h':''}" title="${k.n}"><b class="kd-l">${k.n}</b><b class="kd-s">${k.s}</b></span>`:'';}
 function renderMonth(){
@@ -6495,18 +6611,23 @@ function renderMonth(){
   const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate();
   let h=`<div class="mg-wrap"><div class="mg-hdr">`;
   ['일','월','화','수','목','금','토'].forEach(d=>h+=`<div class="dl">${d}</div>`);
+  if(SUM&&SUM.id!=null){const se0=evById(SUM.id);if(!se0)SUM={};else if(!sumNamed(se0,SUM.ds))SUM.ds=se0.date;}   // (261120) 날짜를 옮기면 요약도 따라감 · 지워졌으면 닫음
   const cells=[];   // (261117 운영-003 22) 칸을 모은 뒤 열린 요약을 그 주 아래에 끼운다
   for(let i=0;i<first;i++){const ds=fd(new Date(y,m-1,prev-first+1+i));cells.push({ds:ds,h:mCell(ds,prev-first+1+i,true)});}
   for(let d=1;d<=days;d++){const ds=fd(new Date(y,m,d));cells.push({ds:ds,h:mCell(ds,d,false)});}
   const rem=(7-(first+days)%7)%7;
   for(let d=1;d<=rem;d++){const ds=fd(new Date(y,m+1,d));cells.push({ds:ds,h:mCell(ds,d,true)});}
   const W=cells.length/7;let at=-1,sumH='';
-  if(SUM&&SUM.id!=null){const se=evById(SUM.id);const ci=cells.findIndex(c=>c.ds===SUM.ds);if(se&&ci>=0&&sumable(se)&&hasSpecial(se)){at=Math.floor(ci/7);sumH=`<div class="m-sum" onclick="event.stopPropagation()">${sumCard(se)}</div>`;}}
-  const rows=at>=0?`grid-template-rows:repeat(${at+1},minmax(0,1fr)) auto${W-at-1>0?` repeat(${W-at-1},minmax(0,1fr))`:''}`:'';
-  h+=`</div><div class="mg"${rows?` style="${rows}"`:''}>`;
-  cells.forEach((c,i)=>{h+=c.h;if(at>=0&&i===at*7+6)h+=sumH;});
+  if(SUM&&SUM.id!=null){const se=evById(SUM.id);const ci=cells.findIndex(c=>c.ds===SUM.ds);if(se&&ci>=0&&sumable(se)&&hasSpecial(se)&&cells[ci].h.indexOf(' m-sopen')>=0){at=Math.floor(ci/7);sumH=`<div class="m-sum" onclick="event.stopPropagation()">${sumCard(se)}</div>`;}}   // (261120) 열린 막대가 그려진 칸에만
+  h+=`</div><div class="mg">`;
+  cells.forEach(c=>{h+=c.h;});
   h+=`</div></div>`;
-  document.getElementById('calBody').innerHTML=h;
+  const cb=document.getElementById('calBody');const pw=cb.querySelector('.mg-wrap');
+  const sw=at>=0?(y+'-'+m+':'+SUM.id+':'+at):'',same=!!(pw&&pw.querySelector('.m-sum')&&pw.dataset.sw===sw),keepTop=same?pw.scrollTop:0;   // 같은 달·같은 요약·같은 주면 보던 자리 그대로
+  cb.innerHTML=h;
+  if(!cb._mcs){cb._mcs=1;cb.addEventListener('scroll',function(ev){const t=ev.target;if(t&&t.classList&&t.classList.contains('mc'))t.classList.toggle('mc-scrolled',t.scrollTop>0);},true);}   // 칸 안을 굴리면 오늘 칸 머리줄만 색을 칠해 막대가 비치지 않게
+  if(at>=0){const nw=cb.querySelector('.mg-wrap');if(nw)nw.dataset.sw=sw;sumPlace(cb,at,W,sumH,keepTop,!same||!!(SUM&&SUM.keepVis));}
+  if(SUM){delete SUM.fresh;delete SUM.keepVis;}
 }
 function mCell(ds,dn,dim){
   const isT=ds===TSTR;
@@ -6552,7 +6673,8 @@ function mCell(ds,dn,dim){
     if(multi){
       // 이름은 시작일 또는 주 시작(일요일)에만 → 나머지는 색 바만 이어짐
       const showName=!isSpanCont||dow===0;
-      spanHtml+=`<div class="m-bar m-span${isSpanCont?' m-cont':''}" data-id="${e.id}" style="background:${isNosh?NOSH_COLOR:L.color};color:${isNosh?NOSH_TEXT:lblTc(e.label)};${op}" onclick="event.stopPropagation();openD(${e.id})">${showName?nameTag(e,L.name,1):'&nbsp;'}</div>`;
+      const hs=showName&&sumable(e)&&hasSpecial(e),so=hs&&!!SUM&&SUM.id===e.id&&SUM.ds===ds;   // (261120) 종일·여러 날·자정 넘김도 이름이 보이는 칸에 ▾
+      spanHtml+=`<div class="m-bar m-span${isSpanCont?' m-cont':''}${hs?' m-hs':''}${so?' m-sopen':''}" data-id="${e.id}" style="background:${isNosh?NOSH_COLOR:L.color};color:${isNosh?NOSH_TEXT:lblTc(e.label)};${op}" onclick="event.stopPropagation();openD(${e.id})">${hs?`<span class="m-nm">${nameTag(e,L.name,1)}</span><span class="m-tg" role="button" aria-label="예약 요약" onclick="event.stopPropagation();toggleSum(${e.id},'${ds}')">${so?'▴':'▾'}</span>`:(showName?nameTag(e,L.name,1):'&nbsp;')}</div>`;
     }else{
       const mAlpha=e.allDay?'ff':'2b';            // 종일=꽉 찬 색, 시간 일정=옅은 파스텔 (261004 허브 톤)
       const mTxc=e.allDay?lblTc(e.label):'var(--tx)';
@@ -6561,7 +6683,7 @@ function mCell(ds,dn,dim){
       inner+=`<div class="m-bar${mStripe?' m-tm':''}${hs?' m-hs':''}${so?' m-sopen':''}" data-id="${e.id}" style="background:${isNosh?NOSH_COLOR:L.color+mAlpha};color:${isNosh?NOSH_TEXT:mTxc};${mStripe}${op}" onclick="event.stopPropagation();openD(${e.id})">${hs?`<span class="m-nm">${nameTag(e,L.name,1)}</span><span class="m-tg" role="button" aria-label="예약 요약" onclick="event.stopPropagation();toggleSum(${e.id},'${ds}')">${so?'▴':'▾'}</span>`:nameTag(e,L.name,1)}</div>`;
     }
   });
-  return`<div class="mc${dim?' dim':''}${isT?' tdc':''}" data-ds="${ds}" onclick="openDay('${ds}')"><div class="dn sticky">${dn}</div>${dayTag(ds)}${spanHtml}${inner}${paHtml}</div>`;   // (261119 운영-003 23) 알아야 하는 날
+  return`<div class="mc${dim?' dim':''}${isT?' tdc':''}${dow===0?' mc-sun':dow===6?' mc-sat':''}" data-ds="${ds}" onclick="openDay('${ds}')"><div class="mc-hd"><div class="dn">${dn}</div>${dayTag(ds)}</div>${spanHtml}${inner}${paHtml}</div>`;   // (261119 운영-003 23) 알아야 하는 날 · (261120) 요일 색=칸 class · 날짜와 이름은 함께 붙어 다니는 머리줄
 }
 
 function renderTimeGrid(){
@@ -6569,15 +6691,15 @@ function renderTimeGrid(){
   const days=['일','월','화','수','목','금','토'];
   let ws=new Date(curDate);
   if(!isDay)ws.setDate(curDate.getDate()-curDate.getDay());
-  let h=`<div class="tg-wrap"><div class="tg-inner"><div class="tg-grid" style="grid-template-columns:44px repeat(${cols},1fr)">
+  let h=`<div class="tg-wrap"><div class="tg-inner"><div class="tg-grid" style="grid-template-columns:44px repeat(${cols},minmax(0,1fr))">
     <div class="tg-corner" style="height:38px"></div>
-    ${Array.from({length:cols},(_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);const isT=fd(d)===TSTR;return`<div class="tg-dh${isT?' td':''}">
+    ${Array.from({length:cols},(_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);const isT=fd(d)===TSTR;return`<div class="tg-dh${isT?' td':''}${isDay?' tg-d1':''}">
       ${!isDay?`<div class="wd">${days[d.getDay()]}</div>`:''}
-      <div class="wn">${d.getDate()}</div></div>`;}).join('')}
+      <div class="wn">${d.getDate()}</div>${dayTag(fd(d))}</div>`;}).join('')}
     ${Array.from({length:HE-HS},(_,r)=>{const hr=HS+r;return`<div class="tg-tl" style="height:${PX}px">${hr}:00</div>`+Array.from({length:cols},(_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);return`<div class="tg-cell" style="height:${PX}px" onclick="openDay('${fd(d)}')"></div>`;}).join('');}).join('')}
   </div></div></div>`;
   document.getElementById('calBody').innerHTML=h;
-  requestAnimationFrame(()=>placeBlocks(ws,cols));
+  requestAnimationFrame(()=>{kdFit(document.getElementById('calBody'));placeBlocks(ws,cols);});
 }
 function placeBlocks(ws,cols){
   const wrap=document.querySelector('.tg-inner');if(!wrap)return;
@@ -6621,13 +6743,14 @@ function openDay(ds){
     let op=isNosh?'text-decoration:line-through;':(isCancel?'opacity:.5;text-decoration:line-through;':(!stActive(e.status)?'opacity:.7;':''));
     const rowBg=isNosh?NOSH_COLOR+'22':L.color+'12';   // 노쇼 = 회색 배경
     const dotC=isNosh?NOSH_COLOR:L.color;
-    b+=`<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;margin-bottom:4px;background:${rowBg};cursor:pointer;${op}" onclick="closeP();openD(${e.id})">
-      <div style="width:8px;height:8px;border-radius:50%;background:${dotC};flex-shrink:0"></div>
-      <div style="flex:1;min-width:0">
+    const hs=sumable(e)&&hasSpecial(e);   // (261120) 특이사항 있는 예약만 ▾
+    b+=`<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;margin-bottom:4px;background:${rowBg};cursor:pointer" onclick="closeP();openD(${e.id})">
+      <div style="width:8px;height:8px;border-radius:50%;background:${dotC};flex-shrink:0;${isCancel?'opacity:.5;':(!isNosh&&!stActive(e.status)?'opacity:.7;':'')}"></div>
+      <div style="flex:1;min-width:0;${op}">
         <div style="font-size:11px;font-weight:700;color:var(--tx)">${nameTag(e,L.name)}</div>
         <div style="font-size:9px;color:var(--mu);margin-top:1px">${e.time?e.time.slice(0,5)+' – '+addH(e.time,e.dur)+' ('+e.dur+'h)':L.name}</div>
-      </div>
-    </div>`;
+      </div>${hs?`<span class="m-tg od-tg" role="button" aria-label="예약 요약" onclick="event.stopPropagation();odSum(this)">▾</span>`:''}
+    </div>${hs?`<div class="od-sum" hidden>${sumCard(e,1)}</div>`:''}`;
   });
   b+=`<button class="sub-btn" style="margin-top:8px;width:100%" onclick="closeP();openAdd('${ds}')">+ 이 날 일정 추가</button>`;
   document.getElementById('pb').innerHTML=b;
@@ -7301,7 +7424,7 @@ function startRebook(id){
   if(pb)pb.insertAdjacentHTML('afterbegin',
     '<div style="border:1px solid #c8a456;background:#fffdf5;border-radius:10px;padding:9px 11px;margin-bottom:12px;font-size:11px;color:#8a6a20;line-height:1.6">'+
     '🔁 <b>재예약</b> — 원 예약 '+o.date+' '+esc(o.client||'')+' (노쇼)와 연결됩니다.<br>'+
-    '<span style="color:#a08040">저장하면 ½ 반값 표시가 함께 붙습니다.</span></div>');
+    '<span style="color:#a08040">½ 반값은 아래 «별도»에 켜 두었어요 — 정가로 받으면 눌러 끄세요.</span></div>');
 }
 // 반값 표시 켜고 끄기
 function toggleHalf(id){
@@ -7383,7 +7506,7 @@ function saveEv(force){
     priv:['rest','personal'].includes(seLabel),
     dlvBasic:null,dlvBuy:null,
     reFrom:_reFrom||null,          // 재예약이면 원 노쇼 예약 id
-    half:!!_reFrom||readXtra().half,   // 재예약은 반값으로 진행 · (261117 운영-003 22) «별도»에서 고른 반값
+    half:readXtra().half,   // 재예약은 창이 열릴 때 반값이 켜져 있음(startRebook) — «별도»에서 고른 그대로 (261120)
     ...(readXtra().extra.length?{extra:readXtra().extra}:{}),   // (261117 운영-003 22) 별도 BTS·디카·폴라로이드·캠코더
     createdAt:new Date().toISOString()   // (260929) 관리자에서 등록한 시각 — 수정해도 유지된다
   };
@@ -7477,6 +7600,7 @@ function v2EditGone(t,cli){
   ev.label=seLabel||ev.label||'studio_f';ev.date=t.date;ev.time=t.time;ev.dur=t.dur;ev.allDay=t.allDay;ev.repeat=t.repeat;
   ev.client=cli;ev.insta=document.getElementById('f_p').value.trim()||null;ev.note=document.getElementById('f_n').value.trim()||'';
   applyStatusChange(ev,document.getElementById('f_s').value);ev.amount=amtFromForm();applyNoshFromForm(ev);
+  {const X=readXtra();ev.half=X.half;if(X.extra.length)ev.extra=X.extra;else delete ev.extra;}   // (261120) «별도»에서 고른 그대로
   delete ev.ovOK;ev.uid=v2Uid();ev.id=v2NewId();
   maydlyEvents.push(ev);saveEvents();closeP();renderBody();buildNav();toast('새 일정으로 다시 넣었어요');
 }
@@ -7928,7 +8052,7 @@ function doJsonImport(){
       if(!e.date||!e.label)return;
       const _id=v2NewId();   // (261106 운영-003 20 저장엔진 v2)
       // 전달 체크(dlvBasic/dlvBuy)가 들어 있으면 살려서 가져온다
-      maydlyEvents.push({id:_id,label:e.label||'studio_f',date:e.date,time:e.time||'10:00',dur:parseFloat(e.dur)||2,status:e.status||'booked',client:e.client||null,insta:e.insta||e.phone||null,note:e.note||'',priv:e.priv||['rest','personal'].includes(e.label),allDay:!!e.allDay,dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null,...(e.pickWait?{pickWait:e.pickWait,pickGot:e.pickGot||null}:{}),...(e.planBasic?{planBasic:e.planBasic}:{}),...(e.planBuy?{planBuy:e.planBuy}:{}),...(e.amount!=null&&e.amount!==''?{amount:Number(e.amount)}:{}),...(e.half?{half:true}:{}),...(e.wm?{wm:true,wmEmoji:e.wmEmoji||'💧'}:{}),...(e.wmPay==='paid'||e.wmPay==='free'?{wmPay:e.wmPay}:{}),...(e.buyAmt!=null?{buyAmt:e.buyAmt}:{}),...(e.extraRet?{extraRet:e.extraRet}:{}),...(e.rushAmt?{rushAmt:e.rushAmt}:{}),...(e.createdAt?{createdAt:e.createdAt}:{})});
+      maydlyEvents.push({id:_id,label:e.label||'studio_f',date:e.date,time:e.time||'10:00',dur:parseFloat(e.dur)||2,status:e.status||'booked',client:e.client||null,insta:e.insta||e.phone||null,note:e.note||'',priv:e.priv||['rest','personal'].includes(e.label),allDay:!!e.allDay,dlvBasic:e.dlvBasic||null,dlvBuy:e.dlvBuy||null,...(e.pickWait?{pickWait:e.pickWait,pickGot:e.pickGot||null}:{}),...(e.planBasic?{planBasic:e.planBasic}:{}),...(e.planBuy?{planBuy:e.planBuy}:{}),...(e.amount!=null&&e.amount!==''?{amount:Number(e.amount)}:{}),...(e.half?{half:true}:{}),...((x=>x.length?{extra:x}:{})(Array.isArray(e.extra)?XTRA.map(z=>z.k).filter(k=>k!=='half'&&e.extra.indexOf(k)>=0):[])),...(e.wm?{wm:true,wmEmoji:e.wmEmoji||'💧'}:{}),...(e.wmPay==='paid'||e.wmPay==='free'?{wmPay:e.wmPay}:{}),...(e.buyAmt!=null?{buyAmt:e.buyAmt}:{}),...(e.extraRet?{extraRet:e.extraRet}:{}),...(e.rushAmt?{rushAmt:e.rushAmt}:{}),...(e.createdAt?{createdAt:e.createdAt}:{})});
       _addedIds.push(_id);
       added++;
     });
@@ -8346,6 +8470,7 @@ function mergeIcal() {
       var g=document.querySelector('#calBody .mg'); if(!g) return;
       var bars=[].slice.call(g.querySelectorAll('.m-bar'));
       bars.forEach(function(b){ FIT.forEach(function(c){ b.classList.remove(c); }); });
+      try{ kdFit(g); }catch(_){}   // (261120) 알아야 하는 날 이름 — 넘치는 칸만 짧은 이름
       if(!PHONE||!PHONE.matches||!g.getClientRects().length) return;
       var todo=bars;
       for(var s=0;s<=FIT.length&&todo.length;s++){
