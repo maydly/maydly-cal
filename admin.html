@@ -6817,7 +6817,7 @@ async function quoteCanvas(q,scale){
   scale=scale||2;
   const texts='NYC STUDIO ESTIMATE 대관 견적서 발행일 예약 정보 예약자 maydly 대관일 이용 시간 대관 공간 대관 금액 공간 대관료 추가 인원 합계 금액 예약 확정 변경 취소 이용 안내 '
     +quoteDateKo(q.date)+' '+quoteDot(q.issued)+' 0123456789,.:~×+·원시간인당 '+Object.keys(QUOTE_SPACES).map(k=>QUOTE_SPACES[k].name+' '+(QUOTE_SPACES[k].tag||'')).join(' ')
-    +' 기본 인원 초과 촬영일 2주 전 취소 100% 환불 이내 환불 불가 그 밖의 이용 안내는 NYC STUDIO 이용 안내 페이지를 참고해 주세요 — '+QUOTE_GUIDE+' '+QUOTE_ADDR+' 본 견적서는 위 예약 건에 한해 발행되었으며, 다른 예약 정보는 포함되어 있지 않습니다. ✓ 최소 기준 1시간당 금액 조정 다음 날 −+';
+    +' 기본 인원 초과 촬영일 2주 전 취소 80% 환불 이내 환불 불가 그 밖의 이용 안내는 NYC STUDIO 이용 안내 페이지를 참고해 주세요 — '+QUOTE_GUIDE+' '+QUOTE_ADDR+' 본 견적서는 위 예약 건에 한해 발행되었으며, 다른 예약 정보는 포함되어 있지 않습니다. ✓ 최소 기준 1시간당 금액 조정 다음 날 −+';
   try{ if(document.fonts&&document.fonts.load){ await Promise.all([400,500,700,800].map(w=>document.fonts.load(w+' 20px '+QUOTE_FONT,texts))); } }catch(e){}
   const c=quoteCalc(q);
   const W=1024, card={x:30,y:30,w:964}, L=76, R=948;
@@ -6883,7 +6883,7 @@ async function quoteCanvas(q,scale){
   F(700,14);spaced('변경 · 취소 기준',L,secRule,1.4,'#9a7425');
   const MID=512;
   x.fillStyle='#e8e6e0';x.fillRect(L,ruleTop,R-L,1);
-  [['촬영일 2주 전 취소','100% 환불',false],['촬영일 2주 이내 취소','환불 불가',true]].forEach((r,i)=>{
+  [['촬영일 2주 전 취소','80% 환불',false],['촬영일 2주 이내 취소','환불 불가',true]].forEach((r,i)=>{
     const t=ruleTop+1+i*57.5;
     x.fillStyle='#f6f5f1';x.fillRect(L,t,MID-L,56.5);
     x.fillStyle=r[2]?'#fbeaea':'#fff';x.fillRect(MID,t,R-MID,56.5);
