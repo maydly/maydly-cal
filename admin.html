@@ -1372,6 +1372,65 @@ html.embed-cal .topnav{height:46px}
   .m-bar.m-hs.m-tm.m-sopen,.m-bar.m-hs.m-tm.m-sopen:hover{box-shadow:inset 3px 0 0 var(--lc),inset -3px 0 0 #2f6f4a}
 }
 </style>
+<style id="r26-style">
+/* 운영-003 26 노쇼 이력 나누기 + 블랙 */
+.r26-chips{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 12px}
+.r26-chip{border:1px solid #d4ddd1;background:#fff;border-radius:999px;padding:6px 11px;font-size:12px;font-weight:700;color:#5d6b5f;cursor:pointer;font-family:inherit;min-height:32px}
+.r26-chip.on{background:#2f6e47;border-color:#2f6e47;color:#fff}
+.r26-chip.bk{color:#9b2c2c;border-color:#efc6c6}
+.r26-chip.bk.on{background:#b23b3b;border-color:#b23b3b;color:#fff}
+.r26-g{font-size:12px;font-weight:800;color:#5d6b5f;margin:16px 2px 8px;display:flex;align-items:center;gap:6px}
+.r26-g small{font-weight:500;color:#8a978b;font-size:11px}
+.r26-row{background:#fff;border:1px solid #e3e9e0;border-radius:14px;padding:11px 12px;margin-bottom:7px;cursor:pointer}
+.r26-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.r26-nm{font-size:13.5px;font-weight:700;color:#1c2620}
+.r26-dt{font-size:12px;color:#7a877b}
+.r26-cnt{font-size:11px;font-weight:800;background:#fdeceb;color:#c0483c;padding:1px 7px;border-radius:20px}
+.r26-cnt0{background:#eef1ee;color:#6b746c}
+.r26-gt{margin-left:auto;color:#b5beb6;font-size:15px;padding-left:4px}
+.r26-black{background:#fdf3f2;border-color:#f1cfcb}
+.r26-black .r26-gt{color:#c9a4a0}
+.r26-memo{font-size:12px;color:#7d3a34;margin-top:6px}
+.r26-sub{font-size:11.5px;color:#7a877b;margin-top:4px;line-height:1.5}
+.r26-warn{margin-top:8px;background:#fff;border:1px solid #f1cfcb;border-radius:10px;padding:8px 10px;font-size:12px;color:#b03a32;font-weight:700}
+.r26-acts{display:flex;gap:6px;justify-content:flex-end;margin-top:8px}
+.r26-line{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #e3e9e0;border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer}
+.r26-line .r26-rt{margin-left:auto;text-align:right;font-size:11.5px;color:#7a877b;line-height:1.45}
+.r26-line .r26-rt b{font-weight:600;color:#b05555}
+.r26-line .r26-rt b.me{color:#6b746c}
+.r26-line .r26-rt i{font-style:normal;font-weight:700;color:#b03a32}
+.r26-line .r26-gt{margin-left:2px}
+.r26-me{opacity:.85}
+.r26-empty{color:var(--mu);font-size:12px;padding:8px 2px}
+.r26-hint{font-size:11.5px;color:var(--mu);margin:10px 2px 14px}
+.r26-b{border-radius:10px;padding:7px 11px;font-size:12px;font-weight:700;border:1px solid #d4ddd1;background:#fff;color:#4a5a4c;cursor:pointer;font-family:inherit;min-height:34px}
+.r26-b.bk{color:#9b2c2c;border-color:#efc6c6}
+.r26-n{font-size:11px;color:var(--mu);margin-left:6px}
+.r26-quiet{display:block;width:100%;margin-top:10px;background:none;border:none;color:#a07a76;font-size:12px;font-weight:600;padding:10px;cursor:pointer;font-family:inherit}
+.r26-ban{background:#fdf0ee;border:1px solid #f1cfcb;border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:12.5px;color:#7d3a34;line-height:1.6}
+.r26-ban b{color:#b03a32}
+.r26-ban-a{margin-top:8px;display:flex;justify-content:flex-end}
+.r26-fw{background:#fdf0ee;border:1px solid #f1cfcb;border-radius:10px;padding:8px 10px;margin:6px 0 12px;font-size:12px;color:#b03a32;font-weight:700;line-height:1.5}
+.r26-fw span{display:block;font-weight:500;color:#7d3a34}
+.r26-fw.nw{background:#fdf6ea;border-color:#ecd9bd;color:#8a5a1c}
+.r26-fw.nw span{color:#7a5a2c}
+.rcard .r26-fw{margin:8px 0 0}
+.nswarn.r26-nwb{background:#fbe3e0;border:1px solid #f0c2bc}
+.r26-mineg{color:#8a978b}
+.prow.r26-minep{color:#7a877b}.prow.r26-minep b{font-weight:600}
+.r26-who{font-size:13px;color:var(--tx);line-height:1.6;margin-bottom:10px}
+.r26-who span{color:var(--mu)}
+.r26-who small{display:block;color:var(--mu2);font-size:12px}
+.r26-exp{font-size:12px;color:var(--mu2);line-height:1.7;background:#f7faf6;border-radius:10px;padding:9px 11px;margin-bottom:10px}
+.r26-sian{font-size:12px;color:#7d3a34;line-height:1.6;margin:0 2px 12px}
+.sub-btn.r26-go{width:100%;margin-top:6px;background:#b23b3b;color:#fff;border:none;font-weight:800}
+.sub-btn.r26-go:disabled{opacity:.6}
+.sub-btn.r26-off{width:100%;margin-top:6px;background:#fff;color:#9b2c2c;border:1px solid #efc6c6;font-weight:800}
+.sub-btn.r26-save{width:100%;margin-top:6px;background:var(--sf2);color:var(--tx);border:1px solid var(--bd);font-weight:700}
+.sub-btn.r26-cancel{width:100%;background:none;border:none;color:var(--mu);font-weight:600}
+.nsrate small.r26-inc{display:block;font-size:9px;font-weight:600;opacity:.75;margin-top:1px}
+.r26-bn{font-size:10.5px;font-weight:700;color:#8a5a1c;background:#fdf6ea;border:1px solid #ecd9bd;padding:1px 7px;border-radius:20px}
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false"><defs>
@@ -1520,6 +1579,440 @@ html.embed-cal .topnav{height:46px}
 </div>
 <div class="toast" id="toast"></div>
 
+<script id="r26-black">
+/* ── 운영-003 26 (261124) 노쇼 이력 나누기 + 블랙 ──
+   · 노쇼 이력을 사람 단위로 묶어 «블랙 / 고객 사유 / 내 사유 / 한 번 더 기회를 준 건»으로 나눈다.
+     «내 사유 환불»만 있는 사람은 경고·«다시 안 받은 사람»에서 뺀다(노쇼 비율 숫자는 그대로 — 내 사유 포함이라고 적는다).
+   · 블랙 목록은 일정 기록과 따로 Firestore mj_cal/black 에 둔다(명진·수빈 로그인만 읽음 · 일정·공개표와 무관 · 고객 화면엔 안 나감).
+     한 줄 = {id,name,insta,phone,memo,on,at,by,ev,offAt,offBy,sian:[{k,prev}]} · 풀어도 줄은 지우지 않고 on:false 로 남긴다.
+     저장은 트랜잭션으로 «그 줄만» 바꾼다(다른 기기가 같은 때 다른 줄을 바꿔도 그대로 남음).
+   · 블랙으로 두기·풀기는 명진만(수빈은 보기만). 블랙으로 두면 같은 인스타로 시안·협업 캘린더를 보던 기기도 «블랙»으로 닫고,
+     풀면 그 기기들을 닫기 전 상태로 돌린다.
+   · 같은 분 판단: 인스타·전화가 같거나 «블랙으로 둔 바로 그 일정»(노쇼면 그 사람으로 묶인 노쇼들)이면 같은 분(블랙) ·
+     이름만 같으면 «블랙과 같은 이름 — 확인»(블랙 칸엔 안 넣음) · 둘 다 적혀 있는데 다르면 다른 분.
+   · 이 묶음은 본 스크립트보다 먼저 읽힌다(저장된 로그인으로 바로 들어갈 때 대시보드·예약 현황이 이 함수를 부름).
+     상세 창 등에 덧붙이는 감싸기는 본 스크립트 뒤 <script id="r26-wrap">.
+*/
+const R26_DOC='mj_cal/black',R26_CACHE='maydly_black_v1';
+const R26_SHOOT=['studio_m','studio_f','outdoor','studio_pay','outdoor_pay','brand'];   // = DASH_SHOOT(본 스크립트에선 자동 진입보다 늦게 선언돼 여기 따로 둔다)
+function r26IsShoot(e){return !!e&&R26_SHOOT.indexOf(e.label)>=0&&stActive(e.status);}
+let R26_LIST=[];
+try{const c=JSON.parse(localStorage.getItem(R26_CACHE)||'null');if(c&&Array.isArray(c.list))R26_LIST=c.list;}catch(e){}
+let R26_REV=0;try{const c=JSON.parse(localStorage.getItem(R26_CACHE)||'null');if(c&&Number.isInteger(c.rev))R26_REV=c.rev;}catch(e){}
+let r26SavedAt=0,r26Lsn=null,r26ReqF='all',r26SianPlan=null,r26SianSeq=0,r26Busy=false;
+function r26To(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(Object.assign(new Error('timeout'),{code:'timeout'}));},ms);})]);}
+function r26Esc(s){return typeof esc==='function'?esc(s):String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function r26Name(s){return String(s||'').replace(/\s+/g,'').replace(/\(.*?\)/g,'').replace(/(님)+$/,'');}
+function r26Phone(s){let d=String(s||'').replace(/\D/g,'');if(/^82/.test(d))d='0'+d.slice(2);return d.length>=9&&d.length<=12?d:'';}
+function r26IsNum(s){return /^[\d\s\-+().]+$/.test(String(s||'').trim());}
+function r26Insta(s){
+  s=String(s||'').trim().toLowerCase();if(!s||r26IsNum(s))return'';
+  s=s.replace(/^https?:\/\//,'');
+  const m=s.match(/^((www|m)\.)?(instagram\.com|instagr\.am)(\/+(.*))?$/);
+  if(m){const seg=(m[5]||'').split(/[\/?#]/).filter(Boolean);if(seg[0]==='stories')seg.shift();if(!seg.length||/^(p|reel|reels|tv|explore|accounts|direct)$/.test(seg[0]))return'';s=seg[0];}   // 프로필 주소는 아이디만 · 게시물·릴스 주소는 사람을 알 수 없음
+  return s.replace(/^@+/,'').replace(/[\/?#].*$/,'').replace(/[^a-z0-9._]/g,'');
+}
+function r26IdOf(e){e=e||{};return{name:r26Name(e.client),insta:r26Insta(e.insta),phone:r26Phone(e.phone)||(r26IsNum(e.insta)?r26Phone(e.insta):'')};}
+function r26EntId(b){b=b||{};return{name:r26Name(b.name),insta:r26Insta(b.insta),phone:r26Phone(b.phone)};}
+// 같은 분인지 — 2: 인스타·전화가 같음 · 1: 이름만 같음(인스타·전화가 서로 다르지 않을 때) · 0: 다른 분
+function r26Same(a,b){
+  if(!a||!b)return 0;
+  if((a.insta&&b.insta&&a.insta===b.insta)||(a.phone&&b.phone&&a.phone===b.phone))return 2;
+  if((a.insta&&b.insta)||(a.phone&&b.phone))return 0;
+  return a.name&&a.name.length>=2&&a.name===b.name?1:0;
+}
+function r26Active(){return R26_LIST.filter(function(b){return b&&b.on;});}
+// 블랙인지 — lv 2: 인스타·전화가 같음 또는 블랙으로 둔 그 일정(evIds) · lv 1: 이름만 같음(확인 필요)
+function r26BlackOf(id,evIds){
+  let best=null,lv=0,how='';
+  r26Active().forEach(function(b){
+    let s=r26Same(r26EntId(b),id),h=s===2?(id.insta&&r26Insta(b.insta)===id.insta?'인스타':'전화'):'이름';
+    if(evIds&&b.ev!=null&&evIds.indexOf(b.ev)>=0&&s<2){s=2;h='기록';}
+    if(s>lv){lv=s;best=b;how=h;}
+  });
+  return best?{b:best,lv:lv,how:how}:null;
+}
+// 이 일정의 블랙 — 그 일정 + 인스타·전화로 이어진 노쇼(블랙으로 둔 일정이 거기 있으면 같은 분) · 이름만 같은 노쇼는 넓히지 않는다
+function r26EvBlack(e){
+  if(!e)return null;
+  const id=r26IdOf(e),ids=[e.id];
+  if(id.insta||id.phone)maydlyEvents.forEach(function(x){if(x&&x.status==='nosh'&&x.id!==e.id&&r26Same(id,r26IdOf(x))===2)ids.push(x.id);});
+  return r26BlackOf(id,ids);
+}
+window.r26BlackInsta=function(s){const i=r26Insta(s);return !!i&&r26Active().some(function(b){return r26Insta(b.insta)===i;});};
+function r26IsMine(e){return /^내 사유 환불/.test(String((e&&e.noshReason)||''));}
+function r26Reason(e){return String((e&&e.noshReason)||'').split(' — ')[0]||'사유 없음';}
+function r26Cust(e){return !!e&&!!String(e.client||'').trim()&&R26_SHOOT.indexOf(e.label)>=0;}
+function r26Md(ds){ds=String(ds||'');return ds.length>=10?Number(ds.slice(5,7))+'/'+Number(ds.slice(8,10)):ds;}
+function r26Day(iso){const d=new Date(iso);if(isNaN(d))return String(iso||'').slice(0,10);try{return fd(d);}catch(e){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}}   // 저장은 세계 표준시 — 보일 땐 이 기기 날짜로
+function r26Today(){try{return todayStr();}catch(e){return new Date().toISOString().slice(0,10);}}
+// 앞으로 잡힌 예약(노쇼·취소 빼고) 중 이 분과 같은 분의 가장 빠른 것
+function r26Next(id,minLv){
+  const t=r26Today();let best=null;
+  maydlyEvents.forEach(function(x){
+    if(!x||!r26IsShoot(x)||String(x.date)<t)return;
+    if(r26Same(id,r26IdOf(x))<(minLv||1))return;
+    if(!best||String(x.date)+(x.time||'')<String(best.date)+(best.time||''))best=x;
+  });
+  return best;
+}
+// 노쇼한 사람 묶기 — 인스타·전화가 같으면 같은 분, 이름만 같으면(서로 다른 인스타·전화가 없을 때) 같은 분으로 본다(예전 노쇼 이력도 이름으로 묶었음)
+function r26People(){
+  const nosh=maydlyEvents.filter(function(e){return e&&e.status==='nosh';}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+  const P=[];
+  nosh.forEach(function(e){
+    const id=r26IdOf(e);if(!id.name&&!id.insta&&!id.phone)return;
+    let p=null,lv=0;P.forEach(function(q){const s=r26Same(q.id,id);if(s>lv){lv=s;p=q;}});
+    if(!p){p={id:Object.assign({},id),name:e.client,evs:[]};P.push(p);}
+    else{if(!p.id.insta&&id.insta)p.id.insta=id.insta;if(!p.id.phone&&id.phone)p.id.phone=id.phone;}
+    p.evs.push(e);
+  });
+  // 블랙(lv2)만 블랙 칸 · 이름만 같으면 표시만 · 같은 블랙 줄에 걸린 묶음은 한 사람으로 합친다
+  P.forEach(function(p){const bk=r26BlackOf(p.id,p.evs.map(function(e){return e.id;}));p.black=bk&&bk.lv===2?bk.b:null;p.blackName=bk&&bk.lv===1?bk.b:null;});
+  for(let i=0;i<P.length;i++){const a=P[i];if(!a||!a.black)continue;for(let j=i+1;j<P.length;j++){const b=P[j];if(b&&b.black&&b.black.id===a.black.id){a.evs=a.evs.concat(b.evs);if(!a.id.insta&&b.id.insta)a.id.insta=b.id.insta;if(!a.id.phone&&b.id.phone)a.id.phone=b.id.phone;P[j]=null;}}}
+  for(let i=P.length-1;i>=0;i--)if(!P[i])P.splice(i,1);
+  P.forEach(function(p){
+    p.evs.sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+    p.cust=p.evs.filter(function(e){return !r26IsMine(e);});
+    p.mine=p.evs.filter(r26IsMine);
+    p.last=p.evs[0];p.lastCust=p.cust[0]||null;
+    p.rebooked=p.cust.length>0&&p.cust.every(function(e){return reBookOf(e.id).length>0;});
+    p.cat=p.black?'black':!p.cust.length?'mine':p.rebooked?'again':'cust';
+    p.next=r26Next(p.id);
+    p.after=!!p.lastCust&&maydlyEvents.some(function(x){return r26IsShoot(x)&&String(x.date)>String(p.lastCust.date)&&r26Same(p.id,r26IdOf(x))>0;});
+  });
+  return P;
+}
+// 노쇼 이력에 없는 블랙(노쇼 아닌 손님을 블랙으로 둔 경우 등)
+function r26BlackOnly(P){
+  const used={};P.forEach(function(p){if(p.black)used[p.black.id]=1;});
+  return r26Active().filter(function(b){return !used[b.id];}).map(function(b){
+    const id=r26EntId(b);let last=null;
+    maydlyEvents.forEach(function(x){if(x&&r26Cust(x)&&(x.id===b.ev||r26Same(id,r26IdOf(x))===2)&&(!last||String(x.date)>String(last.date)))last=x;});
+    return{b:b,id:id,last:last};
+  });
+}
+function r26BlackSoon(){
+  const t=r26Today(),M={};
+  maydlyEvents.forEach(function(x){
+    if(!x||!r26IsShoot(x)||String(x.date)<t)return;
+    const bk=r26BlackOf(r26IdOf(x),[x.id]);if(!bk)return;
+    const o=M[bk.b.id],k=String(x.date)+(x.time||'');
+    if(!o||bk.lv>o.lv||(bk.lv===o.lv&&k<String(o.e.date)+(o.e.time||'')))M[bk.b.id]={e:x,lv:bk.lv,b:bk.b};
+  });
+  return M;
+}
+function r26BlackSub(b,evs){
+  const a=[];if(b.at)a.push(r26Md(r26Day(b.at))+' 블랙');
+  (evs||[]).slice(0,3).forEach(function(e){a.push(String(e.date).slice(5)+' '+r26Reason(e));});
+  return a.join(' · ');
+}
+// ── 예약 현황 › 노쇼 이력 ──
+function r26SetF(k){r26ReqF=k;try{renderReq();}catch(e){}}
+function r26Tap(id){if(id!=null&&evById(id))openD(id);}
+function r26ReqSect(){
+  const P=r26People(),only=r26BlackOnly(P);
+  const blackP=P.filter(function(p){return p.cat==='black';}),cust=P.filter(function(p){return p.cat==='cust';}),
+        mine=P.filter(function(p){return p.cat==='mine';}),again=P.filter(function(p){return p.cat==='again';});
+  const nB=blackP.length+only.length,nEv=P.reduce(function(s,p){return s+p.evs.length;},0);
+  if(!P.length&&!nB)return'';
+  const f=r26ReqF,show=function(k){return f==='all'||f===k;};
+  const chip=function(k,t,n,cls){return'<button type="button" class="r26-chip'+(f===k?' on':'')+(cls?' '+cls:'')+'" onclick="r26SetF(\''+k+'\')">'+t+' '+n+'</button>';};
+  let h='<div class="sect-label">🚫 노쇼 이력 ('+P.length+'명 · '+nEv+'건) <span style="font-weight:400;color:var(--mu);font-size:11px;text-transform:none;letter-spacing:0">· 다시 받을지 판단하는 기준입니다</span></div>'
+    +'<div class="r26-chips">'+chip('all','전체',P.length+only.length)+chip('black','🚫 블랙',nB,'bk')+chip('cust','고객 사유',cust.length)+chip('mine','내 사유',mine.length)+chip('again','기회 준',again.length)+'</div>';
+  let any=false;
+  const BS=r26BlackSoon();
+  const soon=function(b){const o=BS[b.id];return o?'<div class="r26-warn">⚠️ '+r26Esc(r26Md(o.e.date))+(o.e.time?' '+r26Esc(o.e.time):'')+(o.lv===2?' 예약이 잡혀 있어요 — 받을지 판단하세요':' 같은 이름 예약이 있어요 — 같은 분인지 확인하세요')+'</div>':'';};
+  if(show('black')&&nB){any=true;
+    h+='<div class="r26-g">🚫 블랙 '+nB+'명 <small>— 다시 받지 않는 분</small></div>';
+    h+=blackP.map(function(p){const b=p.black;return'<div class="r26-row r26-black" onclick="r26Tap('+p.last.id+')"><div class="r26-top"><span class="r26-nm">'+r26Esc(p.name||b.name)+'</span>'
+      +(b.insta?'<span class="r26-dt">@'+r26Esc(r26Insta(b.insta))+'</span>':'')+'<span class="r26-cnt">노쇼 '+p.evs.length+'회</span><span class="r26-gt">›</span></div>'
+      +(b.memo?'<div class="r26-memo">📝 '+r26Esc(b.memo)+'</div>':'')+'<div class="r26-sub">'+r26Esc(r26BlackSub(b,p.evs))+'</div>'+soon(b)+'</div>';}).join('');
+    h+=only.map(function(o){const b=o.b,tap=o.last?o.last.id:null;return'<div class="r26-row r26-black"'+(tap!=null?' onclick="r26Tap('+tap+')"':'')+'><div class="r26-top"><span class="r26-nm">'+r26Esc(b.name)+'</span>'
+      +(b.insta?'<span class="r26-dt">@'+r26Esc(r26Insta(b.insta))+'</span>':'')+'<span class="r26-cnt r26-cnt0">노쇼 없음</span>'+(tap!=null?'<span class="r26-gt">›</span>':'')+'</div>'
+      +(b.memo?'<div class="r26-memo">📝 '+r26Esc(b.memo)+'</div>':'')+'<div class="r26-sub">'+r26Esc(r26BlackSub(b,[]))+'</div>'+soon(b)
+      +(tap==null&&!isSubinUser()?'<div class="r26-acts"><button type="button" class="r26-b" onclick="event.stopPropagation();r26OpenBlack(\''+r26Esc(b.id)+'\',null)">블랙 정보 · 풀기</button></div>':'')+'</div>';}).join('');
+  }
+  const line=function(p,ev,rs,cls,extra){return'<div class="r26-line'+(cls?' '+cls:'')+'" onclick="r26Tap('+ev.id+')"><span class="r26-nm">'+r26Esc(p.name)+'</span>'
+    +(p.evs.length>1?'<span class="r26-cnt">'+p.evs.length+'회</span>':'')+(p.blackName?'<span class="r26-bn">블랙과 같은 이름?</span>':'')+'<span class="r26-rt">'+r26Esc(ev.date)+'<br>'+rs+(extra||'')+'</span><span class="r26-gt">›</span></div>';};
+  if(show('cust')&&cust.length){any=true;
+    h+='<div class="r26-g">고객 사유 '+cust.length+'명</div>';
+    h+=cust.map(function(p){const e=p.lastCust;return line(p,e,'<b>'+r26Esc(r26Reason(e))+'</b>','',p.next?'<br><i>'+r26Esc(r26Md(p.next.date))+' 예약 있음</i>':'');}).join('');
+  }
+  if(show('mine')&&mine.length){any=true;
+    h+='<div class="r26-g">내 사유 '+mine.length+'명 <small>— 거르는 기준·경고에서 빠져요</small></div>';
+    h+=mine.map(function(p){const e=p.last;return line(p,e,'<b class="me">'+r26Esc(r26Reason(e))+'</b>','r26-me');}).join('');
+  }
+  if(show('again')&&again.length){any=true;
+    h+='<div class="r26-g">한 번 더 기회를 준 건 '+again.length+'명</div>';
+    h+=again.map(function(p){const e=p.lastCust,re=reBookOf(e.id);return line(p,e,r26Esc(r26Reason(e))+'<br><span class="badge bOK">재예약 '+re.map(function(r){return r26Esc(r.date)+(r.half?' ½':'');}).join(', ')+'</span>','');}).join('');
+  }
+  if(!any)h+='<div class="r26-empty">여기에 해당하는 분이 없어요</div>';
+  h+='<div class="r26-hint">줄을 누르면 그 일정 상세 창 — 재예약'+(isSubinUser()?'':'·블랙')+'은 거기서</div>';
+  return h;
+}
+// ── 대시보드 › 노쇼 이력 칸 ──
+function r26DashCard(D){
+  const P=r26People(),only=r26BlackOnly(P),me=!isSubinUser();
+  const blackP=P.filter(function(p){return p.cat==='black';}),cust=P.filter(function(p){return p.cat==='cust';}),mine=P.filter(function(p){return p.cat==='mine';});
+  const notBack=cust.filter(function(p){return !p.after;}),repeat=cust.filter(function(p){return p.cust.length>=2;});
+  const nB=blackP.length+only.length;
+  // 경고 — 사람마다 한 번 · 블랙 먼저 · 내 사유·기회 준 분은 빼고
+  const W=[];
+  const BS=r26BlackSoon(),cnt={},seen={};blackP.forEach(function(p){cnt[p.black.id]=p.evs.length;});
+  const ord=function(a,b){return(String(a.e.date)+(a.e.time||'')).localeCompare(String(b.e.date)+(b.e.time||''));};
+  const BL=Object.keys(BS).map(function(k){return BS[k];}).sort(ord);
+  const push=function(w){if(seen[w.e.id])return;seen[w.e.id]=1;W.push(w);};
+  BL.filter(function(o){return o.lv===2;}).forEach(function(o){push({b:o.b,lv:2,e:o.e,cnt:cnt[o.b.id]||0});});
+  cust.filter(function(p){return p.next;}).map(function(p){return{b:null,e:p.next,cnt:p.cust.length,r:r26Reason(p.lastCust),name:p.name};}).sort(ord).forEach(push);
+  BL.filter(function(o){return o.lv===1;}).forEach(function(o){push({b:o.b,lv:1,e:o.e,cnt:0});});
+  let h='<div class="dcard c-noshlist"><div class="dch"><h2>노쇼 이력</h2><span class="dpill">다시 안 받은 '+notBack.length+'명</span></div>';
+  h+=W.slice(0,3).map(function(w){const e=w.e,when=r26Esc(r26Md(e.date))+(e.time?' '+r26Esc(e.time):'');
+    if(w.b)return'<div class="nswarn r26-nwb" onclick="openD('+e.id+')"><div class="t">'+(w.lv===2?'🚫 블랙인 분 예약이 잡혔어요':'🚫 블랙과 같은 이름 — 같은 분인지 확인하세요')+'</div><div class="n">'+r26Esc(e.client||w.b.name)+'</div>'
+      +'<div class="s">'+when+(w.cnt?' · 노쇼 '+w.cnt+'회':'')+(w.b.memo?' · '+r26Esc(w.b.memo):'')+' — 받을지 판단하세요</div></div>';
+    return'<div class="nswarn" onclick="openD('+e.id+')"><div class="t">⚠️ 예약이 다시 잡혔어요</div><div class="n">'+r26Esc(e.client||w.name)+'</div>'
+      +'<div class="s">'+when+' · 노쇼 '+w.cnt+'회 · '+r26Esc(w.r)+' — 받을지 판단하세요</div></div>';}).join('');
+  if(nB){h+='<div class="nsgrp">🚫 블랙 '+nB+'명</div>'
+    +blackP.slice(0,4).map(function(p){return'<div class="prow rep" onclick="openD('+p.last.id+')"><b>'+r26Esc(p.name)+'</b><span class="cnt">'+p.evs.length+'회</span><span class="s">'+r26Esc(p.black.memo||r26Reason(p.last))+'</span></div>';}).join('')
+    +only.slice(0,Math.max(0,4-blackP.length)).map(function(o){return'<div class="prow rep"'+(o.last?' onclick="openD('+o.last.id+')"':'')+'><b>'+r26Esc(o.b.name)+'</b><span class="s">'+r26Esc(o.b.memo||'노쇼 없음')+'</span></div>';}).join('')
+    +(nB>4?'<div class="dnote">외 '+(nB-4)+'명 — 예약 현황 › 노쇼 이력 «블랙»</div>':'');}
+  if(repeat.length)h+='<div class="nsgrp">🔁 반복 노쇼 '+repeat.length+'명 — 다시 받을지 정해두세요</div>'
+    +repeat.slice(0,4).map(function(p){return'<div class="prow rep" onclick="openD('+p.lastCust.id+')"><b>'+r26Esc(p.name)+'</b><span class="cnt">'+p.cust.length+'회</span><span class="s">마지막 '+r26Esc(p.lastCust.date)+' · '+r26Esc(r26Reason(p.lastCust))+'</span></div>';}).join('');
+  h+='<div class="nsgrp">그 뒤로 안 온 사람 — 고객 사유</div>'
+    +(notBack.length?notBack.slice(0,6).map(function(p){return'<div class="prow" onclick="openD('+p.lastCust.id+')"><b>'+r26Esc(p.name)+'</b>'+(p.cust.length>1?'<span class="cnt">'+p.cust.length+'회</span>':'')+'<span class="s">'+r26Esc(p.lastCust.date)+' · '+r26Esc(r26Reason(p.lastCust))+'</span></div>';}).join('')
+      :'<div class="dempty">전부 다시 예약이 잡혔습니다</div>')
+    +(notBack.length>6?'<div class="dnote">외 '+(notBack.length-6)+'명</div>':'');
+  if(mine.length)h+='<div class="nsgrp r26-mineg">내 사유 — 거르는 기준에서 빠짐</div>'
+    +mine.slice(0,3).map(function(p){return'<div class="prow r26-minep" onclick="openD('+p.last.id+')"><b>'+r26Esc(p.name)+'</b><span class="s">'+r26Esc(p.last.date)+' · '+r26Esc(r26Reason(p.last))+'</span></div>';}).join('')
+    +(mine.length>3?'<div class="dnote">외 '+(mine.length-3)+'명</div>':'');
+  const yr=String(new Date().getFullYear()),yrMine=maydlyEvents.filter(function(e){return e&&e.status==='nosh'&&String(e.date).slice(0,4)===yr&&r26IsMine(e);}).length;
+  h+='<div class="dnote">올해 노쇼 '+D.yrNosh+'건'+(yrMine?'(내 사유 '+yrMine+'건)':'')+' · 블랙 '+nB+'명 · 재예약으로 이어진 '+D.reLinked+'건</div></div>';
+  return h;
+}
+// ── 대기 중인 예약 카드 — 블랙·노쇼 이력 경고 ──
+function r26WarnHtml(id,skipId){
+  const bk=r26BlackOf(id,skipId!=null?[skipId]:null);
+  if(bk){const b=bk.b;return'<div class="r26-fw">'+(bk.lv===2?'🚫 블랙인 분과 같은 '+bk.how+'예요':'🚫 블랙과 같은 이름이에요 — 같은 분인지 확인하세요')
+    +'<span>'+r26Esc(b.name)+(b.insta?' @'+r26Esc(r26Insta(b.insta)):'')+(b.memo?' · '+r26Esc(b.memo):'')+'</span></div>';}
+  const evs=maydlyEvents.filter(function(e){return e&&e.status==='nosh'&&e.id!==skipId&&!r26IsMine(e)&&r26Same(id,r26IdOf(e))>0;});
+  if(!evs.length)return'';
+  evs.sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+  return'<div class="r26-fw nw">⚠️ 노쇼 이력 '+evs.length+'회 — 받을지 판단하세요<span>'+r26Esc(evs[0].date)+' '+r26Esc(r26Reason(evs[0]))+'</span></div>';
+}
+function r26PendWarn(e){try{return r26Cust(e)||String((e&&e.client)||'').trim()?r26WarnHtml(r26IdOf(e),e.id):'';}catch(x){return'';}}
+// ── 일정 추가·편집 창 — 이름·인스타를 적으면 바로 아래 경고 ──
+function r26FormHook(){
+  const c=document.getElementById('f_c'),p=document.getElementById('f_p');if(!c||!p)return;
+  if(!p.dataset.r26){p.dataset.r26='1';c.addEventListener('input',r26FormWarn);p.addEventListener('input',r26FormWarn);}
+  r26FormWarn();
+}
+function r26FormWarn(){
+  const c=document.getElementById('f_c'),p=document.getElementById('f_p');if(!c||!p)return;
+  const fg=p.closest('.fg')||p.parentNode;let w=document.getElementById('r26fw');
+  const id={name:r26Name(String(c.value||'').split(/\d/)[0]),insta:r26Insta(p.value),phone:r26Phone(r26IsNum(p.value)?p.value:'')};
+  const ed=V2&&V2.edit&&V2.edit.id!=null?V2.edit.id:null;
+  const html=(id.name||id.insta||id.phone)?r26WarnHtml(id,ed):'';
+  if(!html){if(w)w.remove();return;}
+  if(!w||w.parentNode!==fg.parentNode){if(w)w.remove();const d=document.createElement('div');d.innerHTML=html;w=d.firstChild;w.id='r26fw';fg.after(w);}
+  else{const d=document.createElement('div');d.innerHTML=html;const n=d.firstChild;w.className=n.className;w.innerHTML=n.innerHTML;}
+}
+// ── 일정 상세 창 — 블랙 띠 / «블랙으로 두기» ──
+function r26AfterOpenD(id){
+  const e=evById(id),pb=document.getElementById('pb');if(!e||!pb||!pb.querySelector('[data-v2d]'))return;
+  pb.querySelectorAll('.r26-x').forEach(function(n){n.remove();});
+  if(!r26Cust(e))return;
+  const me=!isSubinUser(),bk=r26EvBlack(e);
+  if(bk){
+    const b=bk.b,nv=maydlyEvents.filter(function(x){return x&&x.status==='nosh'&&r26Same(r26EntId(b),r26IdOf(x))>0;});
+    const d=document.createElement('div');d.className='r26-ban r26-x';
+    d.innerHTML='<b>'+(bk.lv===2?'🚫 블랙인 분이에요':'🚫 블랙과 같은 이름이에요')+'</b>'+(bk.lv===2?(bk.how==='기록'?'':' · 같은 '+bk.how+(b.insta&&bk.how==='인스타'?'(@'+r26Esc(r26Insta(b.insta))+')':'')):' — 같은 분인지 확인하세요 · '+r26Esc(b.name)+(b.insta?' @'+r26Esc(r26Insta(b.insta)):''))
+      +'<br>'+(nv.length?'노쇼 '+nv.length+'회('+r26Esc(nv.slice(0,3).map(r26Reason).join(' · '))+')':'노쇼 없음')+(b.memo?' · 📝 '+r26Esc(b.memo):'')
+      +(me?'<div class="r26-ban-a"><button type="button" class="r26-b" onclick="r26OpenBlack(\''+r26Esc(b.id)+'\','+id+')">블랙 정보 · 풀기</button></div>':'');
+    pb.insertBefore(d,pb.firstChild);
+    if(bk.lv===2)return;
+  }
+  if(!me)return;
+  if(e.status==='nosh'){
+    const rows=Array.prototype.slice.call(pb.querySelectorAll('.det-r')),r=rows.find(function(x){return /노쇼 사유/.test(x.textContent);});
+    const n=maydlyEvents.filter(function(x){return x&&x.status==='nosh'&&r26Same(r26IdOf(e),r26IdOf(x))>0;}).length;   // 노쇼 이력 묶기와 같은 기준(이름 포함)
+    const d=document.createElement('div');d.className='det-r r26-x';
+    d.innerHTML='<span class="det-l">🚫 블랙</span><button type="button" class="r26-b bk" onclick="r26AskBlack('+id+')">블랙으로 두기</button>'+(n>1?'<span class="r26-n">이 분 노쇼 '+n+'회</span>':'');
+    if(r)r.after(d);else pb.appendChild(d);
+  }else{
+    const d=document.createElement('button');d.type='button';d.className='r26-quiet r26-x';d.textContent='🚫 이 손님 블랙으로 두기';
+    d.onclick=function(){r26AskBlack(id);};pb.appendChild(d);
+  }
+}
+// 이 일정의 분 — 같은 분으로 보이는 다른 일정에서 인스타·전화를 채운다
+function r26FullId(e){
+  const id=r26IdOf(e);
+  maydlyEvents.forEach(function(x){if(!x||x===e)return;const o=r26IdOf(x);if(r26Same(id,o)===2){if(!id.insta&&o.insta)id.insta=o.insta;if(!id.phone&&o.phone)id.phone=o.phone;}});   // 이름만 같은 다른 손님의 인스타는 가져오지 않는다
+  return id;
+}
+// ── 블랙으로 두기 창 ──
+function r26AskBlack(id){
+  if(isSubinUser())return;
+  const e=evById(id);if(!e)return;
+  const fid=r26FullId(e),nv=maydlyEvents.filter(function(x){return x&&x.status==='nosh'&&r26Same(fid,r26IdOf(x))>0;}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+  document.getElementById('pnh').innerHTML='🚫 블랙으로 두기<button class="px" onclick="closeP()">×</button>';
+  document.getElementById('pb').innerHTML=
+    '<div class="r26-who"><b>'+r26Esc(e.client||'')+'</b>'+(fid.insta?' <span>@'+r26Esc(fid.insta)+'</span>':'')+' · '+(nv.length?'노쇼 '+nv.length+'회':'노쇼 없음')
+    +(nv.length?'<small>'+r26Esc(nv.slice(0,3).map(function(x){return x.date+' '+r26Reason(x);}).join(' · '))+'</small>':'')+'</div>'
+    +'<div class="r26-exp">블랙으로 두면 같은 인스타·전화로 예약이 잡히거나 들어올 때 빨간 경고가 뜨고, 노쇼 이력 맨 위 «블랙»에 모여요. 일정 기록은 그대로예요. 언제든 «블랙 풀기»로 되돌릴 수 있어요.</div>'
+    +'<div class="r26-sian" id="r26sian">'+(fid.insta?'시안·협업 캘린더 보기 — 확인 중…':'인스타가 없어 시안·협업 캘린더 보기는 그대로예요')+'</div>'
+    +'<div class="fg"><label>왜 블랙인지 (선택)</label><input type="text" id="r26memo" maxlength="120" placeholder="예: 두 번 연락 없이 안 옴"></div>'
+    +'<button type="button" class="sub-btn r26-go" id="r26go" onclick="r26DoBlack('+id+')"'+(fid.insta?' disabled':'')+'>'+(fid.insta?'시안 확인 중…':'🚫 블랙으로 두기')+'</button>'
+    +'<button type="button" class="sub-btn r26-cancel" onclick="openD('+id+')">취소</button>';
+  openP();
+  r26SianScan(fid.insta);
+}
+// 같은 인스타로 시안·협업 캘린더를 보던 기기 찾기(명진만 읽을 수 있는 목록 — 서버에서)
+function r26SianScan(ins){
+  const seq=++r26SianSeq;r26SianPlan=null;
+  const box=function(t){if(seq!==r26SianSeq)return;const b=document.getElementById('r26sian');if(b)b.textContent=t;const g=document.getElementById('r26go');if(g&&!r26Busy){g.disabled=false;g.textContent='🚫 블랙으로 두기';}};
+  if(!ins){r26SianPlan=[];return;}
+  const M=window.MJCAL;if(!M||typeof M.sianList!=='function'){r26SianPlan=[];box('시안 열람을 확인하지 못했어요 — 블랙만 저장돼요');return;}
+  r26To(M.sianList(),20000).then(function(r){
+    if(seq!==r26SianSeq)return;
+    const keys={},acc=(r&&r.access)||{};
+    Object.keys(acc).forEach(function(k){if(r26Insta(acc[k].insta)===ins)keys[k]=1;});
+    ((r&&r.requests)||[]).forEach(function(q){if(q.key&&r26Insta(q.insta)===ins)keys[q.key]=1;});
+    const plan=[];Object.keys(keys).forEach(function(k){const st=(acc[k]&&acc[k].status)||'';if(st==='black'||st==='owner')return;plan.push({k:k,prev:st==='none'?'':st});});
+    r26SianPlan=plan;
+    box(plan.length?'같은 인스타로 시안·협업 캘린더를 보던 기기 '+plan.length+'대도 함께 닫아요':'같은 인스타로 시안을 본 기기는 없어요 — 나중에 요청이 오면 시안 열람 화면에 경고가 떠요');
+  }).catch(function(){if(seq!==r26SianSeq)return;r26SianPlan=[];box('시안 열람을 확인하지 못했어요(연결) — 블랙만 저장돼요 · 시안 보기는 시안 열람에서 직접');});
+}
+function r26Rid(){return'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+async function r26DoBlack(id){
+  if(isSubinUser()||r26Busy)return;
+  const e=evById(id);if(!e)return;
+  if(r26SianPlan===null&&r26Insta(e.insta||'')){toast('시안 열람 확인이 끝나면 눌러 주세요');return;}
+  const go=document.getElementById('r26go'),m=document.getElementById('r26memo');
+  const fid=r26FullId(e),plan=(r26SianPlan||[]).slice();
+  const ent={id:r26Rid(),name:String(e.client||'').slice(0,40),insta:fid.insta?'@'+fid.insta:'',phone:fid.phone||'',memo:m?String(m.value||'').trim().slice(0,120):'',on:true,at:new Date().toISOString(),by:'m',ev:e.id,sian:plan};
+  r26Busy=true;if(go){go.disabled=true;go.textContent='저장 중…';}
+  let row=null,fail=[];
+  try{
+    const r=await r26Save({op:'add',ent:ent});row=r.aff[0]||ent;
+    const todo=plan.filter(function(s){return (row.sian||[]).some(function(x){return x.k===s.k;});});
+    for(let i=0;i<todo.length;i++){try{await r26To(window.MJCAL.sianSet(todo[i].k,'black',{name:ent.name,insta:ent.insta.replace(/^@/,'')}),10000);}catch(x){fail.push(todo[i].k);}}
+    const shut=todo.length-fail.length;
+    toast('블랙으로 두었어요'+(shut?' · 시안·캘린더 보기 '+shut+'대 닫음':'')+(fail.length?' · '+fail.length+'대는 확인 못 함(시안 열람에서 확인)':''),4500);
+  }catch(x){toast('블랙을 저장하지 못했어요 — '+r26ErrTxt(x),5000);if(go){go.disabled=false;go.textContent='🚫 블랙으로 두기';}r26Busy=false;return;}
+  finally{r26Busy=false;}
+  openD(id);
+}
+function r26ErrTxt(x){const c=String((x&&x.code)||'');return /permission/.test(c)?'권한이 없어요(로그인 확인)':/unauth/.test(c)||/로그인/.test(String(x&&x.message))?'로그인이 필요해요':/deadline|unavailable|timeout/.test(c)?'연결이 느려요 — 잠시 뒤 다시':'다시 해 주세요';}
+// ── 블랙 정보 · 풀기 ──
+function r26OpenBlack(bid,evId){
+  if(isSubinUser())return;
+  const b=R26_LIST.find(function(x){return x&&x.id===bid;});if(!b)return;
+  const back=evId!=null&&evById(evId)?'openD('+evId+')':'closeP()';
+  document.getElementById('pnh').innerHTML='🚫 블랙 정보<button class="px" onclick="closeP()">×</button>';
+  document.getElementById('pb').innerHTML=
+    '<div class="r26-who"><b>'+r26Esc(b.name)+'</b>'+(b.insta?' <span>@'+r26Esc(r26Insta(b.insta))+'</span>':'')+(b.phone?' <span>'+r26Esc(b.phone)+'</span>':'')
+    +'<small>'+r26Esc(b.at?r26Day(b.at):'')+' 블랙으로 둠'+(b.sian&&b.sian.length?' · 시안·캘린더 보기 '+b.sian.length+'대 닫음':'')+'</small></div>'
+    +'<div class="fg"><label>왜 블랙인지</label><input type="text" id="r26memo" maxlength="120" value="'+r26Esc(b.memo||'')+'" placeholder="예: 두 번 연락 없이 안 옴"></div>'
+    +'<button type="button" class="sub-btn r26-save" id="r26ms" onclick="r26SaveMemo(\''+r26Esc(b.id)+'\','+(evId==null?'null':evId)+')">메모 저장</button>'
+    +'<button type="button" class="sub-btn r26-off" id="r26off" onclick="r26Unblack(\''+r26Esc(b.id)+'\','+(evId==null?'null':evId)+')">블랙 풀기</button>'
+    +'<div class="r26-exp" style="margin-top:8px">풀어도 블랙이었던 기록은 남아요'+(b.sian&&b.sian.length?' · 닫았던 시안·캘린더 보기는 닫기 전 상태로 돌아가요':'')+'.</div>'
+    +'<button type="button" class="sub-btn r26-cancel" onclick="'+back+'">← 돌아가기</button>';
+  openP();
+}
+async function r26SaveMemo(bid,evId){
+  if(isSubinUser()||r26Busy)return;
+  const m=document.getElementById('r26memo'),btn=document.getElementById('r26ms');
+  r26Busy=true;if(btn){btn.disabled=true;btn.textContent='저장 중…';}
+  try{await r26Save({op:'patch',id:bid,set:{memo:m?String(m.value||'').trim().slice(0,120):''}});toast('메모를 저장했어요');}
+  catch(x){toast('메모를 저장하지 못했어요 — '+r26ErrTxt(x),5000);}
+  r26Busy=false;if(btn){btn.disabled=false;btn.textContent='메모 저장';}
+}
+async function r26Unblack(bid,evId){
+  if(isSubinUser()||r26Busy)return;
+  const b=R26_LIST.find(function(x){return x&&x.id===bid;});if(!b)return;
+  if(!confirm((b.name||'이분')+'의 블랙을 풀까요? 블랙이었던 기록은 남아요.'))return;
+  const btn=document.getElementById('r26off');r26Busy=true;if(btn){btn.disabled=true;btn.textContent='푸는 중…';}
+  let r=null;
+  try{r=await r26Save({op:'off',id:bid});}
+  catch(x){r26Busy=false;if(btn){btn.disabled=false;btn.textContent='블랙 풀기';}toast('블랙을 풀지 못했어요 — '+r26ErrTxt(x),5000);return;}
+  let back=0,skip=0,msg='';
+  try{
+    const S=[];(r.aff||[]).forEach(function(a){(Array.isArray(a.sian)?a.sian:[]).forEach(function(s){if(s&&s.k&&!S.some(function(y){return y.k===s.k;}))S.push(s);});});
+    if(S.length){
+      let acc=null;try{acc=((await r26To(window.MJCAL.sianList(),20000))||{}).access||null;}catch(x){acc=null;}
+      if(!acc)msg=' · 시안 보기 '+S.length+'대는 시안 열람에서 직접 풀어 주세요';
+      else{
+        const still=r.list.filter(function(x){return x&&x.on;}).map(function(x){return r26Insta(x.insta);}).filter(Boolean);
+        for(let i=0;i<S.length;i++){const s=S[i],a=acc[s.k];
+          // 시안 열람에서 지운 기기·그사이 따로 바꾼 기기·아직 다른 블랙과 같은 인스타인 기기는 그대로
+          if(!a||a.status!=='black'||(a.insta&&still.indexOf(r26Insta(a.insta))>=0)){skip++;continue;}
+          try{await r26To(window.MJCAL.sianSet(s.k,s.prev||'none',{name:b.name,insta:String(b.insta||'').replace(/^@/,'')}),10000);back++;}catch(x){skip++;}
+        }
+      }
+    }
+  }finally{r26Busy=false;}
+  toast('블랙을 풀었어요'+(back?' · 시안·캘린더 보기 '+back+'대 되돌림':'')+(skip?' · '+skip+'대는 그대로(시안 열람에서 확인)':'')+msg,5000);
+  if(evId!=null&&evById(evId))openD(evId);else closeP();
+}
+// ── 저장: 트랜잭션으로 그 줄만 ──
+function r26SianUnion(a,b){const o=(Array.isArray(a)?a:[]).slice();(Array.isArray(b)?b:[]).forEach(function(s){if(s&&s.k&&!o.some(function(x){return x.k===s.k;}))o.push(s);});return o;}
+// 한 가지 바꾸기를 목록에 얹는다 — 돌려줌 {L, aff(바뀐 줄)}
+function r26Apply(list,op){
+  const L=list.map(function(x){return Object.assign({},x);}),aff=[],now=new Date().toISOString();
+  const i=L.findIndex(function(x){return x&&op.id!=null&&x.id===op.id;});
+  if(op.op==='add'){
+    // 같은 분(같은 일정·같은 인스타·전화)의 블랙 줄이 이미 있으면 새 줄 대신 그 줄에 메모·기기만 더한다(두 번 눌러도 한 줄)
+    const ne=r26EntId(op.ent),j=L.findIndex(function(x){return x&&x.on&&((op.ent.ev!=null&&x.ev===op.ent.ev)||x.id===op.ent.id||r26Same(r26EntId(x),ne)===2);});
+    if(j>=0){if(op.ent.memo)L[j].memo=op.ent.memo;L[j].sian=r26SianUnion(L[j].sian,op.ent.sian);aff.push(L[j]);}
+    else{L.push(op.ent);aff.push(op.ent);}
+  }else if(op.op==='patch'){if(i>=0){Object.assign(L[i],op.set);aff.push(L[i]);}}
+  else if(op.op==='off'){
+    if(i>=0){const te=r26EntId(L[i]);L.forEach(function(x){if(x&&x.on&&(x.id===op.id||r26Same(r26EntId(x),te)===2)){x.on=false;x.offAt=now;x.offBy='m';aff.push(x);}});}
+  }
+  return{L:L,aff:aff};
+}
+async function r26Save(op){
+  const M=window.MJCAL;if(!M||!M.user||!(M.ptx||M.tx))throw v2Err('unauthenticated','로그인이 필요해요');
+  const by=String((M.user&&M.user.email)||'').toLowerCase(),txf=M.ptx||M.tx;
+  let out=null;
+  for(let at=0;;at++){
+    try{
+      out=await txf(async function(t){
+        const sn=await t.get(R26_DOC);let cur={list:[]};
+        if(sn.exists&&sn.data&&typeof sn.data.blob==='string'){try{cur=JSON.parse(sn.data.blob);}catch(x){throw v2Err('bad-doc','블랙 목록을 읽지 못함');}}
+        if(!cur||!Array.isArray(cur.list))cur={list:[]};
+        const r=r26Apply(cur.list,op),rev=(sn.exists&&sn.data&&Number.isInteger(sn.data.rev)?sn.data.rev:0)+1;
+        t.set(R26_DOC,{blob:JSON.stringify({list:r.L}),v:1,rev:rev,savedAt:new Date().toISOString(),by:by,at:t.ts()});
+        return{list:r.L,aff:r.aff,rev:rev};
+      });
+      break;
+    }catch(x){const c=String((x&&x.code)||'');if(at>=4||/permission|unauthenticated|invalid-argument|bad-doc|deadline/.test(c))throw x;await new Promise(function(r){setTimeout(r,150+at*250);});}
+  }
+  r26SavedAt=Date.now();
+  if(out.rev>=R26_REV){R26_LIST=out.list;R26_REV=out.rev;try{localStorage.setItem(R26_CACHE,JSON.stringify({list:out.list,rev:out.rev}));}catch(x){}}
+  r26Rerender();
+  return out;
+}
+// ── 받기: 실시간(다른 기기에서 둔 블랙도 바로) ──
+function r26ListenBlack(){
+  const M=window.MJCAL;if(!M||!M.user||typeof M.listen!=='function'||r26Lsn)return;
+  try{r26Lsn=M.listen(R26_DOC,r26OnSnap,function(){r26Lsn=null;});}catch(e){r26Lsn=null;}
+}
+function r26OnSnap(s){
+  if(!s||s.fromCache)return;
+  let list=[],rev=0;
+  if(s.exists&&s.data&&typeof s.data.blob==='string'){try{const o=JSON.parse(s.data.blob);if(o&&Array.isArray(o.list))list=o.list;else return;}catch(e){return;}rev=Number.isInteger(s.data.rev)?s.data.rev:0;}
+  if(rev<R26_REV&&Date.now()-r26SavedAt<60000)return;   // 방금 저장한 것보다 옛 판(늦게 도착) — 저장 직후 1분만
+  const before=JSON.stringify(R26_LIST);R26_LIST=list;R26_REV=rev;
+  try{localStorage.setItem(R26_CACHE,JSON.stringify({list:list,rev:rev}));}catch(e){}
+  if(JSON.stringify(list)!==before)r26Rerender();
+}
+function r26Rerender(){
+  try{if(curPage==='dash'||curPage==='req'){if(typeof v2Rerender==='function')v2Rerender('r26');else if(curPage==='dash')renderDash();else renderReq();}}catch(e){}
+  try{if(V2.open&&V2.open.k==='d'&&V2.open.id!=null)r26AfterOpenD(V2.open.id);}catch(e){}
+  try{r26FormWarn();}catch(e){}
+}
+</script>
 <script>
 // ── 유틸 (최상단 정의, UTC 버그 방지) ──
 function fd(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${dd}`;}
@@ -1930,6 +2423,7 @@ function moneyRerender(){
 }
 // 금액표 읽기 — 구글 로그인 뒤 클라우드에서(없으면 «금액표 없음»), 이 기기에도 기억해 둔다
 async function loadPrices(){
+  try{if(typeof r26ListenBlack==='function')r26ListenBlack();}catch(e){}   // (261124 운영-003 26)
   if(!(window.MJCAL&&window.MJCAL.user))return;
   try{
     const p=cleanPrices(await window.MJCAL.get(PRICE_DOC)),before=JSON.stringify(PRICES),st0=_pricesState;
@@ -3853,6 +4347,7 @@ function v2OnPriceSnap(s){
   if(JSON.stringify(PRICES)!==before||st0!==_pricesState){try{moneyRerender();}catch(e){}try{v2Note();}catch(e){}}   // (261108 운영-003 20 저장엔진 v2) 금액표 엇갈림 줄도 지금 금액표로
 }
 function v2ListenPrices(){
+  try{if(typeof r26ListenBlack==='function')r26ListenBlack();}catch(e){}   // (261124 운영-003 26) 블랙 목록도 실시간
   try{if(V2.plsn)V2.plsn();}catch(e){}V2.plsn=null;
   const M=window.MJCAL;if(!M||typeof M.listen!=='function'||typeof PRICE_DOC==='undefined')return;
   try{V2.plsn=M.listen(PRICE_DOC,v2OnPriceSnap,function(){V2.plsn=null;});}catch(e){V2.plsn=null;}
@@ -6215,7 +6710,7 @@ function renderDash(){
        +'<div class="nslg"><span style="cursor:pointer" onclick="dashStatus(\'done\')"><i style="background:#a9dcc3"></i>진행 완료 <b>'+D.yrDone+'</b></span>'
        +'<span style="cursor:pointer" onclick="dashStatus(\'plan\')"><i style="background:#d8e85c"></i>예정 <b>'+D.yrPlan+'</b></span>'
        +'<span style="cursor:pointer" onclick="dashStatus(\'nosh\')"><i style="background:#e0736b"></i>노쇼 <b>'+D.yrNosh+'</b></span></div>'
-       +'<div class="nsrate"><div><em>'+(D.yrNosh?(100*D.yrNosh/tot).toFixed(1):'0')+'%</em><span>노쇼 비율</span></div>'
+       +'<div class="nsrate"><div><em>'+(D.yrNosh?(100*D.yrNosh/tot).toFixed(1):'0')+'%</em><span>노쇼 비율<small class="r26-inc">내 사유 포함</small></span></div>'
          +'<div><em style="color:#3f7a4a">'+D.reLinked+'</em><span>재예약으로 이어짐</span></div>'
          +'<div><em style="color:#c0483c">'+(D.noshAll.length-D.reLinked)+'</em><span>다시 안 받음</span></div></div></div>'
        +'<div class="nsr"><div class="nsrh">노쇼 사유</div>'+rsnRows
@@ -6229,23 +6724,7 @@ function renderDash(){
        +'<i style="flex:'+D.prop.inq+';background:#eef3e8"></i><i style="flex:'+D.prop.off+';background:#e6e9e4"></i></div>'
      +'<div class="fplg"><span>찬 '+D.prop.full+'</span><span>빈 '+D.prop.free+'</span><span>문의 '+D.prop.inq+'일</span><span>휴무 '+D.prop.off+'일</span></div>')
      +'<div class="flist">'+freeRows+(D.free.length>6?'<div class="fmore">'+(D.free.length-6)+'일 더 있습니다 (앞으로 2개월)</div>':'')+'</div></div>'
-   +'<div class="dcard c-noshlist"><div class="dch"><h2>노쇼 이력</h2><span class="dpill">다시 안 받은 '+D.notBack.length+'명</span></div>'
-     +(D.noshSoon.length?D.noshSoon.slice(0,3).map(function(e){
-        return '<div class="nswarn" onclick="openD('+e.id+')"><div class="t">⚠️ 예약이 다시 잡혔어요</div><div class="n">'+esc(e.client||'')+'</div>'
-          +'<div class="s">'+e.date+' '+esc((e.noshReason||'사유 없음').split(' — ')[0])+' — 받을지 판단하세요</div></div>';}).join(''):'')
-     +(D.repeat.length?'<div class="nsgrp">🔁 반복 노쇼 '+D.repeat.length+'명 — 다시 받을지 정해두세요</div>'
-        +D.repeat.slice(0,4).map(function(o){
-          return '<div class="prow rep" onclick="openD('+o.ids[0]+')"><b>'+esc(o.name||'')+'</b>'
-            +'<span class="cnt">'+o.cnt+'회</span>'
-            +'<span class="s">마지막 '+o.last+(o.reasons.length?' · '+esc(o.reasons[0]):'')+'</span></div>';}).join(''):'')
-     +'<div class="nsgrp">그 뒤로 안 온 사람</div>'
-     +(D.notBack.length?D.notBack.slice(0,6).map(function(o){
-          return '<div class="prow" onclick="openD('+o.ids[0]+')"><b>'+esc(o.name||'')+'</b>'
-            +(o.cnt>1?'<span class="cnt">'+o.cnt+'회</span>':'')
-            +'<span class="s">'+o.last+(o.reasons.length?' · '+esc(o.reasons[0]):'')+'</span></div>';}).join('')
-        :'<div class="dempty">전부 다시 예약이 잡혔습니다</div>')
-     +(D.notBack.length>6?'<div class="dnote">외 '+(D.notBack.length-6)+'명</div>':'')
-     +'<div class="dnote">올해 노쇼 '+D.yrNosh+'건 · 사람 '+D.people.length+'명 · 재예약으로 이어진 '+D.reLinked+'건</div></div>'
+   +r26DashCard(D)   // (261124 운영-003 26) 사람마다 경고 한 번 · 블랙/고객 사유/내 사유
   +'</div></div>';
   requestAnimationFrame(applyDashFit);          // 그린 뒤 실제 높이를 재서 축소 비율을 잡는다
 }
@@ -7852,6 +8331,7 @@ function renderReq(){
       <div class="rm">📅 ${e.date}${e.time?' '+e.time:''}${e.dur?' ('+durLabel(e.dur)+')':''}</div>
       ${(e.insta||e.phone)?`<div class="rm">📷 ${e.insta||e.phone}</div>`:''}
       ${e.note?`<div class="rm">📝 ${e.note}</div>`:''}
+      ${r26PendWarn(e)}
       <div class="act-row" style="margin-top:10px">
         <button class="btn-ok" onclick="confEv(${e.id});renderReq()">✓ 확정</button>
         <button class="btn-ng" onclick="rejEv(${e.id});renderReq()">✕ 거절</button>
@@ -7876,13 +8356,7 @@ function renderReq(){
           :`<button class="btn-ok" style="padding:5px 11px;font-size:10px;background:#c8a456" onclick="startRebook(${e.id})">🔁 재예약 만들기</button>`}</span>
       </div></div>`;
   };
-  const reSect=noshAll.length
-    ?`<div class="sect-label">🚫 노쇼 이력 (${noshOpen.length}) <span style="font-weight:400;color:var(--mu);font-size:11px">· 전체 ${noshAll.length}건 · 다시 받을지 판단하는 기준입니다</span></div>
-      ${(noshOpen.length?noshOpen:[]).map(noshRow).join('')}
-      ${noshOpen.length===0?'<div style="color:var(--mu);font-size:12px;padding:6px 2px 12px">재예약 없이 남아 있는 노쇼가 없습니다.</div>':''}
-      <div class="sect-label" style="margin-top:14px">한 번 더 기회를 준 건 (${noshAll.length-noshOpen.length})</div>
-      ${noshAll.filter(e=>reBookOf(e.id).length).slice(0,20).map(noshRow).join('')||'<div style="color:var(--mu);font-size:12px;padding:6px 2px">아직 없습니다.</div>'}`
-    :'';
+  const reSect=r26ReqSect();   // (261124 운영-003 26) 사람 단위 · 블랙/고객 사유/내 사유/기회 준 건
   document.getElementById('pg-req').innerHTML=`
     <div class="rq-wrap">
       <div class="stats">
@@ -8424,6 +8898,15 @@ function mergeIcal() {
   buildNav();
   toast(`✓ ${added}개 일정 추가 완료${note ? ' — 겹치는 일정 있음' : ''}`);
 }
+</script>
+<script id="r26-wrap">
+// 상세 창·일정 추가·편집 창을 연 뒤에 덧붙인다(원래 함수는 그대로)
+(function(){
+  const wrap=function(name,after){const f=window[name];if(typeof f!=='function')return;window[name]=function(){const r=f.apply(this,arguments);try{after.apply(this,arguments);}catch(e){}return r;};};
+  wrap('openD',function(id){r26AfterOpenD(id);});
+  wrap('openAdd',function(){r26FormHook();});
+  wrap('openEdit',function(){r26FormHook();});
+})();
 </script>
 
 
@@ -9304,7 +9787,7 @@ async function bridge(own){
     }).filter(function (g) { return g.status !== 'owner'; });
     var blackI = {};
     list.forEach(function (g) { if (g.status === 'black' && g.insta) blackI[normI(g.insta)] = 1; });
-    list.forEach(function (g) { g.blackMatch = g.status !== 'black' && !!g.insta && !!blackI[normI(g.insta)]; });
+    list.forEach(function (g) { g.blackMatch = g.status !== 'black' && !!g.insta && (!!blackI[normI(g.insta)] || (typeof window.r26BlackInsta === 'function' && window.r26BlackInsta(g.insta))); });   // (261124 운영-003 26) 캘린더 블랙도
     list.sort(function (a, b) { return b.sort - a.sort; });
     owners.sort(function (a, b) { return b.at - a.at; });
     return { list: list, owners: owners };
